@@ -1,0 +1,22 @@
+﻿#pragma once
+#include "synth/generators/Osc.h"
+#include "events/Note.h"
+#include "array/DoubleArray.h"
+
+
+namespace yzrilyzr_simplesynth{
+	/**
+	 * 指数谐波表
+	 */
+	ECLASS(SineBasePowHarmonicWave, public Osc){
+	private:
+	std::shared_ptr<yzrilyzr_array::DoubleArray> aa;
+	public:
+		~SineBasePowHarmonicWave();
+		SineBasePowHarmonicWave(std::shared_ptr<yzrilyzr_array::DoubleArray> freqAndAmp);
+		SineBasePowHarmonicWave(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<yzrilyzr_array::DoubleArray> freqAndAmp);
+		u_sample getAmp(Note &note) override;
+	private:
+		u_sample a(double x, int id);
+	};
+}

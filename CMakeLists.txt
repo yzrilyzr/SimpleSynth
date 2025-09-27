@@ -1,0 +1,6 @@
+add_subdirectory ("main")
+add_subdirectory ("test/Console")
+add_subdirectory ("test/SimpleSynthImGUI")
+if (CMAKE_USE_JNI)
+add_subdirectory ("jni")
+endif ()

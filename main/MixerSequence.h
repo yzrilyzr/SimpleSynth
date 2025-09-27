@@ -1,0 +1,30 @@
+﻿#pragma once
+#include "events/ChannelEvent.h"
+#include "collection/HashMap.hpp"
+#include "collection/LinkedList.hpp"
+#include "lang/Boxing.h"
+#include "interface/InstrumentProvider.h"
+
+namespace yzrilyzr_simplesynth{
+	class IMixer;
+	class Mixer;
+	class Mixer2;
+	EBCLASS(MixerSequence){
+		private:
+		struct EventWrapper{
+			ChannelEvent * event;
+			size_t index;
+		};
+		std::shared_ptr<InstrumentProvider> instrument=nullptr;
+		static bool compareMixerEvents(const EventWrapper & a, const EventWrapper & b);
+		public:
+		
+		std::unordered_map<s_midichannel_id, std::vector<EventWrapper>> channelEvents;
+		void postToSequence(s_midichannel_id channel, ChannelEvent * n1, u_time startAt);
+		void sortPosted();
+		void postToMixer(IMixer * mixer, u_time deltaLoadTime)const;
+		void postToMixer(IMixer * mixer, u_time deltaLoadTime, const std::string & groupName)const;
+		void setInstrument(std::shared_ptr<InstrumentProvider> midiInstrument);
+		std::shared_ptr<InstrumentProvider> getInstrument()const;
+	};
+}

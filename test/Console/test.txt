@@ -1,0 +1,69 @@
+// yzrutil.cpp: 定义应用程序的入口点。
+//
+
+#include "yzrutil.h"
+#include "dsp/FFT.h"
+#include "dsp/Complex.h"
+#include <random>
+#include <thread>
+#include "util/DT.h"
+using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_util;
+
+
+
+void prepareData(double* val, double* real, double* imag, Complex** complex, int valLength) {
+	for (int i = 0; i < valLength; i++) {
+		val[i] = sin((double)i / valLength);
+	}
+	memcpy(real, val, valLength * 8);
+	memset(imag, 0, valLength * 8);
+	for (int i = 0; i < valLength; i++) {
+		complex[i]->re = val[i];
+		complex[i]->im = 0;
+	}
+}
+int main()
+{
+	int valLength = 1 << 16;
+	double* val = new double[valLength];
+	double* real = new double[valLength];
+	double* imag = new double[valLength];
+	Complex** complex = new Complex * [valLength];
+	for (int i = 0; i < valLength; i++) {
+		complex[i] = new Complex(0, 0);
+	}
+	//
+	double** scTable = FFT::generateSinCosTable(valLength);
+	int M = FFT::computeM(valLength);
+	//PerformanceAnalyzer p = new PerformanceAnalyzer();
+	//p.start();
+	DT* dt = new DT();
+	dt->getMs();
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	cout << dt->getMs() << endl;
+	for (int i = 0; i < 1000; i++) {
+		prepareData(val, real, imag, complex, valLength);
+		FFT::fft(real, imag, scTable, M, valLength);
+	}
+	cout << dt->getMs() << endl;
+	for (int i = 0; i < 1000; i++) {
+		prepareData(val, real, imag, complex, valLength);
+		FFT::fft(complex, scTable, M, valLength);
+	}
+	cout << dt->getMs() << endl;
+	prepareData(val, real, imag, complex, valLength);
+	FFT::fft(real, imag, scTable, M, valLength);
+	FFT::fft(complex, scTable, M, valLength);
+	//
+	//
+	//
+	for (int i = 0; i < valLength; i++) {
+		Complex* c = complex[i];
+		if (c->re != real[i] || c->im != imag[i]) {
+			return -1;
+		}
+	}
+	cout << "eq" << endl;
+	return 0;
+}

@@ -1,0 +1,22 @@
+﻿#pragma once
+#include "SimpleSynth.h"
+#include "interface/NoteProcessor.h"
+#include "AmpBinaryComposition.h"
+
+namespace yzrilyzr_simplesynth{
+	ECLASS(AmpMultiplier, public AmpBinaryComposition){
+	public:
+	AmpMultiplier() : AmpMultiplier(nullptr, nullptr){}
+	AmpMultiplier(NoteProcPtr a, NoteProcPtr b) : AmpBinaryComposition(a, b){}
+	inline u_sample getAmp(Note & note) override{
+		return a->getAmp(note) * b->getAmp(note);
+	}
+	bool noMoreData(Note & note) override{
+		return a->noMoreData(note) && b->noMoreData(note);
+	}
+	NoteProcPtr clone() override{
+		return std::make_shared<AmpMultiplier>(a->clone(), b->clone());
+	}
+	std::string toString() const override;
+	};
+}
