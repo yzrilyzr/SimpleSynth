@@ -83,11 +83,11 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::PIANO_ELECTRIC_PIANO_2:
 				return AmpBuilder(Matrix6x6ModulationBuilder()//alg 5
-								  .setOp(0, AmpBuilder(SineW()).velMix(0.715).ADSR(1, 3000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
+								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 3000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
 								  .setOp(1, AmpBuilder(SineW()).ADSR(1, 300, 0, false, 100, Pow(-5), Pow(4), Pow(2)).build(), 14.0, 0.0, 0.0, 1.0, 0.0)
-								  .setOp(2, AmpBuilder(SineW()).velMix(0.715).ADSR(1, 7500, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
+								  .setOp(2, AmpBuilder(SineW()).ADSR(1, 7500, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
 								  .setOp(3, AmpBuilder(SineW()).velMix(0.143).ADSR(1, 5000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.0)
-								  .setOp(4, AmpBuilder(SineW()).velMix(1).ADSR(1, 7000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
+								  .setOp(4, AmpBuilder(SineW()).ADSR(1, 7000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
 								  .setOp(5, AmpBuilder(SineW()).velMix(0.143).ADSR(1, 3500, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0.0, 0.0, 0.0, 1.0, 0.0)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 0, 0.58 * 6)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 3, 2, 0.89 * 6)
