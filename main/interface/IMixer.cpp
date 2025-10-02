@@ -1,5 +1,11 @@
 #include "IMixer.h"
 #include "IChannel.h"
+#include "array/Array.hpp"
+#include "dsp/DSP3D.h"
+
+using namespace yzrilyzr_array;
+using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	bool IMixer::hasMIDIChannel(s_midichannel_id id){
 		return hasMIDIChannel(DEFAULT_MIDI_CHANNEL_GROUP_NAME, id);
@@ -8,34 +14,16 @@ namespace yzrilyzr_simplesynth{
 		return getMIDIChannel(DEFAULT_MIDI_CHANNEL_GROUP_NAME, id);
 	}
 	u_sample_rate IMixer::getSampleRate() const{
-		return sampleRate;
+		return globalChannelConfig.sampleRate;
 	}
 	void IMixer::setSampleRate(u_sample_rate sr){
-		sampleRate=sr;
+		globalChannelConfig.sampleRate=sr;
 	}
-	size_t IMixer::getOutputChannelCount()const{
+	u_index IMixer::getOutputChannelCount()const{
 		return outputChannelCount;
 	}
 	int8_t IMixer::getSynthMode() const{
 		return synthMode;
-	}
-	void IMixer::setInstrumentProvider(std::shared_ptr<InstrumentProvider> instr){
-		instrument=instr;
-	}
-	std::shared_ptr<InstrumentProvider> IMixer::getInstrumentProvider()const{
-		return instrument;
-	}
-	std::shared_ptr<NoteTuning> IMixer::getNoteTuning()const{
-		return tuning;
-	}
-	void IMixer::setNoteTuning(std::shared_ptr<NoteTuning> tun){
-		tuning=tun;
-	}
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> IMixer::getNoteVelocityMap()const{
-		return velocityMap;
-	}
-	void IMixer::setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val){
-		velocityMap=val;
 	}
 	void IMixer::setUseEQ(bool use){
 		useEQ=use;
@@ -55,14 +43,16 @@ namespace yzrilyzr_simplesynth{
 	bool IMixer::isChannelUseDSP() const{
 		return channelUseDSP;
 	}
-
+	ChannelConfig & IMixer::getGlobalConfig(){
+		return globalChannelConfig;
+	}
 	u_time_f IMixer::getProcessStandardTime() const{
 		return (u_time_f)getBufferSize() / getSampleRate();
 	}
-    u_time_f IMixer::getProcessTime()const{
-        return processTime;
-    }
-	std::string IMixer::toString()const{
+	u_time_f IMixer::getProcessTime()const{
+		return processTime;
+	}
+	String IMixer::toString()const{
 		return "IMixer";
 	}
 	std::mutex & IMixer::getDSPLock(){

@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "synth/generators/Osc.h"
 #include "events/Note.h"
-#include "array/DoubleArray.h"
-#include "array/ObjectArray.hpp"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
 #include "interpolator/Interpolator.h"
 
 namespace yzrilyzr_simplesynth{
@@ -15,12 +15,12 @@ namespace yzrilyzr_simplesynth{
 	 */
 	ECLASS(SineHarmonicWaveTable, public Osc){
 	private:
-	std::shared_ptr<yzrilyzr_array::ObjectArray<yzrilyzr_array::DoubleArray *>> aa;
+	std::shared_ptr<yzrilyzr_array::Array<yzrilyzr_array::DoubleArray *>> aa;
 	yzrilyzr_interpolator::Interpolator * interpolator;
 	public:
 	~SineHarmonicWaveTable();
-	SineHarmonicWaveTable(std::shared_ptr<yzrilyzr_array::ObjectArray<yzrilyzr_array::DoubleArray *>> aa);
-	SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<yzrilyzr_array::ObjectArray<yzrilyzr_array::DoubleArray *>> aa);
+	SineHarmonicWaveTable(std::shared_ptr<yzrilyzr_array::Array<yzrilyzr_array::DoubleArray *>> aa);
+	SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<yzrilyzr_array::Array<yzrilyzr_array::DoubleArray *>> aa);
 	/**
 	 * 分贝转倍数
 	 * line[i]为分贝数（相对于1）
@@ -30,7 +30,7 @@ namespace yzrilyzr_simplesynth{
 	private:
 	u_sample a(Note & note, double x);
 	double getInterpolation(Note & note, yzrilyzr_array::DoubleArray & ampLine);
-	std::string toString() const override{
+	yzrilyzr_lang::String toString() const override{
 		return yzrilyzr_lang::StringFormat::format("SineHarmonicWaveTable(%s)", getPhaseSource());
 	}
 	};

@@ -23,7 +23,7 @@ namespace yzrilyzr_simplesynth{
 		sum+=CymbalOsc::square(558 * mul1, time);
 		sum+=CymbalOsc::square(824 * mul1, time);
 		sum+=CymbalOsc::square(630 * mul1, time);
-		static thread_local size_t randomIndex=0;
+		static thread_local u_index randomIndex=0;
 		sum+=random.next(&randomIndex)*0.7;
 		return sum * note.velocitySynth * 0.15;
 	}
@@ -35,7 +35,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr CymbalOsc::clone(){
 		return std::make_shared<CymbalOsc>(mul);
 	}
-	std::string CymbalOsc::toString()const{
+	String CymbalOsc::toString()const{
 		return StringFormat::object2string("CymbalOsc", getPhaseSource(), mul);
 	}
 }

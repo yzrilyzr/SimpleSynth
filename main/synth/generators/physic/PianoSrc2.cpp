@@ -55,7 +55,7 @@ namespace yzrilyzr_simplesynth{
 				108, 0.00200, // 极高音区
 				128, 0.00250  // 极高音区
 		}, 18));
-		for(int i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
 			PianoKeyParameters & kp=keyParams[i];
 			kp.noteID=i;
 			kp.minr=0.34;
@@ -138,7 +138,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample PianoSrc2::postProcess(u_sample output){
 		output=soundboard.procDsp(output);
 		//重置合成重复状态
-		size_t siz=CHANNEL_MAX_NOTE_ID * sizeof(false);
+		u_index siz=CHANNEL_MAX_NOTE_ID * sizeof(false);
 		memset(isInSynth, false, siz);
 		return output;
 	}

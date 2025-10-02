@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 		ft=ft > 0.5?1:-1;
 		return ft * note.velocitySynth;
 	}
-	std::string SquareWave::toString() const{
+	String SquareWave::toString() const{
 		return StringFormat::object2string("SquareWave", getPhaseSource());
 	}
 }

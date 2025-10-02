@@ -40,7 +40,7 @@ namespace yzrilyzr_simplesynth{
 		return std::make_shared<TapeSaturationDistortion>(a->clone(), inputGain, drive, bias, outputGain);
 	}
 
-	std::string TapeSaturationDistortion::toString() const{
+	String TapeSaturationDistortion::toString() const{
 		return StringFormat::object2string("TapeSaturationDistortion", a, inputGain, drive, bias, outputGain);
 	}
 }

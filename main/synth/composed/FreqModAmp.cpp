@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr FreqModAmp::clone(){
 		return std::make_shared<FreqModAmp>(a->clone(), b->clone(), depth);
 	}
-	std::string FreqModAmp::toString() const{
+	String FreqModAmp::toString() const{
 		return StringFormat::object2string("FreqModAmp", a, b, depth);
 	}
 	FreqModKeyData * FreqModAmp::init(FreqModKeyData * data, Note & note){

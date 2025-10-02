@@ -102,7 +102,7 @@ namespace yzrilyzr_simplesynth{
 			return n1.releaseVolume - n1.releaseVolume * (1 - rCurve->y(Util::clamp01(1 - time1 / releaseTime)));//decayToVolume->0
 		}
 	}
-	std::string AHDSREnvelop::toString()const{
+	String AHDSREnvelop::toString()const{
 		return StringFormat::object2string("AHDSREnvelop",
 										   (int)(delayTime * 1000),
 										   (int)(attackTime * 1000),
@@ -140,25 +140,25 @@ namespace yzrilyzr_simplesynth{
 		if(cc.isMSB()){
 			switch(data.select){
 				case 3000:
-					delayTime=pow(10000.0, data.dataMSB / 127.0f) / 1000.0;
+					delayTime=pow(10000.0, data.dataMSB / PNData::MSB_MAX) / 1000.0;
 					break;
 				case 3001:
-					attackTime=pow(10000.0, data.dataMSB / 127.0f) / 1000.0;
+					attackTime=pow(10000.0, data.dataMSB / PNData::MSB_MAX) / 1000.0;
 					break;
 				case 3002:
-					holdTime=pow(10000.0, data.dataMSB / 127.0f) / 1000.0;
+					holdTime=pow(10000.0, data.dataMSB / PNData::MSB_MAX) / 1000.0;
 					break;
 				case 3003:
-					decayTime=pow(10000.0, data.dataMSB / 127.0f) / 1000.0;
+					decayTime=pow(10000.0, data.dataMSB / PNData::MSB_MAX) / 1000.0;
 					break;
 				case 3004:
-					sustainVolume=data.dataMSB / 127.0f;
+					sustainVolume=data.dataMSB / PNData::MSB_MAX;
 					break;
 				case 3005:
 					canSustain=data.dataMSB >= 64;
 					break;
 				case 3006:
-					releaseTime=pow(10000.0, data.dataMSB / 127.0f) / 1000.0;
+					releaseTime=pow(10000.0, data.dataMSB / PNData::MSB_MAX) / 1000.0;
 					break;
 			}
 		}

@@ -1,5 +1,4 @@
-﻿#include "Channel.h"
-#include "Mixer.h"
+﻿#include "Mixer.h"
 #include "Mixer2.h"
 #include "SynthUtil.h"
 #include "instrument/SimpleWaveTable.h"
@@ -8,7 +7,7 @@
 #include "synth/generators/physic/KarplusStrongSrc.h"
 #include "synth/source/AmpBuilder.h"
 #include "interface/NoteProcessor.h"
-#include "array/SampleArray.h"
+#include "array/Array.hpp"
 #include "dsp/IIR.h"
 #include "dsp/IIRUtil.h"
 #include "util/Random.h"
@@ -20,7 +19,7 @@ using namespace yzrilyzr_collection;
 using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
-	std::string TickChange::toString() const{
+	String TickChange::toString() const{
 		return StringFormat::format("[TickChange:%.2fms Start:%d]", tick * 1000.0f, startAtTick);
 	}
 	std::shared_ptr<MixerSequence> SynthUtil::parseMIDI(InputStream & is){
@@ -31,12 +30,12 @@ namespace yzrilyzr_simplesynth{
 			//Set<String> channelAndTrackName = new HashSet<>();
 			int noteShift=0;
 			ArrayList<ChannelEvent *> ticks;
-			for(int ii=0;ii < midiSequence->tracks.size();ii++){
+			for(u_index ii=0;ii < midiSequence->tracks.size();ii++){
 				MIDIFile::Track * t=midiSequence->tracks.get(ii);
 				double delay=0;
 				int delayTicks=0;
 				float ticksSecond=0.001f;
-				for(int jj=0;jj < t->events.size();jj++){
+				for(u_index jj=0;jj < t->events.size();jj++){
 					MIDIFile::MIDIEvent * e=t->events.get(jj);
 					if(e == nullptr)continue;
 					delayTicks+=e->deltaTimeTicks;
@@ -115,7 +114,7 @@ namespace yzrilyzr_simplesynth{
 	//std::shared_ptr<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID){
 	//	return getMIDIChannelOrNew(mixer, IMixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME, channelID);
 	//}
-	//std::shared_ptr<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, const std::string & groupName, s_midichannel_id channelID){
+	//std::shared_ptr<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, const String & groupName, s_midichannel_id channelID){
 	//	if(auto m1=dynamic_cast<Mixer *>(mixer)){
 	//		std::shared_ptr<Channel> channel=std::dynamic_pointer_cast<Channel>(m1->getMIDIChannel(groupName, channelID));
 	//		if(channel == nullptr){
@@ -154,12 +153,12 @@ namespace yzrilyzr_simplesynth{
 	void SynthUtil::sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2){
 		sendMIDIBytes(mixer, ty, data1, data2, Mixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME);
 	}
-	void SynthUtil::sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const std::string & groupName){
+	void SynthUtil::sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const String & groupName){
 		auto * event=MIDIBytes2Event(ty, data1, data2);
 		event->groupName=groupName;
 		mixer->sendInstantEvent(event);
 	}
-	void SynthUtil::sendMIDIEvent(ChannelEvent * event, const std::string & deviceName){
+	void SynthUtil::sendMIDIEvent(ChannelEvent * event, const String & deviceName){
 		if(callback != nullptr)(*callback)(deviceName, Event2MIDIBytes(event));
 	}
 	uint64_t SynthUtil::MergeMIDIBytes(uint8_t ty, uint8_t data1, uint8_t data2){
@@ -221,7 +220,7 @@ namespace yzrilyzr_simplesynth{
 		this->data=SynthUtil::NOISE;
 		//this->index=0;
 	}
-	double FixedRandom::next(size_t * index){
+	double FixedRandom::next(u_index * index){
 		double d=(*data)[*index];
 		*index=(*index + 1) % data->length;
 		return d;
@@ -231,7 +230,7 @@ namespace yzrilyzr_simplesynth{
 		std::shared_ptr<IIR> iir=IIRUtil::newButterworthIIRFilter(sampleRate, FilterPassType::BANDPASS, 2, f1, f2);
 		iir->init(sampleRate);
 		Random random(5319539547595419742L);
-		for(int i=0;i < length;i++){
+		for(u_index i=0;i < length;i++){
 			(*randomData)[i]=iir->procDsp(random.nextGaussian());
 		}
 		return randomData;
@@ -250,19 +249,19 @@ namespace yzrilyzr_simplesynth{
 		double rowDeltaTime=1.0 / rowsPerSecond;
 		int channelMap=32;
 		std::cout << rowDeltaTime * 64 << std::endl;
-		for(int i=0;i < module1.num_channels;i++){
+		for(u_index i=0;i < module1.num_channels;i++){
 			ChannelEvent * event=new ChannelControl(MIDIFile::CC::MONO_MODE, 127);
 			mixerSequence->postToSequence(i + channelMap, event, 0);
 		}
 		IntArray notePrevInstrument(module1.num_channels);
-		for(int patternTableIndex=0;patternTableIndex < 19;patternTableIndex++){
+		for(u_index patternTableIndex=0;patternTableIndex < 19;patternTableIndex++){
 			int patternIndex=module1.pattern_table[patternTableIndex];
 			if(patternIndex >= module1.patterns.size())throw IndexOutOfBoundsException();
 			XMFile::Pattern & pattern=module1.patterns[patternIndex];
 			bool portamentoState=false;
-			for(int row=0;row < pattern.num_rows;row++){
+			for(u_index row=0;row < pattern.num_rows;row++){
 				time+=rowDeltaTime;
-				for(int channelI=0;channelI < module1.num_channels;channelI++){
+				for(u_index channelI=0;channelI < module1.num_channels;channelI++){
 					int slotIndex=row * module1.num_channels + channelI;
 					int channel=channelI + channelMap;
 					XMFile::PatternSlot & s=pattern.slots[slotIndex];
@@ -364,7 +363,7 @@ namespace yzrilyzr_simplesynth{
 			}
 		}
 		time+=rowDeltaTime;
-		for(int channelI=0;channelI < module1.num_channels;channelI++){
+		for(u_index channelI=0;channelI < module1.num_channels;channelI++){
 			int channel=channelI + channelMap;
 			ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::ALL_NOTES_OFF, 127);
 			mixerSequence->postToSequence(channel, channelEvent, time);

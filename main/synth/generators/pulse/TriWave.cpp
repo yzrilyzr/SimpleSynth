@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 		ft=ft > 0.5?((1 - ft) * 4 - 1):(ft * 4 - 1);
 		return ft * note.velocitySynth;
 	}
-	std::string TriWave::toString() const{
+	String TriWave::toString() const{
 		return StringFormat::object2string("TriWave", getPhaseSource());
 	}
 }

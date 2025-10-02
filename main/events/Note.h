@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "SimpleSynth.h"
-#include "array/SampleArray.h"
+#include "array/Array.hpp"
 #include "lang/StringFormat.hpp"
 #include "events/ChannelConfig.h"
 
@@ -63,25 +63,25 @@ namespace yzrilyzr_simplesynth{
 	 * @brief 获取音符描述字符串
 	 * @return 格式化为"[Note:{ID} Vel:{力度}]"的字符串
 	 */
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 
-	inline bool closed(ChannelConfig & cfg)const{
+	inline bool closed(const ChannelConfig & cfg)const{
 		return closedAtTime != 0 && closedAtTime < cfg.currentTime||fclosed(cfg);
 	}
 
-	inline bool fclosed(ChannelConfig & cfg)const{
+	inline bool fclosed(const ChannelConfig & cfg)const{
 		return forceCloseAtTime != 0 && forceCloseAtTime < cfg.currentTime;
 	}
 	/**
 	 * @brief 请求关闭音符(触发NoteOff流程，进入Release)
 	 */
-	inline void requestClose(ChannelConfig & cfg){
+	inline void requestClose(const ChannelConfig & cfg){
 		if(closedAtTime == 0)closedAtTime=cfg.currentTime;
 	}
 	/**
 	 * @brief 强制立即关闭音符(经过Release阶段，但是更短)
 	 */
-	inline void forceClose(ChannelConfig & cfg){
+	inline void forceClose(const ChannelConfig & cfg){
 		if(closedAtTime == 0)closedAtTime=cfg.currentTime;
 		if(forceCloseAtTime == 0)forceCloseAtTime=cfg.currentTime;
 	}
@@ -90,7 +90,7 @@ namespace yzrilyzr_simplesynth{
 	 * @brief 从另一个音符复制状态
 	 * @param note 源音符对象
 	 */
-	void set(Note & note);
+	void set(const Note & note);
 
 	/**
 	 * @brief 检查音符ID是否有效

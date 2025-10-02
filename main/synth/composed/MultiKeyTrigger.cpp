@@ -18,9 +18,9 @@ namespace yzrilyzr_simplesynth{
 		MultiKeyTriggerKeyData * data=getData(note);
 		Note ** notes=data->notes;
 		ChannelConfig & cfg=*note.cfg;
-		for(size_t i=0;i < notesCount;i++){
+		for(u_index i=0;i < notesCount;i++){
 			Note & n1=*notes[i];
-			NoteUpdater::preUpdateNote(n1, cfg);
+			NoteUpdater::preUpdateNote(n1,cfg);
 			sum+=a->getAmp(n1);
 			NoteUpdater::postUpdateNote(n1, cfg);
 		}
@@ -34,12 +34,12 @@ namespace yzrilyzr_simplesynth{
 			data=new MultiKeyTriggerKeyData();
 			data->notes=new Note * [notesCount];
 			data->size=notesCount;
-			for(int i=0;i < notesCount;i++){
+			for(u_index i=0;i < notesCount;i++){
 				int id=uniqueID.fetch_add(1);
 				data->notes[i]=new Note(id);
 			}
 		}
-		for(int i=0;i < notesCount;i++){
+		for(u_index i=0;i < notesCount;i++){
 			Note * n=data->notes[i];
 			n->set(note);
 			n->id=note.id + (*idShift)[i];
@@ -47,7 +47,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		return data;
 	}
-	std::string MultiKeyTrigger::toString() const{
+	String MultiKeyTrigger::toString() const{
 		return StringFormat::object2string("MultiKeyTrigger", a, idShift, velocityMul);
 	}
 }

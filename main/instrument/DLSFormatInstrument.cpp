@@ -9,10 +9,10 @@
 #include "SynthUtil.h"
 #include "SimpleSynth.h"
 #include <algorithm>
-#include "array/ByteArray.h"
-#include "array/FloatArray.h"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
 #include "array/SampleProvider.h"
-#include "array/ShortArray.h"
+#include "array/Array.hpp"
 #include <cmath>
 #include "collection/ArrayList.hpp"
 #include <cstdint>
@@ -51,7 +51,7 @@ namespace yzrilyzr_simplesynth{
 			case DLSSampleFormat::SIGNED:
 				if(sample.bits == 16){
 					std::shared_ptr<ShortArray> arr=std::make_shared<ShortArray>(byteArr->length / 2);
-					for(size_t si=0, bi=0;bi < byteArr->length;){
+					for(u_index si=0, bi=0;bi < byteArr->length;){
 						uint16_t val=0;
 						val=(*byteArr)[bi++] & 0xff;
 						val|=((*byteArr)[bi++] & 0xff) << 8;
@@ -76,7 +76,7 @@ namespace yzrilyzr_simplesynth{
 			case DLSSampleFormat::FLOAT:
 				if(sample.bits == 32){
 					std::shared_ptr<FloatArray> arr=std::make_shared<FloatArray>(byteArr->length / 4);
-					for(size_t si=0, bi=0;bi < byteArr->length;){
+					for(u_index si=0, bi=0;bi < byteArr->length;){
 						uint32_t val=0;
 						val=(*byteArr)[bi++] & 0xff;
 						val|=((*byteArr)[bi++] & 0xff) << 8;

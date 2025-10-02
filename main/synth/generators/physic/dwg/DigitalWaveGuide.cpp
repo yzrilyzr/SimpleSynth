@@ -64,7 +64,7 @@ namespace yzrilyzr_simplesynth{
 			leftLoad=0;
 		} else{
 			leftLoad=leftAlpha * leftNode.signals[0];
-			for(int k=0; k < leftNodeCount; k++){
+			for(u_index k=0; k < leftNodeCount; k++){
 				// 极性转换（false→1，true→0）
 				int polarity=leftNodePolarities[k]?0:1;
 				leftLoad+=leftConnectedNodes[k]->load;
@@ -75,7 +75,7 @@ namespace yzrilyzr_simplesynth{
 			rightLoad=0;
 		} else{
 			rightLoad=rightAlpha * rightNode.signals[1];
-			for(int k=0; k < rightNodeCount; k++){
+			for(u_index k=0; k < rightNodeCount; k++){
 				// 极性转换（false→0，true→1）
 				int polarity=rightNodePolarities[k]?1:0;
 				rightLoad+=rightConnectedNodes[k]->load;
@@ -137,21 +137,21 @@ namespace yzrilyzr_simplesynth{
 
 		// 计算左侧alpha系数
 		totalImpedance=leftNode.impedance;
-		for(int k=0; k < leftNodeCount; k++){
+		for(u_index k=0; k < leftNodeCount; k++){
 			totalImpedance+=leftConnectedNodes[k]->impedance;
 		}
 		leftAlpha=2.0 * leftNode.impedance / totalImpedance;
-		for(int k=0; k < leftNodeCount; k++){
+		for(u_index k=0; k < leftNodeCount; k++){
 			leftNodeAlphas[k]=2.0 * leftConnectedNodes[k]->impedance / totalImpedance;
 		}
 
 		// 计算右侧alpha系数
 		totalImpedance=rightNode.impedance;
-		for(int k=0; k < rightNodeCount; k++){
+		for(u_index k=0; k < rightNodeCount; k++){
 			totalImpedance+=rightConnectedNodes[k]->impedance;
 		}
 		rightAlpha=2.0 * rightNode.impedance / totalImpedance;
-		for(int k=0; k < rightNodeCount; k++){
+		for(u_index k=0; k < rightNodeCount; k++){
 			rightNodeAlphas[k]=2.0 * rightConnectedNodes[k]->impedance / totalImpedance;
 		}
 	}

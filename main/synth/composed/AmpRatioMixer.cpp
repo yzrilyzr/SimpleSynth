@@ -2,7 +2,7 @@
 #include "lang/StringFormat.hpp"
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	std::string AmpRatioMixer::toString() const{
+	String AmpRatioMixer::toString() const{
 		return StringFormat::object2string("AmpRatioMixer", a, b, ratio);
 	}
 }

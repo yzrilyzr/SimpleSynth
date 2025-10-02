@@ -65,8 +65,8 @@ void eqWindow(CurrentProjectContext & ctx){
 	static ArrayList<StructEQ *> eqs;
 	u_sample_rate sampleRate=mixer.getSampleRate();
 	u_sample_rate test_sampleRate=44100;
-	const size_t siz=1 << 16;
-	const size_t fsiz=siz >> 1;
+	const u_index siz=1 << 16;
+	const u_index fsiz=siz >> 1;
 	static double * input_data=new double[siz];
 	static double * mag_data=new double[fsiz];
 	static double * pha_data=new double[fsiz];
@@ -88,17 +88,17 @@ void eqWindow(CurrentProjectContext & ctx){
 		}
 		std::fill(input_data, input_data + siz, 0);
 		input_data[0]=fsiz;
-		for(size_t i=0;i < siz;i++){
+		for(u_index i=0;i < siz;i++){
 			input_data[i]=dsp.procDsp(input_data[i]);
 		}
-		for(size_t i=0;i < fsiz;i++){
+		for(u_index i=0;i < fsiz;i++){
 			x_data[i]=(double)i * test_sampleRate / fsiz / 2.0;
 		}
 		fft.inputDoubleArray(input_data, siz);
 		fft.fft();
 		fft.outputMagnitudeDoubleArray(mag_data, fsiz);
 		fft.outputPhaseDoubleArray(pha_data, fsiz);
-		for(size_t i=0;i < fsiz;i++){
+		for(u_index i=0;i < fsiz;i++){
 			mag_data[i]=20.0 * log10(mag_data[i]);
 			pha_data[i]=pha_data[i] * 180.0 / PI;
 		}
@@ -107,7 +107,7 @@ void eqWindow(CurrentProjectContext & ctx){
 		std::shared_ptr<DSPChain> * c=mixer.getEQ();
 		std::mutex & dspLock=mixer.getDSPLock();
 		std::unique_lock <std::mutex > lock(dspLock);
-		for(int ii=0;ii < 2;ii++){
+		for(u_index ii=0;ii < 2;ii++){
 			std::shared_ptr<DSPChain> cc=c[ii];
 			cc->clear();
 			for(StructEQ * s : eqs){
@@ -198,7 +198,7 @@ void eqWindow(CurrentProjectContext & ctx){
 		if(ImPlot::IsPlotHovered()){
 			ImGui::BeginTooltip();
 			double slope=calculateDbPerOctave(x_data, mag_data, point.x, siz);
-			ImGui::Text(ctx.LANG.getf("window.eq.freq_response.hover", point.x, slope).c_str());
+			ImGui::Text(ctx.LANG.getf("window.eq.freq_response.hover", point.x, slope).c_str(UTF8));
 			ImGui::EndTooltip();
 		}
 
@@ -225,7 +225,7 @@ void eqWindow(CurrentProjectContext & ctx){
 		bool removeEq=ImGui::Button(ctx.LANG.getc("window.eq.filter.remove"));
 		changed=changed || removeEq;
 		if(removeEq){
-			eqs.removeElement(currentEdit);
+			eqs.remove(currentEdit);
 			currentEdit=nullptr;
 		}
 	}

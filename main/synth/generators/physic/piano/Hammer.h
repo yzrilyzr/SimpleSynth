@@ -16,6 +16,6 @@ namespace yzrilyzr_simplesynth{
 	virtual void init(double sampleRate, double m, double K, double p, double Z, double alpha)=0;
 	virtual double load(double in)=0;
 	virtual void trigger(double v)=0;
-	std::string toString()const override{ return "Hammer"; }
+	yzrilyzr_lang::String toString()const override{ return "Hammer"; }
 	};
 }

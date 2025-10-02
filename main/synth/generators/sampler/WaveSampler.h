@@ -3,10 +3,10 @@
 #include "synth/generators/Osc.h"
 #include "SimpleSynth.h"
 #include "array/SampleProvider.h"
-#include "array/ByteArray.h"
-#include "array/FloatArray.h"
-#include "array/SampleArray.h"
-#include "array/ShortArray.h"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -26,11 +26,11 @@ namespace yzrilyzr_simplesynth{
 	int32_t startLoopIndex=0;
 	int32_t endLoopIndex=0;
 	int loopType=0;
-	size_t sampleOffset=0;
-	size_t sampleLength=0;
+	u_index sampleOffset=0;
+	u_index sampleLength=0;
 	public:
 	WaveSampler();
-	WaveSampler(std::shared_ptr<PhaseSrc> freq, s_phase phaseMul, std::shared_ptr<yzrilyzr_array::SampleProvider> sampleData, size_t sampleOffset, size_t sampleLength,
+	WaveSampler(std::shared_ptr<PhaseSrc> freq, s_phase phaseMul, std::shared_ptr<yzrilyzr_array::SampleProvider> sampleData, u_index sampleOffset, u_index sampleLength,
 				int32_t startLoopIndex, int32_t endLoopIndex, int loopType);
 	u_sample getAmp(Note & note) override;
 	u_sample getSample(yzrilyzr_array::SampleProvider & sample, int32_t index);
@@ -38,14 +38,14 @@ namespace yzrilyzr_simplesynth{
 	private:
 	u_sample reSampleCubicSpline(yzrilyzr_array::SampleProvider & src, s_phase index);
 	int32_t clampToLoop(int32_t index) const;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 	EBCLASS(WaveSamplerBuilder){
 		std::shared_ptr<PhaseSrc> freq=nullptr;
 		s_phase phaseMul=1;
 		std::shared_ptr<yzrilyzr_array::SampleProvider> sampleData=nullptr;
-		size_t sampleOffset=0;
-		size_t sampleLength=0;
+		u_index sampleOffset=0;
+		u_index sampleLength=0;
 		int32_t startLoopIndex=0;
 		int32_t endLoopIndex=0;
 		uint8_t loopType=WaveSampler::LOOP_DISABLE;
@@ -73,7 +73,7 @@ namespace yzrilyzr_simplesynth{
 		this->phaseMul=static_cast<s_phase>(sampleDataRate) / sampleDataFreq;
 		return *this;
 	}
-	WaveSamplerBuilder & sampleOffsetLength(size_t sampleOffset, size_t sampleLength){
+	WaveSamplerBuilder & sampleOffsetLength(u_index sampleOffset, u_index sampleLength){
 		this->sampleOffset=sampleOffset;
 		this->sampleLength=sampleLength;
 		return *this;

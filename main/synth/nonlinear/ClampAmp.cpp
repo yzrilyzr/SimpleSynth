@@ -20,7 +20,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr ClampAmp::clone(){
 		return std::make_shared<ClampAmp>(a->clone(), inputGain, clamp, outputGain);
 	}
-	std::string ClampAmp::toString() const{
+	String ClampAmp::toString() const{
 		return StringFormat::object2string("ClampAmp", a, inputGain, clamp, outputGain);
 	}
 }

@@ -88,7 +88,7 @@ namespace yzrilyzr_simplesynth{
 	void SVPWM::setCornerModulation(bool enable){
 		cornerModulation=enable;
 	}
-	std::string SVPWM::toString() const{
+	String SVPWM::toString() const{
 		return StringFormat::object2string("SVPWM", getPhaseSource());
 	}
 }

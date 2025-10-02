@@ -39,6 +39,6 @@ namespace yzrilyzr_simplesynth{
 	bool noMoreData(Note & note) override;
 	NoteProcPtr clone() override;
 	SimpleDrumAmpKeyData * init(SimpleDrumAmpKeyData * data, Note & note) override;
-	std::string toString()const override;
+	yzrilyzr_lang::String toString()const override;
 	};
 }

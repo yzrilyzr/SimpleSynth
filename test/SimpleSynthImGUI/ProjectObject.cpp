@@ -40,7 +40,7 @@ void ProjectObject::paramToJSON(json & a, const ParamRegister & paramReg){
 				a[p.name.c_str()]=*static_cast<bool *>(p.value);
 				break;
 			case ParamType::Size:
-				a[p.name.c_str()]=*static_cast<size_t *>(p.value);
+				a[p.name.c_str()]=*static_cast<u_index *>(p.value);
 				break;
 			case ParamType::Enum:
 				a[p.name.c_str()]=*static_cast<int *>(p.value);
@@ -78,8 +78,8 @@ void ProjectObject::paramToJSON(json & a, const ParamRegister & paramReg){
 
 json ProjectObject::to_json() const{
 	json a={
-		{"name", name},
-		{"category", category},
+		{"name", name.tostring()},
+		{"category", category.tostring()},
 		{"id", reinterpret_cast<uint64_t>(paramRegPtr.get())},
 		{"showWindow", showWindow},
 		{"windowPosX", windowPos.x},
@@ -93,13 +93,13 @@ json ProjectObject::to_json() const{
 		auto datap=p.second;
 		if(auto datap2=std::dynamic_pointer_cast<SampleArray>(datap)){
 			json jsonArray=json::array();
-			for(size_t i=0;i < datap2->length;i++){
+			for(u_index i=0;i < datap2->length;i++){
 				jsonArray.push_back((*datap2)[i]);
 			}
 			storedDataJSON[p.first.c_str()]={{"data", jsonArray}, {"type", "SampleArray"}};
 		} else if(auto datap2=std::dynamic_pointer_cast<DoubleArray>(datap)){
 			json jsonArray=json::array();
-			for(size_t i=0;i < datap2->length;i++){
+			for(u_index i=0;i < datap2->length;i++){
 				jsonArray.push_back((*datap2)[i]);
 			}
 			storedDataJSON[p.first.c_str()]={{"data", jsonArray}, {"type", "DoubleArray"}};
@@ -145,7 +145,7 @@ void ProjectObject::JSONToParam(const json & j, ParamRegister & paramReg){
 				*static_cast<bool *>(param.value)=j.value(key, false);
 				break;
 			case ParamType::Size:
-				*static_cast<size_t *>(param.value)=j.value(key, static_cast<size_t>(0));
+				*static_cast<u_index *>(param.value)=j.value(key, static_cast<u_index>(0));
 				break;
 			case ParamType::Enum:
 				*static_cast<int *>(param.value)=j.value(key, static_cast<int>(0));
@@ -172,8 +172,8 @@ void ProjectObject::JSONToParam(const json & j, ParamRegister & paramReg){
 	}
 }
 void ProjectObject::from_json(const json & j){
-	name=j["name"];
-	category=j["category"];
+	name=std::string(j["name"]);
+	category=std::string(j["category"]);
 	showWindow=j.value("showWindow", true);
 	windowPos.x=j.value("windowPosX", 100.0f);
 	windowPos.y=j.value("windowPosY", 100.0f);
@@ -181,7 +181,7 @@ void ProjectObject::from_json(const json & j){
 	windowSize.y=j.value("windowSizeY", 200.0f);
 	name2obj(category, name, &name, &category, &showName, &paramRegPtr, &renderFunc, &enableOriginalRender);
 	if(paramRegPtr == nullptr){
-		throw Exception("Object not found: [category: " + category + ", name: " + name + "]");
+		throw Exception(String("Object not found: [category: ") + category + ", name: " + name + "]");
 	}
 	JSONToParam(j, *paramRegPtr);
 	if(j.find("StoredData") != j.end()){
@@ -195,13 +195,13 @@ void ProjectObject::from_json(const json & j){
 					auto type=value["type"];
 					if(type == "SampleArray"){
 						auto arrPtr=std::make_shared<SampleArray>(data.size());
-						for(size_t i=0;i < data.size();i++){
+						for(u_index i=0;i < data.size();i++){
 							(*arrPtr)[i]=data[i].get<u_sample>();
 						}
 						storeData[key]=arrPtr;
 					} else if(type == "DoubleArray"){
 						auto arrPtr=std::make_shared<DoubleArray>(data.size());
-						for(size_t i=0;i < data.size();i++){
+						for(u_index i=0;i < data.size();i++){
 							(*arrPtr)[i]=data[i].get<double>();
 						}
 						storeData[key]=arrPtr;
@@ -224,10 +224,10 @@ void ProjectObject::from_json(const json & j){
 }
 
 void ProjectObject::renderWindow(CurrentProjectContext & ctx){
-	std::string windowName=showName + "##" + std::to_string((int64_t)this);
+	String windowName=showName + "##" + std::to_string((int64_t)this);
 	ImGui::SetNextWindowPos(windowPos);
 	ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
-	ImGui::Begin(windowName.c_str(), &showWindow, ImGuiWindowFlags_None);
+	ImGui::Begin(windowName.c_str(UTF8), &showWindow, ImGuiWindowFlags_None);
 	windowPos=ImGui::GetWindowPos();
 	windowSize=ImGui::GetWindowSize();
 	if(ImGui::Button(ctx.LANG.getc("window.project_object.drag_this"))){}
@@ -239,7 +239,7 @@ void ProjectObject::renderWindow(CurrentProjectContext & ctx){
 		else if(std::dynamic_pointer_cast<DSP>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_DSP;
 		else if(std::dynamic_pointer_cast<SampleProvider>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_Sample;
 		ImGui::SetDragDropPayload(ctx.dragPayloadType, this, sizeof(ProjectObject));
-		ImGui::Text(ctx.LANG.getf("window.project_object.dragging_this").c_str());
+		ImGui::Text(ctx.LANG.getf("window.project_object.dragging_this").c_str(UTF8));
 		ImGui::EndDragDropSource();
 	}
 	ImVec2 button1Min=ImGui::GetItemRectMin();
@@ -260,11 +260,11 @@ void ProjectObject::renderWindow(CurrentProjectContext & ctx){
 bool ProjectObject::renderParams(CurrentProjectContext & ctx, std::vector<ParamReg> & paramReg){
 	bool change=false;
 	for(auto & param : paramReg){
-		std::string guiName=param.name;
+		String guiName=param.name;
 		if(param.aliasName != ""){
 			guiName=param.aliasName + "(" + guiName + ")";
 		}
-		const char * cstrName=guiName.c_str();
+		const char * cstrName=guiName.c_str(UTF8);
 		bool localChange=false;
 		switch(param.type){
 			case ParamType::Bool:
@@ -298,7 +298,7 @@ bool ProjectObject::renderParams(CurrentProjectContext & ctx, std::vector<ParamR
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_U64, param.value, param.valueMin, param.valueMax);
 				break;
 			case ParamType::Size:
-				localChange=ImGui::SliderScalar(cstrName, sizeof(size_t) == 8?ImGuiDataType_U64:ImGuiDataType_U32, param.value, param.valueMin, param.valueMax);
+				localChange=ImGui::SliderScalar(cstrName, sizeof(u_index) == 8?ImGuiDataType_U64:ImGuiDataType_U32, param.value, param.valueMin, param.valueMax);
 				break;
 			case ParamType::Gain:
 				localChange=ImGui::SliderScalar(cstrName, sizeof(u_sample) == 8?ImGuiDataType_Double:ImGuiDataType_Float, param.value, param.valueMin, param.valueMax, "%.3f mul", ImGuiSliderFlags_Logarithmic);

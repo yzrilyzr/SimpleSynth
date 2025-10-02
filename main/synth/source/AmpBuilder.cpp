@@ -309,7 +309,7 @@ namespace yzrilyzr_simplesynth{
 		this->_src=std::make_shared<SimpleDetuner>(_src, count, offset);
 		return *this;
 	}
-	NoteProcPtr AmpBuilder::parse(const std::string & str){
+	NoteProcPtr AmpBuilder::parse(const String & str){
 		/*String[] str1 = str.split("\n");
 		for(String s: str1){
 			ASTParser.parse(s);

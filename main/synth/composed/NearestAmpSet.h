@@ -16,7 +16,7 @@ namespace yzrilyzr_simplesynth{
 	~NearestAmpSet();
 	NearestAmpSet(std::shared_ptr<PhaseSrc> freq);
 	NearestAmpSet();
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	bool noMoreData(Note & note) override;
 	u_sample getAmp(Note & note) override;
 	};

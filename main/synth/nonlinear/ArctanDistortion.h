@@ -13,6 +13,6 @@ namespace yzrilyzr_simplesynth{
 	ArctanDistortion(NoteProcPtr a, u_sample inputGain, double alpha, u_sample outputGain);
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

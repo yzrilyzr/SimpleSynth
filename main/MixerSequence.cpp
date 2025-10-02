@@ -4,6 +4,7 @@
 #include "Mixer2.h"
 #include <algorithm>
 using namespace yzrilyzr_collection;
+using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	void MixerSequence::postToSequence(s_midichannel_id channel, ChannelEvent * n1, u_time startAt){
 		n1->startAtTime=startAt;
@@ -12,7 +13,7 @@ namespace yzrilyzr_simplesynth{
 		if(it == channelEvents.end()){
 			it=channelEvents.emplace(channel, std::vector<EventWrapper>()).first;
 		}
-		EventWrapper w={n1, it->second.size()};
+		EventWrapper w={n1, static_cast<u_index>(it->second.size())};
 		it->second.emplace_back(w);
 	}
 	bool MixerSequence::compareMixerEvents(const EventWrapper & a, const EventWrapper & b){
@@ -33,8 +34,8 @@ namespace yzrilyzr_simplesynth{
 	void MixerSequence::postToMixer(IMixer * mixer, u_time deltaLoadTime)const{
 		postToMixer(mixer, deltaLoadTime, Mixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME);
 	}
-	void MixerSequence::postToMixer(IMixer * mixer, u_time deltaLoadTime, const std::string & groupName)const{
-		if(instrument != nullptr) mixer->setInstrumentProvider(instrument);
+	void MixerSequence::postToMixer(IMixer * mixer, u_time deltaLoadTime, const String & groupName)const{
+		if(instrument != nullptr) mixer->getGlobalConfig().setInstrumentProvider(instrument);
 		u_time t1=mixer->getCurrentTime() + deltaLoadTime;
 		if(auto m1=dynamic_cast<Mixer *>(mixer)){
 			for(auto & entry : channelEvents){
@@ -49,7 +50,7 @@ namespace yzrilyzr_simplesynth{
 			std::vector<EventWrapper>eventsv;
 			for(auto & entry : channelEvents){
 				auto & events=entry.second;
-				size_t indexInChannel=0;
+				u_index indexInChannel=0;
 				for(auto & eventw : events){
 					ChannelEvent * clone=eventw.event->clone();
 					clone->groupName=groupName;

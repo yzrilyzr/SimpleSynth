@@ -12,14 +12,14 @@ using namespace yzrilyzr_util;
 namespace yzrilyzr_simplesynth{
 	Sakura::Sakura() :Osc(nullptr){
 		registerParam("Exciter", ParamType::NoteSrc, &exciter, nullptr, nullptr);
-		for(int i=0;i < 8;i++){
+		for(u_index i=0;i < 8;i++){
 			resonators[i]=new RingBufferSample(1024);
 		}
 		exciterHiCutEnv=new AHDSREnvelop(0, 100, 100, 100, 0.5, true, 100, 100, Pow(-5), Pow(5), Pow(5));
 		stringEnv=new AHDSREnvelop(0, 100, 100, 100, 0.5, true, 100, 100, Pow(-5), Pow(5), Pow(5));
 	}
 	Sakura::~Sakura(){
-		for(int i=0;i < 8;i++){
+		for(u_index i=0;i < 8;i++){
 			delete resonators[i];
 		}
 		delete exciterHiCutEnv;
@@ -36,7 +36,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sample Sakura::postProcess(u_sample output){
 		u_sample sum=output;
-		for(int i=0;i < 8;i++){
+		for(u_index i=0;i < 8;i++){
 			bool enabled=resonatorEnabled[i];
 			if(!enabled)continue;
 			RingBufferSample & re=*resonators[i];

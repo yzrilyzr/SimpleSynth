@@ -101,10 +101,11 @@ using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_util;
+using namespace yzrilyzr_lang;
 void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	// 复合模块（Composed）分类 - 原有翻译键已补充，此处保持一致
-	std::string composedsn=lang.getc("register_module.category.notesrc.composed");
-	std::string composed="Composed";
+	String composedsn=lang.get("register_module.category.notesrc.composed");
+	String composed="Composed";
 	reg.registerModule(lang, composed, composedsn, "AmpAdder", "register_module.notesrc.name.add", [](){return std::make_shared<AmpAdder>();});
 	reg.registerModule(lang, composed, composedsn, "AmpMultiplier", "register_module.notesrc.name.mul", [](){return std::make_shared<AmpMultiplier>();});
 	reg.registerModule(lang, composed, composedsn, "FreqModAmp", "register_module.notesrc.name.freq_mod", [](){return std::make_shared<FreqModAmp>();});
@@ -122,30 +123,30 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, composed, composedsn, "HardSync", "register_module.notesrc.name.hardsync", [](){return std::make_shared<HardSync>();});
 
 	// 滤波器（Filter）分类 - 补充 lang 参数和翻译键
-	std::string filtersn=lang.getc("register_module.category.notesrc.filter");
-	std::string filter="Filter";
+	String filtersn=lang.get("register_module.category.notesrc.filter");
+	String filter="Filter";
 	reg.registerModule(lang, filter, filtersn, "BiquadFilterSrc", "register_module.notesrc.name.biquad", [](){return std::make_shared<BiquadFilterSrc>();});
 	reg.registerModule(lang, filter, filtersn, "MeanFilterSrc", "register_module.notesrc.name.mean", [](){return std::make_shared<MeanFilterSrc>();});
 
 	// 鼓点（Drum）分类 - 补充 lang 参数和翻译键
-	std::string drumsn=lang.getc("register_module.category.notesrc.drum");
-	std::string drum="Drum";
+	String drumsn=lang.get("register_module.category.notesrc.drum");
+	String drum="Drum";
 	reg.registerModule(lang, drum, drumsn, "SimpleDrumAmp", "register_module.notesrc.name.simple_drum_amp", [](){return std::make_shared<SimpleDrumAmp>();});
 
 	// 噪声源（Noise）分类 - 补充 lang 参数和翻译键
-	std::string noisesn=lang.getc("register_module.category.notesrc.noise");
-	std::string noise="Noise";
+	String noisesn=lang.get("register_module.category.notesrc.noise");
+	String noise="Noise";
 	reg.registerModule(lang, noise, noisesn, "NoiseSrc", "register_module.notesrc.name.noise", [](){return std::make_shared<NoiseSrc>();});
 	reg.registerModule(lang, noise, noisesn, "LFSRNoise", "register_module.notesrc.name.lfsr", [](){return std::make_shared<LFSRNoise>();});
 
 	// 正弦波（Sine）分类 - 补充 lang 参数和翻译键
-	std::string sinesn=lang.getc("register_module.category.notesrc.sine");
-	std::string sine="Sine";
+	String sinesn=lang.get("register_module.category.notesrc.sine");
+	String sine="Sine";
 	reg.registerModule(lang, sine, sinesn, "SineWave", "register_module.notesrc.name.sine_wave", [](){return std::make_shared<SineWave>();});
 
 	// 脉冲波（Pulse）分类 - 补充 lang 参数和翻译键
-	std::string pulsesn=lang.getc("register_module.category.notesrc.pulse");
-	std::string pulse="Pulse";
+	String pulsesn=lang.get("register_module.category.notesrc.pulse");
+	String pulse="Pulse";
 	reg.registerModule(lang, pulse, pulsesn, "CymbalOsc", "register_module.notesrc.name.cymbal", [](){return std::make_shared<CymbalOsc>();});
 	reg.registerModule(lang, pulse, pulsesn, "VVVF", "register_module.notesrc.name.vvvf", [](){return std::make_shared<VVVF>();});
 	reg.registerModule(lang, pulse, pulsesn, "TriWave", "register_module.notesrc.name.tri_wave", [](){return std::make_shared<TriWave>();});
@@ -154,8 +155,8 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, pulse, pulsesn, "Pulse", "register_module.notesrc.name.pulse", [](){return std::make_shared<Pulse>();});
 
 	// 物理建模（Physic）分类 - 补充 lang 参数和翻译键，统一参数顺序
-	std::string physicsn=lang.getc("register_module.category.notesrc.physic");
-	std::string physic="Physic";
+	String physicsn=lang.get("register_module.category.notesrc.physic");
+	String physic="Physic";
 	reg.registerModule(lang, physic, physicsn, "KarplusStrongSrc", "register_module.notesrc.name.karplus_strong", [](){return std::make_shared<KarplusStrongSrc>();});
 	reg.registerModule(lang, physic, physicsn, "BowedString", "register_module.notesrc.name.bowed_string", [](){return std::make_shared<BowedString>();});
 	reg.registerModule(lang, physic, physicsn, "Sitar", "register_module.notesrc.name.sitar", [](){return std::make_shared<Sitar>();});
@@ -164,14 +165,14 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, physic, physicsn, "PianoSrc", "register_module.notesrc.name.piano_src", [](){return std::make_shared<PianoSrc>();}, pianoRenderFunc);
 
 	// 采样器（Sampler）分类 - 补充未完善模块的翻译键，统一参数顺序
-	std::string samplersn=lang.getc("register_module.category.notesrc.sampler");
-	std::string sampler="Sampler";
+	String samplersn=lang.get("register_module.category.notesrc.sampler");
+	String sampler="Sampler";
 	reg.registerModule(lang, sampler, samplersn, "WaveSampler", "register_module.notesrc.name.wave_sampler", [](){return std::make_shared<WaveSampler>();});
 	reg.registerModule(lang, sampler, samplersn, "SampleArrayProvider", "register_module.notesrc.name.sample_data", [](){return std::make_shared<SampleArrayProvider>();}, sampleDataRenderFunc);
 
 	// 包络器（Envelop）分类 - 补充 lang 参数和翻译键
-	std::string envelopsn=lang.getc("register_module.category.notesrc.envelop");
-	std::string envelop="Envelop";
+	String envelopsn=lang.get("register_module.category.notesrc.envelop");
+	String envelop="Envelop";
 	reg.registerModule(lang, envelop, envelopsn, "EnvelopMultiplier", "register_module.notesrc.name.envelop_multiplier", [](){return std::make_shared<EnvelopMultiplier>();});
 	reg.registerModule(lang, envelop, envelopsn, "AHDSREnvelop", "register_module.notesrc.name.ahdsr", [](){return std::make_shared<AHDSREnvelop>();});
 	reg.registerModule(lang, envelop, envelopsn, "GraphEnvelop", "register_module.notesrc.name.graph", [](){return std::make_shared<GraphEnvelop>();});
@@ -179,8 +180,8 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, envelop, envelopsn, "MultiStageEnvelope", "register_module.notesrc.name.multi_stage_envelope", [](){return std::make_shared<MultiStageEnvelope>();}, MultiStageEnvRenderFunc);
 
 	// 非线性处理（NonLinear）分类 - 补充 lang 参数和翻译键
-	std::string nonlinearsn=lang.getc("register_module.category.notesrc.nonlinear");
-	std::string nonlinear="NonLinear";
+	String nonlinearsn=lang.get("register_module.category.notesrc.nonlinear");
+	String nonlinear="NonLinear";
 	reg.registerModule(lang, nonlinear, nonlinearsn, "ArctanDistortion", "register_module.notesrc.name.arctan", [](){return std::make_shared<ArctanDistortion>();});
 	reg.registerModule(lang, nonlinear, nonlinearsn, "ClampAmp", "register_module.notesrc.name.clamp", [](){return std::make_shared<ClampAmp>();});
 	reg.registerModule(lang, nonlinear, nonlinearsn, "ClampWithVelocityAmp", "register_module.notesrc.name.clamp_vel", [](){return std::make_shared<ClampWithVelocityAmp>();});
@@ -188,22 +189,22 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, nonlinear, nonlinearsn, "TapeSaturationDistortion", "register_module.notesrc.name.tape_saturation_distortion", [](){return std::make_shared<TapeSaturationDistortion>();});
 	reg.registerModule(lang, nonlinear, nonlinearsn, "FoldbackDistortion", "register_module.notesrc.name.foldback_distortion", [](){return std::make_shared<FoldbackDistortion>();});
 	// 常量模块（Const）分类 - 补充 lang 参数和翻译键
-	std::string constcsn=lang.getc("register_module.category.notesrc.const");
-	std::string constc="Const";
+	String constcsn=lang.get("register_module.category.notesrc.const");
+	String constc="Const";
 	reg.registerModule(lang, constc, constcsn, "ConstAmp", "register_module.notesrc.name.const_amp", [](){return std::make_shared<_ConstAmp>();});
 	reg.registerModule(lang, constc, constcsn, "NoteIDAmp", "register_module.notesrc.name.note_id_amp", [](){return std::make_shared<_NoteIDAmp>();});
-	reg.registerModule(lang, constc, constcsn, "NoteVelAmp", "register_module.notesrc.name.note_id_amp", [](){return std::make_shared<_NoteVelAmp>();});
-	reg.registerModule(lang, constc, constcsn, "NoteFreqAmp", "register_module.notesrc.name.note_id_amp", [](){return std::make_shared<_NoteFreqAmp>();});
+	reg.registerModule(lang, constc, constcsn, "NoteVelAmp", "register_module.notesrc.name.note_vel_amp", [](){return std::make_shared<_NoteVelAmp>();});
+	reg.registerModule(lang, constc, constcsn, "NoteFreqAmp", "register_module.notesrc.name.note_freq_amp", [](){return std::make_shared<_NoteFreqAmp>();});
 }
 
 void registerAllDSP(Lang & lang, MenuRegister & reg){
-	std::string filtersn=lang.getc("register_module.category.dsp.filter");
-	std::string filter="Filter";
-	std::string delaysn=lang.getc("register_module.category.dsp.delay");
-	std::string delay="Delay";
-	std::string dynamicsn=lang.getc("register_module.category.dsp.dynamic");
-	std::string dynamic="Dynamic";
-	std::string cate="";
+	String filtersn=lang.get("register_module.category.dsp.filter");
+	String filter="Filter";
+	String delaysn=lang.get("register_module.category.dsp.delay");
+	String delay="Delay";
+	String dynamicsn=lang.get("register_module.category.dsp.dynamic");
+	String dynamic="Dynamic";
+	String cate="";
 
 	reg.registerModule(lang, filter, filtersn, "AllPassFilter", "register_module.dsp.name.all_pass_filter", [](){return std::make_shared<AllPassFilter>();});
 	reg.registerModule(lang, filter, filtersn, "BiquadIIR", "register_module.dsp.name.biquad", [](){return std::make_shared<BiquadIIR>();});
@@ -230,14 +231,14 @@ void registerAllDSP(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, delay, delaysn, "UnitDelay", "register_module.dsp.name.unit_delay", [](){return std::make_shared<UnitDelay>();});
 }
 void registerAllInterpolator(Lang & lang, MenuRegister & reg){
-	std::string cate="";
+	String cate="";
 	reg.registerModule(lang, cate, cate, "PowInterpolator", "register_module.interpolator.name.pow", [](){return std::make_shared<PowInterpolator>();});
 	reg.registerModule(lang, cate, cate, "GraphInterpolator", "register_module.interpolator.name.graph", [](){return std::make_shared<GraphInterpolator>();}, graphInterpRenderFunc);
 	//reg.registerModule("", "Bezier", [](){return std::make_shared<BezierInterpolator>();});
 	reg.registerModule(lang, cate, cate, "LineInterpolator", "register_module.interpolator.name.linear", [](){return std::make_shared<LineInterpolator>();});
 }
 void registerAllPhaseSrc(Lang & lang, MenuRegister & reg){
-	std::string cate="";
+	String cate="";
 	reg.registerModule(lang, cate, cate, "NotePhase", "register_module.phasesrc.name.note", [](){return std::make_shared<_NotePhase>();});
 	reg.registerModule(lang, cate, cate, "AddPhase", "register_module.phasesrc.name.add", [](){return std::make_shared<_AddPhase>();});
 	reg.registerModule(lang, cate, cate, "MulPhase", "register_module.phasesrc.name.mul", [](){return std::make_shared<_MulPhase>();});

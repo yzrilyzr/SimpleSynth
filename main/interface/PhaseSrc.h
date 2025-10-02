@@ -9,6 +9,6 @@ namespace yzrilyzr_simplesynth{
 		virtual ~PhaseSrc()=default;
 		virtual s_phase getPhase(Note & note)=0;
 		virtual void init(){}
-		void registerParamPhaseSrc(const std::string & name, std::shared_ptr<PhaseSrc> *value);
+		void registerParamPhaseSrc(const yzrilyzr_lang::String & name, std::shared_ptr<PhaseSrc> *value);
 	};
 }

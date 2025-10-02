@@ -33,7 +33,7 @@ namespace yzrilyzr_simplesynth{
 		BowedStringKeyData & data=*getData(note);
 		RingBufferSample & buffer=data.ringBuffer;
 		u_freq freq2=getSetFreq(note);
-		static thread_local size_t randomIndex=0;
+		static thread_local u_index randomIndex=0;
 		u_sample input=random->next(&randomIndex) * 0.1;
 		s_phase time=getPhase(note);//. % 1;
 		time=time - (int)time;

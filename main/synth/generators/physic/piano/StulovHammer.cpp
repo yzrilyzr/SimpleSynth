@@ -1,5 +1,5 @@
 #include "StulovHammer.h"
-
+using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	void StulovHammer::init(double sampleRate, double m, double K, double p, double Z, double alpha){
 		this->sampleRate=sampleRate;
@@ -18,13 +18,13 @@ namespace yzrilyzr_simplesynth{
 		this->upprev=0;
 	}
 	double StulovHammer::load(double in){
-		for(int j=0;j < S;j++){
+		for(u_index j=0;j < S;j++){
 			double up;
 			double v1=0;
 			double x1=0;
 			up=(x > 0)?pow(x, p):0;
 			double dupdt=(up - upprev) * dti;
-			for(int k=0;k < S;k++){
+			for(u_index k=0;k < S;k++){
 				F=K * (up + alpha * dupdt);
 				if(this->F < 0) this->F=0;
 				a=-F * mi;
@@ -45,7 +45,7 @@ namespace yzrilyzr_simplesynth{
 		this->v=v;
 		this->x=0.0f;
 	}
-	std::string StulovHammer::toString()const{
+	String StulovHammer::toString()const{
 		return "StulovHammer";
 	}
 }

@@ -75,7 +75,7 @@ namespace yzrilyzr_simplesynth{
 		// 创建新的弦数组
 		key.string.clear();
 		// 初始化每根弦的数字波导模型
-		for(int k=0; k < stringCount; k++){
+		for(u_index k=0; k < stringCount; k++){
 			std::shared_ptr<PianoDwgs> pianoDWGs=std::make_shared<PianoDwgs>();
 			key.string.push_back(pianoDWGs);
 			// 初始化弦的物理模型，应用失谐因子
@@ -109,7 +109,7 @@ namespace yzrilyzr_simplesynth{
 		int dispersionOrder=0;
 		if(freq > 400)dispersionOrder=1;
 		else dispersionOrder=4;
-		for(int m=0;m < dispersionOrder;m++){
+		for(u_index m=0;m < dispersionOrder;m++){
 			double targetDelay=IIRUtil::calculateThiranDelay(dispersionFactor, freq, dispersionOrder);
 			targetDelay=std::max(targetDelay, 1.0);
 			dispersionDelay+=targetDelay;
@@ -203,7 +203,7 @@ namespace yzrilyzr_simplesynth{
 		return output;
 	}
 	void PianoModel::PianoKeyTrigger(PianoKey & key, s_note_vel v){
-		for(int i=0; i < key.string.size();i++){
+		for(u_index i=0; i < key.string.size();i++){
 			PianoDwgs & dwgs=*key.string[i];
 			DigitalWaveGuide & dwg=dwgs.dwgs[1];
 			dwg.damper=1;
@@ -211,7 +211,7 @@ namespace yzrilyzr_simplesynth{
 		key.hammer->trigger(v * key.weight);
 	}
 	void PianoModel::PianoKeyDamper(PianoKey & key){
-		for(int i=0; i < key.string.size();i++){
+		for(u_index i=0; i < key.string.size();i++){
 			PianoDwgs & dwgs=*key.string[i];
 			DigitalWaveGuide & dwg=dwgs.dwgs[1];
 			dwg.damper=Util::clamp01(0.05 - key.offTimePassed) * 20;

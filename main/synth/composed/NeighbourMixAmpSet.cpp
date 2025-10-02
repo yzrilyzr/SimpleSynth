@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 		notesRatio[note][1]=1.0;
 		return this;
 	}
-	std::string NeighbourMixAmpSet::toString()const{
+	String NeighbourMixAmpSet::toString()const{
 		return StringFormat::format("InterpolateAmpSet(%s)", getPhaseSource());
 	}
 	bool NeighbourMixAmpSet::noMoreData(Note & note){

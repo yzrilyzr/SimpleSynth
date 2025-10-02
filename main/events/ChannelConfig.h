@@ -1,12 +1,13 @@
 #pragma once
 #include "SimpleSynth.h"
 #include "events/PNData.h"
+#include "array/Array.hpp"
 
-namespace yzrilyzr_array{
-	class SampleArray;
-}
 namespace yzrilyzr_interpolator{
 	class Interpolator;
+}
+namespace yzrilyzr_dsp{
+	class DSP3D;
 }
 namespace yzrilyzr_simplesynth{
 	class NoteTuning;
@@ -15,10 +16,13 @@ namespace yzrilyzr_simplesynth{
 	class IMixer;
 	class IChannel;
 	class ChannelEvent;
+	class InstrumentProvider;
 	typedef std::shared_ptr<NoteProcessor> NoteProcPtr;
 	EBCLASS(ChannelConfig){
 		private:
 		NoteProcPtr sp_noteProcessor=nullptr;
+		std::shared_ptr<yzrilyzr_dsp::DSP3D> sp_dsp3d=nullptr;
+		std::shared_ptr<InstrumentProvider> sp_instrument=nullptr;
 		std::shared_ptr<NoteTuning> sp_tuning=nullptr;
 		std::shared_ptr<yzrilyzr_interpolator::Interpolator> sp_velocityMap=nullptr;
 		public:
@@ -56,19 +60,32 @@ namespace yzrilyzr_simplesynth{
 		PNData nrpn;                     // NRPN参数
 		bool noteHoldMap[CHANNEL_MAX_NOTE_ID]={false}; // 音符是否按下映射
 		bool sostenutoLock[CHANNEL_MAX_NOTE_ID]={false};         // 选择性延音锁定状态
-		NoteTuning * tuning=nullptr;
+		//
 		NoteProcessor * noteProcessor=nullptr;
 		Note * lastNote=nullptr;// 上次触发NoteOn的音符
+		NoteTuning * tuning=nullptr;
 		yzrilyzr_interpolator::Interpolator * velocityMap=nullptr;
+		yzrilyzr_dsp::DSP3D * dsp3d=nullptr;
 		//
+		void setContext(IMixer * mixer,  IChannel * channel);
 		void postInstantEvent(ChannelEvent * event);
-		void setOnlyChannelConfig(ChannelConfig & other);
+		void setNoteProcessor(NoteProcPtr val);
+		void setOnlyChannelConfig(const ChannelConfig & other);
 		void sostenutoChange();
 		void allNotesOff();
-		void setNoteProcessor(NoteProcPtr val);
-		void setNoteTuning(std::shared_ptr<NoteTuning> val);
-		void setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val);		
 		void reset();
 		~ChannelConfig();
+		//
+		public:		
+		std::shared_ptr<InstrumentProvider> getInstrumentProvider()const;
+		void setInstrumentProvider(std::shared_ptr<InstrumentProvider> instr);
+		std::shared_ptr<NoteTuning> getNoteTuning()const;
+		void setNoteTuning(std::shared_ptr<NoteTuning> tun);
+		std::shared_ptr<yzrilyzr_interpolator::Interpolator> getNoteVelocityMap()const;
+		void setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val);
+		void set3DEffect(std::shared_ptr<yzrilyzr_dsp::DSP3D> dsp3d);
+		std::shared_ptr<yzrilyzr_dsp::DSP3D> get3DEffect();
+		void set(const ChannelConfig & other);
+		static std::shared_ptr<ChannelConfig> DefaultConfig();
 	};
 }

@@ -3,7 +3,7 @@
 #include "SimpleSynth.h"
 #include "SynthUtil.h"
 #include "interpolator/GraphInterpolator.h"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
 #include "events/NoteData.hpp"
 #include "piano/PianoKey.h"
 #include "piano/PianoKeyParameters.h"

@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 	WaveSampler::WaveSampler() :Osc(nullptr){
 		static s_phase phase_min=0, phase_max=100;
 		static int32_t loop_min=0, loop_max=1000000;
-		static size_t len_min=0, len_max=1000000;
+		static u_index len_min=0, len_max=1000000;
 		registerParamSample("SampleData", &sampleData);
 		registerParam("PhaseMul", ParamType::Double, &phaseMul, &phase_min, &phase_max);
 		registerParam("SampleOffset", ParamType::Size, &sampleOffset, &len_min, &len_max);
@@ -30,7 +30,7 @@ namespace yzrilyzr_simplesynth{
 		registerParam("LoopType", ParamType::Enum, &loopType, enumNames, &names);
 	}
 
-	WaveSampler::WaveSampler(std::shared_ptr<PhaseSrc> freq, s_phase phaseMul, std::shared_ptr<SampleProvider> sampleData, size_t sampleOffset, size_t sampleLength,
+	WaveSampler::WaveSampler(std::shared_ptr<PhaseSrc> freq, s_phase phaseMul, std::shared_ptr<SampleProvider> sampleData, u_index sampleOffset, u_index sampleLength,
 							 int32_t startLoopIndex, int32_t endLoopIndex, int loopType) :
 		Osc(freq),
 		sampleData(sampleData),
@@ -102,7 +102,7 @@ namespace yzrilyzr_simplesynth{
 				return index;
 		}
 	}
-	std::string WaveSampler::toString() const{
+	String WaveSampler::toString() const{
 		return StringFormat::object2string("WaveSampler", getPhaseSource(),
 										   phaseMul,
 										   sampleData,

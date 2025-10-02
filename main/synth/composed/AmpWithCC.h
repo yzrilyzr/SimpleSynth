@@ -2,7 +2,7 @@
 #include "SimpleSynth.h"
 #include "interface/NoteProcessor.h"
 #include "AmpUnaryComposition.h"
-#include "array/IntArray.h"
+#include "array/Array.hpp"
 
 namespace yzrilyzr_simplesynth{
 	ECLASS(AmpWithCC, public AmpUnaryComposition){
@@ -15,6 +15,6 @@ namespace yzrilyzr_simplesynth{
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
 	void init(ChannelConfig & cfg) override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

@@ -2,7 +2,7 @@
 #include "DWGNode.h"
 #include "SimpleSynth.h"
 #include "yzrutil.h"
-#include "array/ObjectArray.hpp"
+#include "array/Array.hpp"
 #include "dsp/RingBuffer.h"
 #include "dsp/DSP.h"
 #include <vector>

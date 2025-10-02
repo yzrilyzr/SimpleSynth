@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 	bool AmpBuilderProcessor::isStackFull(){
 		return stackPointer >= stackLength;
 	}
-	void AmpBuilderProcessor::setStackType(int type, size_t len){
+	void AmpBuilderProcessor::setStackType(int type, u_index len){
 		stackType=type;
 		stackLength=len;
 		stackPointer=0;

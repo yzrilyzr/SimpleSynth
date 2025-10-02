@@ -22,6 +22,6 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr clone() override{
 		return std::make_shared<AmpQuantization>(a, quantization);
 	}
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

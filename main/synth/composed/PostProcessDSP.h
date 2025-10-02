@@ -17,6 +17,6 @@ namespace yzrilyzr_simplesynth{
 	u_sample getAmp(Note & note) override;
 	u_sample postProcess(u_sample output) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

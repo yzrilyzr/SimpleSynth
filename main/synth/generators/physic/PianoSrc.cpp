@@ -55,7 +55,7 @@ namespace yzrilyzr_simplesynth{
 				108, 0.00200, // 极高音区
 				128, 0.00250  // 极高音区
 		}, 18));
-		for(int i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
 			PianoKeyParameters & kp=keyParams[i];
 			kp.noteID=i;
 			kp.minr=0.34;

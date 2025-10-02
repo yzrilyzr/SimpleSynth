@@ -138,10 +138,10 @@ namespace yzrilyzr_simplesynth{
 			.build());
 		add(MIDIFile::DrumSet::BASS_DRUM_ACOUSTIC, AmpBuilder().src(std::make_shared<SimpleDrumAmp>(std::make_shared<SineWave>(), 350, 50, 1.0f, SimpleDrumAmp::MODE_FIXED, Pow(-50)))
 			.ADSR(10, 5, 1, false, 500, 500, Pow(-5), Pow(2), Pow(10))
-			.arctanDistortion(1,10,1)
+			.arctanDistortion(1, 10, 1)
 			.add(AmpBuilder().src(std::make_shared<SimpleDrumAmp>(std::make_shared<SineWave>(), 1000, 100, 0.1f, SimpleDrumAmp::MODE_FIXED, Pow(-50)))
 				 .ADSR(10, 5, 1, false, 100, 100, Pow(-5), Pow(2), Pow(5))
-				 .arctanDistortion(1, 10,0.3)
+				 .arctanDistortion(1, 10, 0.3)
 				 .build())
 			.build());
 		add(MIDIFile::DrumSet::BASS_DRUM_1, AmpBuilder().src(std::make_shared<SimpleDrumAmp>(std::make_shared<SineWave>(), 250, 40, 1.0f, SimpleDrumAmp::MODE_FIXED, Pow(-25)))
@@ -200,7 +200,8 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 2243, 0.7, 0)
 					 .build())
 			.mul(0.8)
-			.ADSR(5, 1, 1, false, 1000, Pow(5), Pow(5), std::make_shared<GraphInterpolator>(std::make_shared<DoubleArray>(std::vector<double>{
+			.ADSR(5, 1, 1, false, 1000, Pow(5), Pow(5),
+				  std::make_shared<GraphInterpolator>(std::initializer_list<double>{
 			0, 0,
 				0.15, 0.00001,
 				0.35, 0.001,
@@ -215,7 +216,7 @@ namespace yzrilyzr_simplesynth{
 				0.985, 0,
 				0.994, 1,
 				0.995, 0,
-				1, 1})))
+				1, 1}))
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_1,
 			AmpBuilder(std::make_shared<CymbalOsc>(1))

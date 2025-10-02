@@ -38,7 +38,7 @@ namespace yzrilyzr_simplesynth{
 		data->last=0;
 		return data;
 	}
-	std::string MeanFilterSrc::toString()const{
+	String MeanFilterSrc::toString()const{
 		return StringFormat::object2string("MeanFilterSrc", src, env, envMulti);
 	}
 }

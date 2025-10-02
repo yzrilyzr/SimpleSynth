@@ -46,7 +46,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr LFSRNoise::clone(){
 		return std::make_shared<LFSRNoise>(shiftCount);
 	}
-	std::string LFSRNoise::toString()const{
+	String LFSRNoise::toString()const{
 		return StringFormat::object2string("LFSRNoise", shiftCount);
 	}
 }

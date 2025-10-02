@@ -25,6 +25,6 @@ namespace yzrilyzr_simplesynth{
 	bool noMoreData(Note & note) override;
 	NoteProcPtr clone() override;
 	MeanFilterSrcKeyData * init(MeanFilterSrcKeyData * data, Note & note) override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

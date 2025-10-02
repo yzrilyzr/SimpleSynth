@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr PostProcessDSP::clone(){
 		return std::make_shared<PostProcessDSP>(a->clone(), dsp->cloneDSP());
 	}
-	std::string PostProcessDSP::toString() const{
+	String PostProcessDSP::toString() const{
 		return StringFormat::object2string("PostProcessDSP", a, dsp);
 	}
 }

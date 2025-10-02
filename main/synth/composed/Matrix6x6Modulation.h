@@ -53,7 +53,7 @@ namespace yzrilyzr_simplesynth{
 		Matrix6x6ModulationBuilder(){
 			ptr=std::make_shared<Matrix6x6Modulation>();
 		}
-		Matrix6x6ModulationBuilder & setOp(size_t index, NoteProcPtr osc,
+		Matrix6x6ModulationBuilder & setOp(u_index index, NoteProcPtr osc,
 									double freqMul=1.0, u_freq freqOff=0.0,
 									s_phase initPhase=0.0, u_sample input=1.0,
 									u_sample output=0.0){
@@ -66,7 +66,7 @@ namespace yzrilyzr_simplesynth{
 			op.output=output;
 			return *this;
 		}
-		Matrix6x6ModulationBuilder & setMatrix(int type, size_t from, size_t to, u_sample depth){
+		Matrix6x6ModulationBuilder & setMatrix(int type, u_index from, u_index to, u_sample depth){
 			if(type == TYPE_FM)ptr->fmMatrix[from][to]=depth;
 			else if(type == TYPE_RM)ptr->rmMatrix[from][to]=depth;
 			return *this;

@@ -46,7 +46,7 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg) override;
 	NoteProcPtr clone() override;
 	u_sample getAmp(Note & note) override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	private:
 	u_freq getSetFreq(Note & note);
 	};

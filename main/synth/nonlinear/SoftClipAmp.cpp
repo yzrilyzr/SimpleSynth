@@ -43,7 +43,7 @@ namespace yzrilyzr_simplesynth{
 		return std::make_shared<SoftClipAmp>(a->clone(), inputGain, threshold, outputGain);
 	}
 
-	std::string SoftClipAmp::toString() const{
+	String SoftClipAmp::toString() const{
 		return StringFormat::object2string("SoftClipAmp", a, inputGain, threshold, outputGain);
 	}
 }

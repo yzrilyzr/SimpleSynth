@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 		registerParamSrc("A", &a);
 		registerParamSrc("B", &b);
 	}
-	std::string AmpBinaryComposition::toString() const{
+	String AmpBinaryComposition::toString() const{
 		return StringFormat::format("AmpBinaryComposition(%s,%s)", a, b);
 	}
 	void AmpBinaryComposition::init(ChannelConfig & cfg){

@@ -9,6 +9,7 @@
 using namespace yzrilyzr_ast;
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
+using namespace yzrilyzr_lang;
 static int fMulI1=4;
 static int fMulI2=4;
 void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
@@ -20,7 +21,7 @@ void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	//
 	bool change=false;
 	ImGui::BeginChild("Exciter", ImVec2(ImGui::GetContentRegionAvail().x * 0.25f, 0));
-	change=ImGuiKnobs::Knob("NoiseMix", &paramRegPtr->noiseMixRatio, 0.0f, 1.0f, 0.01f, "%.2f", knobvariant, knobSize, knobFlags)||change;
+	change=ImGuiKnobs::Knob("NoiseMix", &paramRegPtr->noiseMixRatio, 0.0f, 1.0f, 0.01f, "%.2f", knobvariant, knobSize, knobFlags) || change;
 	ImGui::SameLine();
 	change=ImGuiKnobs::Knob("NoiseRate", &paramRegPtr->noiseRate, 0.0f, 1.0f, 0.01f, "%.2f", knobvariant, knobSize, knobFlags) || change;
 	change=ImGuiKnobs::Knob("HiCutFreq", &paramRegPtr->exciterHiCutFreq, 0.0f, 1.0f, 0.01f, "%.2f", knobvariant, knobSize, knobFlags) || change;
@@ -93,7 +94,7 @@ void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	static double freqMin=20.0;
 	static double freqMax=20000.0;
 	//ImGui::PushItemWidth(300);
-	for(int i=0;i < 8;i++){
+	for(u_index i=0;i < 8;i++){
 		ImGui::PushID(i);
 		change=ImGui::SliderScalar("Freq##ExciterHiCutFreq", ImGuiDataType_Double, &paramRegPtr->resonatorFreq[i], &freqMin, &freqMax, "%.1f Hz", ImGuiSliderFlags_Logarithmic) || change;
 		change=ImGui::SliderFloat("Fb", &paramRegPtr->resonatorFeedback[i], -1.0f, 1.0f) || change;
@@ -111,7 +112,7 @@ void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 
 int toFMulI(double x){
 	const double elems_value[9]={1.0 / 5.0, 1.0 / 4.0, 1.0 / 3.0, 1.0 / 2.0, 1.0, 2.0, 3.0, 4.0, 5.0};
-	for(int i=0;i < 9;i++){
+	for(u_index i=0;i < 9;i++){
 		if(abs(x - elems_value[i]) < 0.001)return i;
 	}
 	return 4;
@@ -239,10 +240,10 @@ void SakuraEditWindow(IMixer & mixer, std::shared_ptr<Sakura> & paramRegPtr){
 						tokens->next();
 					}
 				}
-				std::cout << to.toString().c_str() << std::endl;
+				std::cout << to.toString().c_str(UTF8) << std::endl;
 				tokens->next();
 			}
-			for(int i=0;i < 8;i++){
+			for(u_index i=0;i < 8;i++){
 				if(!resOn[i])paramRegPtr->resonatorEnabled[i]=false;
 			}
 		} catch(...){
@@ -276,7 +277,7 @@ void SakuraEditWindow(IMixer & mixer, std::shared_ptr<Sakura> & paramRegPtr){
 			")" << std::endl;
 		ss << ".stringLevel(" << paramRegPtr->stringOutputLevel << ")" << std::endl;
 		ss << ".comb(" << paramRegPtr->combPosition << ", " << paramRegPtr->combFeedback1 << ", " << paramRegPtr->combFeedback2 << ", " << paramRegPtr->combOutputLevel << ")" << std::endl;
-		for(int i=0;i < 8;i++){
+		for(u_index i=0;i < 8;i++){
 			bool enable=paramRegPtr->resonatorEnabled[i];
 			if(!enable)continue;
 			ss << ".resonator(" << i << ", " << paramRegPtr->resonatorFreq[i] << ", " << paramRegPtr->resonatorFeedback[i] << ")" << std::endl;

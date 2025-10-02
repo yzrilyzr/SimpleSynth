@@ -16,9 +16,9 @@ using json=nlohmann::json;
 
 EBCLASS(ProjectObject){
 	public:
-	std::string category;
-	std::string name;
-	std::string showName;
+	yzrilyzr_lang::String category;
+	yzrilyzr_lang::String name;
+	yzrilyzr_lang::String showName;
 	json fromJSON=nullptr;
 	std::shared_ptr<yzrilyzr_util::ParamRegister> paramRegPtr=nullptr;
 	bool showWindow=true;
@@ -30,7 +30,7 @@ EBCLASS(ProjectObject){
 	ImVec2 rightButtonCenter;
 	MenuRegister::RenderFunc renderFunc;
 	bool enableOriginalRender=true;
-	std::unordered_map<std::string, std::shared_ptr<yzrilyzr_lang::Object>> storeData;
+	std::unordered_map<yzrilyzr_lang::String, std::shared_ptr<yzrilyzr_lang::Object>> storeData;
 	json to_json() const;
 	void from_json(const json & j);
 	void renderWindow(CurrentProjectContext & ctx);

@@ -50,7 +50,7 @@ namespace yzrilyzr_simplesynth{
 		return std::make_shared<FoldbackDistortion>(a->clone(), inputGain, threshold, foldRatio, outputGain);
 	}
 
-	std::string FoldbackDistortion::toString() const{
+	String FoldbackDistortion::toString() const{
 		return StringFormat::object2string("FoldbackDistortion", a, inputGain, threshold, foldRatio, outputGain);
 	}
 }

@@ -16,7 +16,7 @@ namespace yzrilyzr_simplesynth{
 	inline s_phase getPhase(Note & note) override final{
 		return note.phaseSynth;
 	}
-	std::string toString() const override{
+	yzrilyzr_lang::String toString() const override{
 		return "NotePhase";
 	}
 	};
@@ -38,7 +38,7 @@ namespace yzrilyzr_simplesynth{
 	inline s_phase getPhase(Note & note) override final{
 		return src->getPhase(note) * r;
 	}
-	std::string toString()const override{
+	yzrilyzr_lang::String toString()const override{
 		return  yzrilyzr_lang::StringFormat::format("MulPhase(%s, %f)", src, r);
 	}
 	};
@@ -62,7 +62,7 @@ namespace yzrilyzr_simplesynth{
 	inline s_phase getPhase(Note & note) override final{
 		return a->getPhase(note) + b->getPhase(note);
 	}
-	std::string toString()const override{
+	yzrilyzr_lang::String toString()const override{
 		return  yzrilyzr_lang::StringFormat::format("AddPhase(%s, %s)", a, b);
 	}
 	};
@@ -77,7 +77,7 @@ namespace yzrilyzr_simplesynth{
 	inline s_phase getPhase(Note & note) override final{
 		return hz * note.passedTime;
 	}
-	std::string toString()const override{
+	yzrilyzr_lang::String toString()const override{
 		return  yzrilyzr_lang::StringFormat::format("ConstPhase(%f)", hz);
 	}
 	};
@@ -92,7 +92,7 @@ namespace yzrilyzr_simplesynth{
 	inline u_sample getAmp(Note & note) override final{
 		return value;
 	}
-	std::string toString()const override{
+	yzrilyzr_lang::String toString()const override{
 		return  yzrilyzr_lang::StringFormat::format("ConstAmp(%f)", value);
 	}
 	};
@@ -101,7 +101,7 @@ namespace yzrilyzr_simplesynth{
 	inline u_sample getAmp(Note & note) override final{
 		return note.idSynth;
 	}
-	std::string toString() const override{
+	yzrilyzr_lang::String toString() const override{
 		return "NoteIDAmp";
 	}
 	};
@@ -110,7 +110,7 @@ namespace yzrilyzr_simplesynth{
 	inline u_sample getAmp(Note & note) override final{
 		return note.freqSynth;
 	}
-	std::string toString() const override{
+	yzrilyzr_lang::String toString() const override{
 		return "NoteFreqAmp";
 	}
 	};
@@ -119,7 +119,7 @@ namespace yzrilyzr_simplesynth{
 	inline u_sample getAmp(Note & note) override final{
 		return note.velocitySynth;
 	}
-	std::string toString() const override{
+	yzrilyzr_lang::String toString() const override{
 		return "NoteVelAmp";
 	}
 	};

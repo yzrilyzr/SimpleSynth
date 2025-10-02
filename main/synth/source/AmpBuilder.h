@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "array/IntArray.h"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
 #include "synth/generators/Osc.h"
 #include "dsp/FilterPassType.h"
 #include "interpolator/Interpolator.h"
@@ -122,6 +122,6 @@ namespace yzrilyzr_simplesynth{
 	// 工具方法
 	NoteProcPtr build(); // 构建最终的音频处理器
 	NoteProcPtr cali(int samples); // 校准处理
-	NoteProcPtr parse(const std::string & str); // 解析字符串配置
+	NoteProcPtr parse(const yzrilyzr_lang::String & str); // 解析字符串配置
 	};
 }

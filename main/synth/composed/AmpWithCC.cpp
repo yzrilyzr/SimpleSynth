@@ -23,7 +23,7 @@ namespace yzrilyzr_simplesynth{
 			cfg.postInstantEvent(cc1);
 		}
 	}
-	std::string AmpWithCC::toString()const{
+	String AmpWithCC::toString()const{
 		return StringFormat::object2string("AmpWithCC", a, cc);
 	}
 }

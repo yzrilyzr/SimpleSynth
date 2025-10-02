@@ -31,7 +31,7 @@ namespace yzrilyzr_simplesynth{
 		sumExcite=exciteClickFunc(note.phaseSynth);
 		u_sample_rate sampleRate=note.cfg->sampleRate;
 		data->noiseRateCounter+=noiseRate * sampleRate;
-		static thread_local size_t randomIndex=0;
+		static thread_local u_index randomIndex=0;
 		if(data->noiseRateCounter > sampleRate){
 			data->noiseRateCounter=0;
 			data->lastNoiseValue=random.next(&randomIndex);

@@ -1,5 +1,5 @@
 ﻿#include "SimpleDrumSet.h"
-#include "SimpleMidiInstrument.h"
+#include "SimpleMIDIInstrument.h"
 #include "dsp/Chorus.h"
 #include "dsp/DSPGroupBuilder.h"
 #include "dsp/Delayer.h"
@@ -33,7 +33,7 @@ using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_array;
 
 namespace yzrilyzr_simplesynth{
-	NoteProcPtr SimpleMidiInstrument::get(s_bank_id bank, s_program_id program, u_sample_rate sampleRate){
+	NoteProcPtr SimpleMIDIInstrument::get(s_bank_id bank, s_program_id program, u_sample_rate sampleRate){
 		switch(program){
 			case MIDIFile::Instruments::PIANO_ACOUSTIC_GRAND_PIANO:
 				return std::make_shared<PianoSrc>();
@@ -415,7 +415,6 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::BASS_SLAP_BASS_1:
 			case MIDIFile::Instruments::BASS_SLAP_BASS_2:
 				return AmpBuilder().src(std::make_shared<Pulse>(0.3, 0.4, 0.3, 0))
-					.add(ConstAmp(-0.5))
 					.ks(0.9)
 					.IIR(sampleRate, 2, 10.1, 20000.0)
 					.mul(1.2)
@@ -1119,7 +1118,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(AmpBuilder().src(std::make_shared<NoiseSrc>())
 										.addMul(std::make_shared<SquareWave>(ConstPhase(51)), 0.1)
 										.mean(std::make_shared<TimeEnvelop>(2100, Pow(-4)), 130)
-										.build()).ADSR(2, 0, 0, false, 2000, Pow(5), Pow(5), std::make_shared<GraphInterpolator>(std::make_shared<DoubleArray>(std::vector<double>{
+										.build()).ADSR(2, 0, 0, false, 2000, Pow(5), Pow(5), std::make_shared<GraphInterpolator>(std::initializer_list<double>{
 					0, 0,
 						0.15, 0.00001,
 						0.35, 0.001,
@@ -1134,12 +1133,12 @@ namespace yzrilyzr_simplesynth{
 						0.985, 0,
 						0.994, 1,
 						0.995, 0,
-						1, 1}))).build();
+						1, 1})).build();
 			default:
 				return nullptr;
 		}
 	}
-	NoteProcPtr SimpleMidiInstrument::getDrumSet(s_bank_id bank, u_sample_rate sampleRate){
+	NoteProcPtr SimpleMIDIInstrument::getDrumSet(s_bank_id bank, u_sample_rate sampleRate){
 		return std::make_shared<SimpleDrumSet>();
 	}
 }

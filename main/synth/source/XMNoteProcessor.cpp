@@ -1,5 +1,5 @@
 ﻿#include "XMNoteProcessor.h"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
 #include "events/ChannelConfig.h"
 #include "events/ChannelEvent.h"
 #include "synth/envelopers/AHDSREnvelop.h"
@@ -16,7 +16,7 @@ namespace yzrilyzr_simplesynth{
 		XMFile::Envelop & volEnv=xmInstrument->volume_envelope;
 		if(volEnv.enabled){
 			DoubleArray pts(volEnv.num_points * 2);
-			for(int i=0;i < volEnv.num_points;i++){
+			for(u_index i=0;i < volEnv.num_points;i++){
 				XMFile::EnvelopPoint & envelopPoint=volEnv.points[i];
 				pts[i * 2]=envelopPoint.frame * 1000.0 / ticksPerSecond;
 				pts[i * 2 + 1]=envelopPoint.value / 64.0;
@@ -31,7 +31,7 @@ namespace yzrilyzr_simplesynth{
 		XMFile::Envelop & panEnv=xmInstrument->panning_envelope;
 		if(panEnv.enabled){
 			DoubleArray pts(panEnv.num_points * 2);
-			for(int i=0;i < panEnv.num_points;i++){
+			for(u_index i=0;i < panEnv.num_points;i++){
 				XMFile::EnvelopPoint & envelopPoint=panEnv.points[i];
 				pts[i * 2]=envelopPoint.frame * 1000.0 / ticksPerSecond;
 				pts[i * 2 + 1]=(envelopPoint.value - 32) / 32.0;
@@ -41,15 +41,15 @@ namespace yzrilyzr_simplesynth{
 													   panEnv.loop_enabled?panEnv.loop_end_point:-1,
 													   &pts);
 		}
-		for(int i=0;i < instrument->num_samples;i++){
+		for(u_index i=0;i < instrument->num_samples;i++){
 			XMFile::SampleData & xsample=xmInstrument->samples[i];
 			/*std::shared_ptr<SampleArray> sData=std::make_shared<SampleArray>(xsample.length);
 			if(xsample.bits == 8){
-				for(int j=0;j < sData->length;j++){
+				for(u_index j=0;j < sData->length;j++){
 					(*sData)[j]=(*xsample.data8)[j] / 127.0 * xsample.volume;
 				}
 			} else if(xsample.bits == 16){
-				for(int j=0;j < sData->length;j++){
+				for(u_index j=0;j < sData->length;j++){
 					(*sData)[j]=(*xsample.data16)[j] / 32767.0 * xsample.volume;
 				}
 			}*/

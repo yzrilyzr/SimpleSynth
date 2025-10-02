@@ -32,7 +32,7 @@ namespace yzrilyzr_simplesynth{
 		data->dsp->resetMemory();
 		return data;
 	}
-	std::string NoteDSP::toString() const{
+	String NoteDSP::toString() const{
 		return StringFormat::object2string("DSP", a, dsp);
 	}
 }

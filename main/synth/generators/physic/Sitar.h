@@ -5,7 +5,7 @@
 #include "SynthUtil.h"
 #include "dsp/RingBuffer.h"
 #include "dsp/IIR.h"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
 
 namespace yzrilyzr_simplesynth{
 	ECLASS(Sitar, public Osc, NoteData<yzrilyzr_dsp::RingBufferSample>){

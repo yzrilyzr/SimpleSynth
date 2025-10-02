@@ -47,7 +47,7 @@ namespace yzrilyzr_simplesynth{
 		data->phaseSynth=0.0;
 		return data;
 	}
-	std::string HardSync::toString() const{
+	String HardSync::toString() const{
 		return StringFormat::object2string("HardSync", a, slaveFreqRatio);
 	}
 }

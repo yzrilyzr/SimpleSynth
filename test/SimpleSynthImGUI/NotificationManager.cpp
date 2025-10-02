@@ -1,5 +1,6 @@
 ﻿#include "NotificationManager.h"
-void  NotificationManager::AddNotification(const std::string & message, float duration=3.0f, ImVec4 color=ImVec4(0.0f, 1.0f, 0.0f, 1.0f)){
+using namespace yzrilyzr_lang;
+void  NotificationManager::AddNotification(const String & message, float duration=3.0f, ImVec4 color=ImVec4(0.0f, 1.0f, 0.0f, 1.0f)){
 	messages.push_back(NotificationMessage{message, ImGui::GetTime() + duration, color});
 }
 void NotificationManager::Draw(){
@@ -45,7 +46,7 @@ void NotificationManager::Draw(){
 		ImGui::PushStyleColor(ImGuiCol_Text,
 							  ImVec4(messages[i].color.x, messages[i].color.y,
 									 messages[i].color.z, messages[i].color.w * alpha));
-		ImGui::TextWrapped("%s", messages[i].text.c_str());
+		ImGui::TextWrapped("%s", messages[i].text.c_str(UTF8));
 		ImGui::PopStyleColor();
 
 		ImGui::End();

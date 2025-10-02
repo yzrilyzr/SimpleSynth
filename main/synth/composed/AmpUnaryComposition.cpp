@@ -13,7 +13,7 @@ namespace yzrilyzr_simplesynth{
 		if(a == nullptr)throw NullPointerException("a == null");
 		a->init(cfg);
 	}
-	std::string AmpUnaryComposition::toString() const{
+	String AmpUnaryComposition::toString() const{
 		return StringFormat::format("AmpUnaryComposition(%s)", a);
 	}
 }

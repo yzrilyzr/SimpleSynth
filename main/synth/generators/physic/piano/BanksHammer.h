@@ -22,6 +22,6 @@ namespace yzrilyzr_simplesynth{
 	void init(double sampleRate, double m, double K, double p, double Z, double alpha) override;
 	double load(double vin) override;
 	void trigger(double v) override;
-	std::string toString()const override;
+	yzrilyzr_lang::String toString()const override;
 	};
 }

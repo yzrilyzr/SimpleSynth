@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 	NoteShift(NoteProcPtr a, int shift);
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override{
+	yzrilyzr_lang::String toString() const override{
 		return yzrilyzr_lang::StringFormat::format("NoteShift(%s,%d)", a, shift);
 	}
 	NoteShiftKeyData * init(NoteShiftKeyData * data, Note & note) override;

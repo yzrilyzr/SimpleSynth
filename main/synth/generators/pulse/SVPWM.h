@@ -31,6 +31,6 @@ namespace yzrilyzr_simplesynth{
 	float modulationPhase;      // 调制波初始相位(0-1)
 	bool thirdHarmonicInjection; // 是否使用三次谐波注入
 	bool cornerModulation;       // 是否使用折角调制
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

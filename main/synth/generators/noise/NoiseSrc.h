@@ -7,6 +7,6 @@ namespace yzrilyzr_simplesynth{
 	public:
 	NoiseSrc(){}
 	u_sample getAmp(Note & note) override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

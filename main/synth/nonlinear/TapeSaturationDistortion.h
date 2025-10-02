@@ -14,6 +14,6 @@ namespace yzrilyzr_simplesynth{
 	TapeSaturationDistortion(NoteProcPtr a, double inputGain, double drive, double bias, double outputGain);
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

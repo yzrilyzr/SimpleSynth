@@ -76,7 +76,7 @@ namespace yzrilyzr_simplesynth{
 		data->freqTimeSynth=0;
 		return data;
 	}
-	std::string SimpleDrumAmp::toString()const{
+	String SimpleDrumAmp::toString()const{
 		return StringFormat::object2string("SimpleDrumAmp", src, startFreq, endFreq, duration, mode, curve);
 	}
 }

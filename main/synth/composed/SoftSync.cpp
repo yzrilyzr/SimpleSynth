@@ -69,7 +69,7 @@ namespace yzrilyzr_simplesynth{
 		return data;
 	}
 
-	std::string SoftSync::toString() const{
+	String SoftSync::toString() const{
 		return StringFormat::object2string("SoftSync", a, slaveFreqRatio, syncInterp);
 	}
 }

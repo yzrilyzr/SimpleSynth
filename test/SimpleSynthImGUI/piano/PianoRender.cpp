@@ -59,7 +59,7 @@ void pianoRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	d=ImGui::SliderScalar("Hammer Hysteresis", ImGuiDataType_Double, &hysteresis, &STD_MIN, &STD_MAX) || d;
 	d=ImGui::SliderScalar("Hammer Pos", ImGuiDataType_Double, &pos, &POS_MIN, &POS_MAX) || d;
 	if(d){
-		for(int i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
 			PianoKeyParameters & kp=paramRegPtr->keyParams[i];
 			kp.minr=minR;
 			kp.maxr=maxR;

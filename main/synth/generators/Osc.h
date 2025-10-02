@@ -48,6 +48,6 @@ namespace yzrilyzr_simplesynth{
 	 */
 	void lpm(std::shared_ptr<Osc> lpmSrc, double lpmAmp, u_freq lpmHz);
 	void lpm(NoteProcPtr lpmSrc, double lpmAmp);
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

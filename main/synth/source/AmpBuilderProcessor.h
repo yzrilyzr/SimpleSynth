@@ -12,11 +12,11 @@ namespace yzrilyzr_simplesynth{
 	private:
 	AmpBuilder * amp=nullptr;
 	uint8_t stack[128]={0};
-	size_t stackPointer=0;
-	size_t stackLength=0;
+	u_index stackPointer=0;
+	u_index stackLength=0;
 	int stackType=0;
 	int regControl=0;
-	size_t regArgLen=0;
+	u_index regArgLen=0;
 	static constexpr int const TYPE_CONTROL=0;
 	static constexpr int const TYPE_ARGLEN=1;
 	static constexpr int const TYPE_ARG=2;
@@ -26,7 +26,7 @@ namespace yzrilyzr_simplesynth{
 	int32_t readShort();
 	uint8_t readByte();
 	float readFloat();
-	void setStackType(int type, size_t len);
+	void setStackType(int type, u_index len);
 	void processData(IMixer * mixer, IChannel * channel);
 	NoteProcPtr parseSrc();
 	public:

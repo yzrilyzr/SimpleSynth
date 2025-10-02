@@ -72,6 +72,6 @@ class CurrentProjectContext{
 	void saveAsSub(bool selectedOnly);
 };
 
-void name2obj(const std::string & category, const std::string & name, std::string * name1, std::string * category1, std::string * showName, std::shared_ptr<yzrilyzr_util::ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender);
+void name2obj(const yzrilyzr_lang::String & category, const yzrilyzr_lang::String & name, yzrilyzr_lang::String * name1, yzrilyzr_lang::String * category1, yzrilyzr_lang::String * showName, std::shared_ptr<yzrilyzr_util::ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender);
 json obj2json(yzrilyzr_collection::ArrayList<ProjectObject *> & arr, yzrilyzr_simplesynth::NoteProcPtr finalProcessor);
 void json2obj(json & j, yzrilyzr_collection::ArrayList<ProjectObject *> & arr);

@@ -107,7 +107,7 @@ void CurrentProjectContext::HandleSelectionAndDrag(){
 		}
 
 		if(selection.isDragging){
-			size_t posIndex=0;
+			u_index posIndex=0;
 			for(auto * obj : objects){
 				if(obj->isSelected && posIndex < originalPositions.size()){
 					obj->windowPos=ImVec2(

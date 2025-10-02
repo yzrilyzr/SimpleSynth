@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sample SineHarmonicWave::a(double x){
 		u_sample y=0;
-		for(int i=0;i<aa->length;i++){
+		for(u_index i=0;i<aa->length;i++){
 			if((*aa)[i]==0) continue;
 			y+=(*aa)[i]*fast_sin(x*(i+1.0),i);
 		}

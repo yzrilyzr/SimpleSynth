@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 	T * data[CHANNEL_MAX_VOICE]={nullptr};
 	NoteData(){}
 	~NoteData(){
-		for(int i=0;i < CHANNEL_MAX_VOICE;i++){
+		for(u_index i=0;i < CHANNEL_MAX_VOICE;i++){
 			delete data[i];
 		}
 	}

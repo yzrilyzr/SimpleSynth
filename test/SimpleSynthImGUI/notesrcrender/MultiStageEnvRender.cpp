@@ -1,7 +1,7 @@
 #include "../ProjectObject.h"
 #include "../SimpleSynthProject.h"
 #include "NoteSrcRender.h"
-#include "array/SampleArray.h"
+#include "array/Array.hpp"
 #include "events/NoteUpdater.h"
 #include "imgui-knobs.h"
 #include "imgui.h"
@@ -45,7 +45,7 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 			endX=std::max(dataSize - 1, endX);
 			MSEPoint * start=&pts[0];
 			MSEPoint * end=&pts[1];
-			for(int i=0;i < endX;i++){
+			for(u_index i=0;i < endX;i++){
 				u_time t=i / 1000.0;
 				if(t >= end->x){
 					start=end;
@@ -91,7 +91,7 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 		if(ImGui::DragFloat(ctx.LANG.getc("module.multi_stage_envelope.current_edit_x"), &oldX, 0.001, 0.0, 10.0)){
 			changed=true;
 			float deltaX=oldX - p.x;
-			for(int i=currentEdit;i < pts.size();i++){
+			for(u_index i=currentEdit;i < pts.size();i++){
 				pts[i].x+=deltaX;
 			}
 		}

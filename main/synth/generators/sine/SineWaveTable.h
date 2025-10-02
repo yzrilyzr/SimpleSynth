@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "synth/generators/Osc.h"
 #include "events/Note.h"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
 
 namespace yzrilyzr_simplesynth{
 	ECLASS(SineWaveTable, public Osc){

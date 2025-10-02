@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr clone()override{
 		return std::make_shared<EnvelopMultiplier>(a->clone(), b->clone());
 	}
-	std::string toString()const override{
+	yzrilyzr_lang::String toString()const override{
 		return yzrilyzr_lang::StringFormat::object2string("EnvelopMultiplier", a, b);
 	}
 	u_sample postProcess(u_sample output)override{

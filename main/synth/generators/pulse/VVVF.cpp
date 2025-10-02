@@ -1,6 +1,7 @@
 ﻿#include "VVVF.h"
-#include "events/ChannelEvent.h"
 #include "dsp/PWM.h"
+#include "events/ChannelEvent.h"
+#include "interface/NoteTuning.h"
 #include "lang/StringFormat.hpp"
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
@@ -22,16 +23,16 @@ namespace yzrilyzr_simplesynth{
 					sync=data.dataMSB;
 					break;
 				case 10103:
-					vSine=data.dataMSB / 127.0;
+					vSine=data.dataMSB / PNData::MSB_MAX;
 					break;
 			}
 		} else if(cc.isLSB()){
 			switch(data.select){
 				case 10100:
-					fSin=data.data / 16384.0 * 120;
+					fSin=data.data / PNData::LSB_MAX * 120;
 					break;
 				case 10101:
-					fTri=data.data / 16384.0 * 1000;
+					fTri=data.data / PNData::LSB_MAX * 1000;
 					break;
 			}
 		}
@@ -73,7 +74,7 @@ namespace yzrilyzr_simplesynth{
 		data->pTri=0;
 		return data;
 	}
-	std::string VVVF::toString() const{
+	String VVVF::toString() const{
 		return StringFormat::object2string("VVVF", getPhaseSource());
 	}
 }

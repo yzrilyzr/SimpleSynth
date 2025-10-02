@@ -48,7 +48,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr clone() override;
 	void init(ChannelConfig & cfg) override;
 	u_sample getAmp(Note & note) override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc)override;
 	AHDSREnvelopKeyData * init(AHDSREnvelopKeyData * data, Note & note) override;
 	private:

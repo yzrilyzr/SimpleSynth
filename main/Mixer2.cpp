@@ -2,10 +2,10 @@
 #include "NRPN.h"
 #include "SimpleSynth.h"
 #include "SynthUtil.h"
-#include "array/SampleArray.h"
-#include "collection/LinkedList.hpp"
+#include "array/Array.hpp"
 #include "dsp/Chorus.h"
 #include "dsp/DSP.h"
+#include "dsp/DSP3D.h"
 #include "dsp/DSPChain.h"
 #include "dsp/Freeverb.h"
 #include "dsp/Limiter.h"
@@ -17,12 +17,8 @@
 #include "events/PNData.h"
 #include "interface/InstrumentProvider.h"
 #include "interface/NoteProcessor.h"
-#include "interface/NoteTuning.h"
-#include "interpolator/PowInterpolator.h"
 #include "lang/Runtime.h"
 #include "lang/System.h"
-#include "lang/Thread.h"
-#include "tuning/EqualTemperament.h"
 #include "util/FixedThreadPool.h"
 #include "util/MIDIFile.h"
 #include "util/Pool2.hpp"
@@ -31,7 +27,6 @@
 #include "yzrutil.h"
 #include <cmath>
 #include <cstdint>
-#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -56,11 +51,11 @@ namespace yzrilyzr_simplesynth{
 	void NoteTaskPool::reset(){}
 	void NoteTaskPool::onReuse(NoteTask * note){}
 	NoteTask::NoteTask(uint8_t uniqueID) :note(uniqueID){}
-	ChannelData::ChannelData(const std::string & groupName, s_midichannel_id channelID, uint32_t bufSize){
+	ChannelData::ChannelData(const String & groupName, s_midichannel_id channelID, uint32_t bufSize){
 		this->groupName=groupName;
 		this->channelID=channelID;
 		cfgSnapshots.resize(bufSize);
-		for(size_t i=0; i < bufSize; ++i){
+		for(u_index i=0; i < bufSize; ++i){
 			cfgSnapshots[i]=std::make_shared<ChannelConfig>();
 		}
 
@@ -84,7 +79,7 @@ namespace yzrilyzr_simplesynth{
 		limiter[1]=std::make_shared<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 300);
 		//
 		Random rand;
-		for(int i=0;i < 2;i++){
+		for(u_index i=0;i < 2;i++){
 			dspChain[i]->add(choruser[i]);
 			dspChain[i]->add(phaser[i]);
 			dspChain[i]->add(reverber[i]);
@@ -93,18 +88,21 @@ namespace yzrilyzr_simplesynth{
 		setName(groupName + " #" + std::to_string(channelID));
 	}
 	void ChannelData::setSampleRate(u_sample_rate sr){
-		for(int i=0;i < 2;i++){
+		for(u_index i=0;i < 2;i++){
 			dspChain[i]->init(sr);
 			limiter[i]->init(sr);
 		}
+		if(auto p=getConfig().dsp3d){
+			p->init(sr);
+		}
 	}
-	yzrilyzr_dsp::Chorus & ChannelData::getChorus(size_t ch)const{
+	yzrilyzr_dsp::Chorus & ChannelData::getChorus(u_index ch)const{
 		return static_cast<Chorus &>(*choruser[ch]);
 	}
-	yzrilyzr_dsp::Freeverb & ChannelData::getReverb(size_t ch)const{
+	yzrilyzr_dsp::Freeverb & ChannelData::getReverb(u_index ch)const{
 		return static_cast<Freeverb &>(*choruser[ch]);
 	}
-	yzrilyzr_dsp::Phaser & ChannelData::getPhaser(size_t ch)const{
+	yzrilyzr_dsp::Phaser & ChannelData::getPhaser(u_index ch)const{
 		return static_cast<Phaser &>(*choruser[ch]);
 	}
 	void ChannelData::reset(){}
@@ -114,10 +112,11 @@ namespace yzrilyzr_simplesynth{
 	ChannelConfig & ChannelData::getConfig(){
 		return *cfgSnapshots[0];
 	}
-	Mixer2::Mixer2(size_t bufferSize){
+	Mixer2::Mixer2(u_index bufferSize){
 		setBufferSize(bufferSize);
-		setNoteTuning(std::make_shared<EqualTemperament>());
-		setNoteVelocityMap(std::make_shared<PowInterpolator>(2));
+		setSynthMode(MODE_THREAD_POOL, -1);
+		auto defCfg=ChannelConfig::DefaultConfig();
+		getGlobalConfig().set(*defCfg);
 		nonDrumSetLimiter[0]=std::make_shared<Limiter>(5, 5000, 5000, 1.0);
 		nonDrumSetLimiter[1]=std::make_shared<Limiter>(5, 5000, 5000, 1.0);
 		drumSetLimiter[0]=std::make_shared<Limiter>(5, 500, 500, 3.0);
@@ -139,8 +138,8 @@ namespace yzrilyzr_simplesynth{
 		// 1. 准备基本参数
 		u_sample_rate sampleRate=getSampleRate();
 		u_time deltaTime=1.0 / sampleRate;
-		size_t bufSize=getBufferSize();
-		size_t chc=getOutputChannelCount();
+		u_index bufSize=getBufferSize();
+		u_index chc=getOutputChannelCount();
 
 		// 2. 处理通道和事件
 		processChannelSnapshots();
@@ -149,19 +148,19 @@ namespace yzrilyzr_simplesynth{
 
 		// 3. 音符合成阶段
 		synthesizeNotes();
-		threadPool->waitAll();
+		waitForAllTasks();
 
 		// 4. 音符混合阶段
 		std::unordered_map<ChannelData *, std::vector<NoteTask *>> noteMixTasks;
 		prepareNoteMixTasks(noteMixTasks);
 		submitNoteMixTasks(noteMixTasks);
-		threadPool->waitAll();
+		waitForAllTasks();
 
 		// 5. 清理和混音阶段
 		cleanupFinishedNotes();
 
 		// 清空主输出缓冲区
-		for(size_t ch=0; ch < chc; ch++){
+		for(u_index ch=0; ch < chc; ch++){
 			memset(output[ch]->_array, 0, bufSize * sizeof(u_sample));
 		}
 
@@ -182,7 +181,16 @@ namespace yzrilyzr_simplesynth{
 
 		processTime=(u_time_f)((u_time_f)(System::nanoTime() - t) / 1000000000.0);
 	}
-
+	void Mixer2::waitForAllTasks(){
+		if(synthMode == MODE_THREAD_POOL){
+			threadPool->waitAll();
+		} else if(synthMode == MODE_FUTURE){
+			for(auto & fu : futures){
+				fu.get();
+			}
+			futures.clear();
+		}
+	}
 	void Mixer2::processChannelSnapshots(){
 		std::unique_lock<std::mutex> lock(channelLock);
 		for(auto & data : allChannelData){
@@ -195,7 +203,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	void Mixer2::processInstantEvents(u_time deltaTime, size_t bufSize){
+	void Mixer2::processInstantEvents(u_time deltaTime, u_index bufSize){
 		std::unique_lock<std::mutex> lock(eventLock);
 		for(auto it=instantEventQueue.begin(); it != instantEventQueue.end();){
 			ChannelEvent * event=*it;
@@ -210,7 +218,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	void Mixer2::processScheduledEvents(u_time deltaTime, size_t bufSize){
+	void Mixer2::processScheduledEvents(u_time deltaTime, u_index bufSize){
 		std::unique_lock<std::mutex> lock(eventLock);
 		for(auto it=postEventQueue.begin(); it != postEventQueue.end();){
 			ChannelEvent * event=*it;
@@ -237,7 +245,7 @@ namespace yzrilyzr_simplesynth{
 
 		for(auto & data : allChannelData){
 			auto & pool=data->workingNotesPool;
-			for(size_t i=0, j=pool.size(); i < j; i++){
+			for(u_index i=0, j=pool.size(); i < j; i++){
 				auto & po=pool.get(i);
 				NoteTask & task=*po.object;
 
@@ -255,6 +263,10 @@ namespace yzrilyzr_simplesynth{
 					threadPool->commit([this, &task](){
 						procNoteTask(task);
 					});
+				} else if(synthMode == MODE_FUTURE){
+					futures.push_back(std::async(std::launch::async, [this, &task](){
+						procNoteTask(task);
+					}));
 				} else{
 					procNoteTask(task);
 				}
@@ -267,7 +279,7 @@ namespace yzrilyzr_simplesynth{
 
 		// 清空所有通道的输出缓冲区
 		for(auto & data : allChannelData){
-			for(size_t ch=0; ch < getOutputChannelCount(); ch++){
+			for(u_index ch=0; ch < getOutputChannelCount(); ch++){
 				memset(data->output[ch]->_array, 0, getBufferSize() * sizeof(u_sample));
 			}
 		}
@@ -275,7 +287,7 @@ namespace yzrilyzr_simplesynth{
 		// 准备混合任务
 		for(auto & data : allChannelData){
 			auto & pool=data->workingNotesPool;
-			for(size_t i=0; i < pool.size(); i++){
+			for(u_index i=0; i < pool.size(); i++){
 				auto & po=pool.get(i);
 				NoteTask & task=*po.object;
 				ChannelData * taskData=task.data;
@@ -302,9 +314,13 @@ namespace yzrilyzr_simplesynth{
 			}
 
 			if(synthMode == MODE_THREAD_POOL){
-				threadPool->commit([this, data=data.get(), tasks](){
-					procNoteMix(*data, tasks);
+				threadPool->commit([this, &data=*data, tasks](){
+					procNoteMix(data, tasks);
 				});
+			} else if(synthMode == MODE_FUTURE){
+				futures.push_back(std::async(std::launch::async, [this, &data=*data, tasks](){
+					procNoteMix(data, tasks);
+				}));
 			} else{
 				procNoteMix(d, tasks);
 			}
@@ -316,7 +332,7 @@ namespace yzrilyzr_simplesynth{
 
 		for(auto & data : allChannelData){
 			auto & pool=data->workingNotesPool;
-			for(size_t i=0; i < pool.size(); i++){
+			for(u_index i=0; i < pool.size(); i++){
 				auto & po=pool.get(i);
 				NoteTask & task=*po.object;
 
@@ -329,35 +345,35 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	void Mixer2::mixNonDrumChannelsToOutput(size_t chc, size_t bufSize){
+	void Mixer2::mixNonDrumChannelsToOutput(u_index chc, u_index bufSize){
 		std::unique_lock<std::mutex> lock(channelLock);
 
 		for(auto & data : allChannelData){
 			if(data->isDrumSetChannel()) continue;
 
-			for(size_t ch=0; ch < chc; ch++){
+			for(u_index ch=0; ch < chc; ch++){
 				u_sample * mixerOut=output[ch]->_array;
 				u_sample * channelOut=data->output[ch]->_array;
 
-				for(size_t i=0; i < bufSize; i++){
+				for(u_index i=0; i < bufSize; i++){
 					mixerOut[i]+=channelOut[i];
 				}
 			}
 		}
 	}
 
-	void Mixer2::processNonDrumLimiters(size_t chc, size_t bufSize){
+	void Mixer2::processNonDrumLimiters(u_index chc, u_index bufSize){
 		if(!useLimiter) return;
 
 		std::unique_lock<std::mutex> lock(dspLock);
-		for(size_t ch=0; ch < chc; ch++){
+		for(u_index ch=0; ch < chc; ch++){
 			nonDrumSetLimiter[ch]->procBlock(output[ch]->_array, bufSize);
 		}
 	}
 
-	void Mixer2::mixDrumChannelsToOutput(size_t chc, size_t bufSize){
+	void Mixer2::mixDrumChannelsToOutput(u_index chc, u_index bufSize){
 		// 清空鼓组输出缓冲区
-		for(size_t ch=0; ch < chc; ch++){
+		for(u_index ch=0; ch < chc; ch++){
 			memset(drumOutput[ch]->_array, 0, bufSize * sizeof(u_sample));
 		}
 
@@ -366,54 +382,54 @@ namespace yzrilyzr_simplesynth{
 		for(auto & data : allChannelData){
 			if(!data->isDrumSetChannel()) continue;
 
-			for(size_t ch=0; ch < chc; ch++){
+			for(u_index ch=0; ch < chc; ch++){
 				u_sample * chOut=data->output[ch]->_array;
 				u_sample * drumOut=drumOutput[ch]->_array;
 
-				for(size_t i=0; i < bufSize; i++){
+				for(u_index i=0; i < bufSize; i++){
 					drumOut[i]+=chOut[i];
 				}
 			}
 		}
 	}
 
-	void Mixer2::processDrumLimiters(size_t chc, size_t bufSize){
+	void Mixer2::processDrumLimiters(u_index chc, u_index bufSize){
 		if(!useLimiter) return;
 
 		std::unique_lock<std::mutex> lock(dspLock);
-		for(size_t ch=0; ch < chc; ch++){
+		for(u_index ch=0; ch < chc; ch++){
 			drumSetLimiter[ch]->procBlock(drumOutput[ch]->_array, bufSize);
 		}
 	}
 
-	void Mixer2::mixDrumToMainOutput(size_t chc, size_t bufSize){
-		for(size_t ch=0; ch < chc; ch++){
+	void Mixer2::mixDrumToMainOutput(u_index chc, u_index bufSize){
+		for(u_index ch=0; ch < chc; ch++){
 			u_sample * mixerOut=output[ch]->_array;
 			u_sample * drumOut=drumOutput[ch]->_array;
 
-			for(size_t i=0; i < bufSize; i++){
+			for(u_index i=0; i < bufSize; i++){
 				mixerOut[i]+=drumOut[i];
 			}
 		}
 	}
 
-	void Mixer2::processMasterEffects(size_t chc, size_t bufSize){
+	void Mixer2::processMasterEffects(u_index chc, u_index bufSize){
 		std::unique_lock<std::mutex> lock(dspLock);
 
 		if(useEQ){
-			for(size_t ch=0; ch < chc; ch++){
+			for(u_index ch=0; ch < chc; ch++){
 				std::dynamic_pointer_cast<DSP>(finalEQ[ch])->procBlock(output[ch]->_array, bufSize);
 			}
 		}
 
 		if(useLimiter){
-			for(size_t ch=0; ch < chc; ch++){
+			for(u_index ch=0; ch < chc; ch++){
 				masterLimiter[ch]->procBlock(output[ch]->_array, bufSize);
 			}
 		}
 	}
 
-	void Mixer2::finalizeMix(size_t bufSize){
+	void Mixer2::finalizeMix(u_index bufSize){
 		mixerCurrentSampleIndex+=bufSize;
 
 		if(flags.hasAndRemove(FLAG_RESET)){
@@ -422,9 +438,9 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer2::transferSnapshot(ChannelData & data, int32_t startInc){
 		auto & cfgSnapshots=data.cfgSnapshots;
-		size_t bufSize=cfgSnapshots.size();
+		u_index bufSize=cfgSnapshots.size();
 		std::shared_ptr<ChannelConfig> last=cfgSnapshots[startInc == -1?bufSize - 1:startInc];
-		for(size_t i=startInc + 1;i < bufSize;i++){
+		for(u_index i=startInc + 1;i < bufSize;i++){
 			ChannelConfig & curt=*cfgSnapshots[i];
 			curt.setOnlyChannelConfig(*last);
 		}
@@ -447,15 +463,15 @@ namespace yzrilyzr_simplesynth{
 	u_time Mixer2::getCurrentTime() const{
 		return mixerCurrentSampleIndex / (u_time)getSampleRate();
 	}
-	size_t Mixer2::getCurrentProcessingNoteCount(){
+	u_index Mixer2::getCurrentProcessingNoteCount(){
 		std::unique_lock <std::mutex > lock(channelLock);
-		size_t sum=0;
+		u_index sum=0;
 		for(auto & data : allChannelData){
 			sum+=data->workingNotesPool.size();
 		}
 		return sum;
 	}
-	size_t Mixer2::getPostedEventCount(){
+	u_index Mixer2::getPostedEventCount(){
 		return instantEventQueue.size() + postEventQueue.size();
 	}
 	bool Mixer2::hasData(){
@@ -465,10 +481,10 @@ namespace yzrilyzr_simplesynth{
 	void Mixer2::setDataSnapshotBaseInfo(ChannelData & data){
 		u_sample_rate sampleRate=getSampleRate();
 		u_time deltaTime=1.0 / sampleRate;
-		size_t bufSize=getBufferSize();
+		u_index bufSize=getBufferSize();
 		auto & cfgSnapshots=data.cfgSnapshots;
 		//填充基础信息
-		for(size_t index=0;index < bufSize;index++){
+		for(u_index index=0;index < bufSize;index++){
 			ChannelConfig & current=*cfgSnapshots[index];
 			current.currentTime=(mixerCurrentSampleIndex + index) * deltaTime;
 			current.deltaTime=deltaTime;
@@ -479,7 +495,7 @@ namespace yzrilyzr_simplesynth{
 	* 一对一任务
 	*/
 	void Mixer2::procNoteTask(NoteTask & task){
-		size_t bufSize=getBufferSize();
+		u_index bufSize=getBufferSize();
 		Note & note=task.note;
 		auto & data=*task.data;
 		const auto & cfgSnapshots=data.cfgSnapshots;
@@ -489,7 +505,7 @@ namespace yzrilyzr_simplesynth{
 		u_sample * output=task.output->_array;
 		//填充Note数据
 		memset(output, 0, bufSize * sizeof(u_sample));
-		for(size_t index=0;index < bufSize;index++){
+		for(u_index index=0;index < bufSize;index++){
 			ChannelConfig & cfg=*cfgSnapshots[index];
 			if(note.noMoreData)break;
 			note.cfg=&cfg;
@@ -519,7 +535,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	void Mixer2::procNoteMix(ChannelData & data, std::vector< NoteTask *> * noteTasks){
-		size_t bufSize=getBufferSize();
+		u_index bufSize=getBufferSize();
 		auto & cfgSnapshots=data.cfgSnapshots;
 		u_sample * allNoteOutput=data.noteOutput->_array;
 		memset(allNoteOutput, 0, sizeof(u_sample) * bufSize);
@@ -528,37 +544,45 @@ namespace yzrilyzr_simplesynth{
 			std::vector< NoteTask *> noteTasksRef=*noteTasks;
 			for(auto & task : noteTasksRef){
 				u_sample * noteoutput=task->output->_array;
-				for(size_t i=0;i < bufSize;i++){
+				for(u_index i=0;i < bufSize;i++){
 					allNoteOutput[i]+=noteoutput[i];
 				}
 			}
 		}
-		size_t chc=getOutputChannelCount();
+		u_index chc=getOutputChannelCount();
 		//应用后处理
-		for(size_t i=0;i < bufSize;i++){
+		for(u_index i=0;i < bufSize;i++){
 			ChannelConfig & cfg=*cfgSnapshots[i];
 			NoteProcessor * noteProcessor=cfg.noteProcessor;
 			if(noteProcessor == nullptr)continue;
-			allNoteOutput[i]=noteProcessor->postProcess(allNoteOutput[i]);
+			allNoteOutput[i]=noteProcessor->postProcess(allNoteOutput[i]) * cfg.Volume;
 		}
 		//应用声像
-		if(chc == 2){
-			u_sample * channelOutputL=data.output[0]->_array;
-			u_sample * channelOutputR=data.output[1]->_array;
-			for(size_t i=0;i < bufSize;i++){
-				ChannelConfig & cfg=*cfgSnapshots[i];
-				channelOutputL[i]=allNoteOutput[i] * Util::clamp01(1 - cfg.Pan) * cfg.Volume;
-				channelOutputR[i]=allNoteOutput[i] * Util::clamp01(1 + cfg.Pan) * cfg.Volume;
+		if(auto dsp3d=data.getConfig().dsp3d){
+			for(u_index ch=0;ch < chc;ch++){
+				dsp3d->setChannel(ch);
+				dsp3d->procBlock(allNoteOutput, data.output[ch]->_array, bufSize);
+			}
+		} else{
+			if(chc == 2){
+				u_sample * channelOutputL=data.output[0]->_array;
+				u_sample * channelOutputR=data.output[1]->_array;
+				for(u_index i=0;i < bufSize;i++){
+					ChannelConfig & cfg=*cfgSnapshots[i];
+					channelOutputL[i]=allNoteOutput[i] * Util::clamp01(1 - cfg.Pan);
+					channelOutputR[i]=allNoteOutput[i] * Util::clamp01(1 + cfg.Pan);
+				}
+			}
+			//应用DSP链
+			if(channelUseDSP){
+				for(u_index ch=0;ch < chc;ch++){
+					std::dynamic_pointer_cast<DSP>(data.dspChain[ch])->procBlock(data.output[ch]->_array, bufSize);
+				}
 			}
 		}
-		//应用DSP链
-		if(channelUseDSP){
-			for(size_t ch=0;ch < chc;ch++){
-				u_sample * channelOutput=data.output[ch]->_array;
-				std::dynamic_pointer_cast<DSP>(data.dspChain[ch])->procBlock(channelOutput, bufSize);
-				if(useLimiter){
-					data.limiter[ch]->procBlock(channelOutput, bufSize);
-				}
+		if(useLimiter){
+			for(u_index ch=0;ch < chc;ch++){
+				data.limiter[ch]->procBlock(data.output[ch]->_array, bufSize);
 			}
 		}
 	}
@@ -573,23 +597,23 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer2::setSampleRate(u_sample_rate sr){
 		IMixer::setSampleRate(sr);
-		for(int ch=0;ch < getOutputChannelCount();ch++){
+		for(u_index ch=0;ch < getOutputChannelCount();ch++){
 			nonDrumSetLimiter[ch]->init(sr);
 			drumSetLimiter[ch]->init(sr);
 			masterLimiter[ch]->init(sr);
 			finalEQ[ch]->init(sr);
 		}
 	}
-	void Mixer2::setBufferSize(size_t bs){
-		for(int i=0;i < getOutputChannelCount();i++){
+	void Mixer2::setBufferSize(u_index bs){
+		for(u_index i=0;i < getOutputChannelCount();i++){
 			output[i]=std::make_shared<SampleArray>(bs);
 			drumOutput[i]=std::make_shared<SampleArray>(bs);
 		}
 	}
-	size_t Mixer2::getBufferSize()const{
+	u_index Mixer2::getBufferSize()const{
 		return output[0]->length;
 	}
-	std::shared_ptr<ChannelData> Mixer2::getOrCreateMIDIChannelData(const std::string & groupName, s_midichannel_id channelID){
+	std::shared_ptr<ChannelData> Mixer2::getOrCreateMIDIChannelData(const String & groupName, s_midichannel_id channelID){
 		auto outerIt=channelData.find(groupName);
 		if(outerIt == channelData.end()){
 			outerIt=channelData.emplace(
@@ -601,12 +625,11 @@ namespace yzrilyzr_simplesynth{
 		auto & innerMap=outerIt->second;
 		auto innerIt=innerMap.find(channelID);
 		if(innerIt == innerMap.end()){
-			size_t bufSize=getBufferSize();
+			u_index bufSize=getBufferSize();
 			auto newChannelData=std::make_shared<ChannelData>(groupName, channelID, bufSize);
 			ChannelData & ref=*newChannelData;
+			ref.getConfig().set(getGlobalConfig());
 			ref.setSampleRate(getSampleRate());
-			ref.cfgSnapshots[0]->setNoteVelocityMap(getNoteVelocityMap());
-			ref.cfgSnapshots[0]->setNoteTuning(getNoteTuning());
 			setDataSnapshotBaseInfo(ref);
 			transferSnapshot(ref, 0);
 			allChannelData.push_back(newChannelData);
@@ -676,8 +699,9 @@ namespace yzrilyzr_simplesynth{
 		if(cfg.noteProcessor == nullptr){
 			NoteProcPtr ins=nullptr;
 			u_sample_rate sampleRate=getSampleRate();
-			if(data.isDrumSetChannel())ins=instrument->getDrumSet(cfg.Bank, sampleRate);
-			else ins=instrument->get(0,0, sampleRate);
+			auto instrp=cfg.getInstrumentProvider();
+			if(data.isDrumSetChannel())ins=instrp->getDrumSet(cfg.Bank, sampleRate);
+			else ins=instrp->get(0, 0, sampleRate);
 			if(ins != nullptr){
 				cfg.setNoteProcessor(ins);
 				cfg.Sustain=true;
@@ -687,13 +711,13 @@ namespace yzrilyzr_simplesynth{
 		if(cfg.noteProcessor != nullptr)cfg.noteProcessor->noteOn(cfg, event.id, event.velocity);
 		auto & pool=data.workingNotesPool;
 		if(cfg.MonoMode){
-			for(int i=0;i < pool.size();i++){
+			for(u_index i=0;i < pool.size();i++){
 				auto & po=pool.get(i);
 				NoteTask & n=*po.object;
 				n.note.forceClose(cfg);
 			}
 		}
-		for(int i=0;i < pool.size();i++){
+		for(u_index i=0;i < pool.size();i++){
 			auto & po=pool.get(i);
 			NoteTask & n=*po.object;
 			if(n.note.id == event.id){
@@ -704,7 +728,7 @@ namespace yzrilyzr_simplesynth{
 		if(pool.size() >= pool.capacity()){
 			//std::cout << "NotePool is full" << std::endl;
 			NoteTask * maxNote=nullptr;
-			for(int i=0;i < pool.size();i++){
+			for(u_index i=0;i < pool.size();i++){
 				auto & po=pool.get(i);
 				NoteTask & n=*po.object;
 				if(maxNote == nullptr || n.note.passedTime > maxNote->note.passedTime){
@@ -728,7 +752,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		if(cfg.noteProcessor != nullptr)cfg.noteProcessor->noteOff(cfg, event.id, event.velocity);
 		auto & pool=data.workingNotesPool;
-		for(int i=0;i < pool.size();i++){
+		for(u_index i=0;i < pool.size();i++){
 			auto & po=pool.get(i);
 			NoteTask & n=*po.object;
 			//可能有多个匹配
@@ -739,7 +763,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer2::procNotePressure(ChannelData & data, ChannelConfig & cfg, NotePressure & event){
 		auto & pool=data.workingNotesPool;
-		for(int i=0;i < pool.size();i++){
+		for(u_index i=0;i < pool.size();i++){
 			auto & po=pool.get(i);
 			NoteTask & nt=*po.object;
 			Note & n=nt.note;
@@ -753,7 +777,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer2::procChannelPressure(ChannelData & data, ChannelConfig & cfg, ChannelPressure & event){
 		auto & pool=data.workingNotesPool;
-		for(int i=0;i < pool.size();i++){
+		for(u_index i=0;i < pool.size();i++){
 			auto & po=pool.get(i);
 			NoteTask & nt=*po.object;
 			Note & n=nt.note;
@@ -762,7 +786,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer2::procNotePitchBend(ChannelData & data, ChannelConfig & cfg, NotePitchBend & event){
 		auto & pool=data.workingNotesPool;
-		for(int i=0;i < pool.size();i++){
+		for(u_index i=0;i < pool.size();i++){
 			auto & po=pool.get(i);
 			NoteTask & nt=*po.object;
 			Note & n=nt.note;
@@ -788,9 +812,13 @@ namespace yzrilyzr_simplesynth{
 				cfg.Foot=std::pow(cc.value / 127.0f, 2.0f);
 				break;
 			case MIDIFile::CC::PAN:
-				if(cc.value == 64) cfg.Pan=0;
-				else if(cc.value < 64) cfg.Pan=(cc.value - 64.0f) / 64.0f;
-				else cfg.Pan=(cc.value - 64.0f) / 63.0f;
+				if(auto dsp3d=data.getConfig().dsp3d){
+					dsp3d->setPos((cc.value - 64.0f) / 127.0f, 0, 3);
+				} else{
+					if(cc.value == 64) cfg.Pan=0;
+					else if(cc.value < 64) cfg.Pan=(cc.value - 64.0f) / 64.0f;
+					else cfg.Pan=(cc.value - 64.0f) / 63.0f;
+				}
 				break;
 			case MIDIFile::CC::SUSTAIN_SWITCH:
 				if(cc.channelID == MIDI_DRUM_CHANNEL){
@@ -801,6 +829,9 @@ namespace yzrilyzr_simplesynth{
 				closeNotSustainNotes(data, cfg);
 				break;
 			case MIDIFile::CC::RESET_ALL_CONTROLLERS:
+				if(auto dsp3d=data.getConfig().dsp3d){
+					dsp3d->setPos(0, 0, 3);
+				}
 				cfg.reset();
 				break;
 			case MIDIFile::CC::RESET_MUTE_ALL_NOTES:
@@ -816,13 +847,13 @@ namespace yzrilyzr_simplesynth{
 				cfg.allNotesOff();
 				bool offMap[CHANNEL_MAX_NOTE_ID]{false};
 				auto & pool=data.workingNotesPool;
-				for(int i=0;i < pool.size();i++){
+				for(u_index i=0;i < pool.size();i++){
 					auto & po=pool.get(i);
 					NoteTask & n=*po.object;
 					n.note.requestClose(cfg);
 				}
 				if(cfg.noteProcessor != nullptr){
-					for(int i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+					for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
 						if(offMap[i])cfg.noteProcessor->noteOff(cfg, i, 0);
 					}
 				}
@@ -861,12 +892,12 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::CC::DATA_ENTRY_MSB://msb先来
 				cfg.rpn.setDataMSB(cc.value & 0x7f);
 				cfg.nrpn.setDataMSB(cc.value & 0x7f);
-				procDataEntry(data, cfg);
+				procDataEntry(false, data, cfg);
 				break;
 			case MIDIFile::CC::DATA_ENTRY_LSB:
 				cfg.rpn.setDataLSB(cc.value & 0x7f);
 				cfg.nrpn.setDataLSB(cc.value & 0x7f);
-				procDataEntry(data, cfg);
+				procDataEntry(true, data, cfg);
 				break;
 			case MIDIFile::CC::BANK:
 				cfg.Bank=(cc.value & 0x7f) << 7;
@@ -939,7 +970,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		if(cfg.noteProcessor != nullptr) cfg.noteProcessor->cc(cfg, cc);
 	}
-	void Mixer2::procDataEntry(ChannelData & data, ChannelConfig & cfg){
+	void Mixer2::procDataEntry(bool lsb, ChannelData & data, ChannelConfig & cfg){
 		PNData & rpn=cfg.rpn;
 		if(rpn.active){
 			switch(rpn.select){
@@ -957,13 +988,43 @@ namespace yzrilyzr_simplesynth{
 					//	break;
 			}
 		} else if(cfg.nrpn.active){
-			procNRPN(true, cfg.nrpn.select, cfg.nrpn.data);
+			procNRPN(lsb, data, cfg.nrpn.select, cfg.nrpn.data);
 		}
 	}
-	void Mixer2::procNRPN(bool lsb, uint16_t nrpnController, uint16_t value){
+	void Mixer2::procNRPN(bool lsb, ChannelData & data, uint16_t nrpnController, uint16_t value){
 		switch(nrpnController){
 			case NRPN::MIXER_LIMITER:
 				setUseLimiter(value >= 64);
+				break;
+			case NRPN::CHANNEL_3D_YAW:
+				if(lsb)
+					if(auto dsp3d=data.getConfig().dsp3d)
+						dsp3d->setPos(value * 2.0 / PNData::LSB_MAX - 1.0, dsp3d->pitch, dsp3d->distance);
+				break;
+			case NRPN::CHANNEL_3D_PITCH:
+				if(lsb)
+					if(auto dsp3d=data.getConfig().dsp3d)
+						dsp3d->setPos(dsp3d->yaw, value * 2.0 / PNData::LSB_MAX - 1.0, dsp3d->distance);
+				break;
+			case NRPN::CHANNEL_3D_DISTANCE:
+				if(lsb)
+					if(auto dsp3d=data.getConfig().dsp3d)
+						dsp3d->setPos(dsp3d->yaw, dsp3d->pitch, value * 100 / PNData::LSB_MAX);
+				break;
+			case NRPN::CHANNEL_3D_X:
+				if(lsb)
+					if(auto dsp3d=data.getConfig().dsp3d)
+						dsp3d->setPosXYZ(value * 1000 / PNData::LSB_MAX - 500.0, dsp3d->y, dsp3d->z);
+				break;
+			case NRPN::CHANNEL_3D_Y:
+				if(lsb)
+					if(auto dsp3d=data.getConfig().dsp3d)
+						dsp3d->setPosXYZ(dsp3d->x, value * 1000 / PNData::LSB_MAX - 500.0, dsp3d->z);
+				break;
+			case NRPN::CHANNEL_3D_Z:
+				if(lsb)
+					if(auto dsp3d=data.getConfig().dsp3d)
+						dsp3d->setPosXYZ(dsp3d->x, dsp3d->y, value * 1000 / PNData::LSB_MAX - 500.0);
 				break;
 			default:
 				//System.out.println("Unimplemented NRPN:"+nrpnController+" = "+value);
@@ -982,7 +1043,7 @@ namespace yzrilyzr_simplesynth{
 		mResetLimiter();
 	}
 	void Mixer2::mResetLimiter(){
-		for(int i=0;i < getOutputChannelCount();i++){
+		for(u_index i=0;i < getOutputChannelCount();i++){
 			masterLimiter[i]->resetMemory();
 			nonDrumSetLimiter[i]->resetMemory();
 			drumSetLimiter[i]->resetMemory();
@@ -990,12 +1051,12 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::procTuningChange(ChannelData & data, ChannelConfig & cfg, TuningChange & event){
-		cfg.setNoteTuning(event.value);
+		data.getConfig().setNoteTuning(event.value);
 	}
 	void Mixer2::procInstrument(ChannelData & data, ChannelConfig & cfg, ProgramChange & event){
 		if(!data.ENABLE_MIDI_PROGRAM_CHANGE)return;
 		NoteProcPtr ptr=nullptr;
-		std::shared_ptr<InstrumentProvider> instr=getInstrumentProvider();
+		auto instr=data.getConfig().getInstrumentProvider();
 		u_sample_rate sampleRate=getSampleRate();
 		if(event.noteProcessor != nullptr){
 			ptr=event.noteProcessor;
@@ -1024,7 +1085,7 @@ namespace yzrilyzr_simplesynth{
 		if(cfg.Sustain) return;
 		bool offMap[CHANNEL_MAX_NOTE_ID]{false};
 		auto & pool=data.workingNotesPool;
-		for(int i=0; i < pool.size(); i++){
+		for(u_index i=0; i < pool.size(); i++){
 			auto & po=pool.get(i);
 			NoteTask & n=*po.object;
 			Note & note=n.note;
@@ -1035,7 +1096,7 @@ namespace yzrilyzr_simplesynth{
 			}
 		}
 		if(cfg.noteProcessor != nullptr){
-			for(int i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+			for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
 				if(offMap[i])cfg.noteProcessor->noteOff(cfg, i, 0);
 			}
 		}
@@ -1051,7 +1112,7 @@ namespace yzrilyzr_simplesynth{
 	std::shared_ptr<yzrilyzr_dsp::DSPChain> * Mixer2::getEQ(){
 		return finalEQ;
 	}
-	std::shared_ptr<IChannel> Mixer2::getMIDIChannel(const std::string & group, s_midichannel_id ch){
+	std::shared_ptr<IChannel> Mixer2::getMIDIChannel(const String & group, s_midichannel_id ch){
 		std::unique_lock <std::mutex > lock(channelLock);
 		return getOrCreateMIDIChannelData(group, ch);
 	}
@@ -1061,7 +1122,7 @@ namespace yzrilyzr_simplesynth{
 	s_sample_index Mixer2::getCurrentSampleIndex() const{
 		return mixerCurrentSampleIndex;
 	}
-	bool Mixer2::hasMIDIChannel(const std::string & groupName, s_midichannel_id channelID){
+	bool Mixer2::hasMIDIChannel(const String & groupName, s_midichannel_id channelID){
 		auto outerIt=channelData.find(groupName);
 		if(outerIt == channelData.end())return false;
 		auto & innerMap=outerIt->second;

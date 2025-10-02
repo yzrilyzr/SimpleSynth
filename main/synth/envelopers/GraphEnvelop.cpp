@@ -98,7 +98,7 @@ namespace yzrilyzr_simplesynth{
 		data->loopEnterTime=-1;
 		return data;
 	}
-	std::string GraphEnvelop::toString()const{
+	String GraphEnvelop::toString()const{
 		return StringFormat::object2string("GraphEnvelop", sustainPointIndex, loopStartPointIndex, loopEndPointIndex, points);
 	}
 }

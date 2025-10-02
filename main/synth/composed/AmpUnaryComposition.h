@@ -8,7 +8,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr a=nullptr;
 	public:
 	AmpUnaryComposition(NoteProcPtr a1);
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	void init(ChannelConfig & cfg) override;
 	inline u_sample postProcess(u_sample output) override{
 		return a->postProcess(output);

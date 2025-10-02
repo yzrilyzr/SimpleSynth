@@ -2,7 +2,6 @@
 #include "SimpleSynth.h"
 #include "Note.h"
 #include "events/ChannelEvent.h"
-#include "Channel.h"
 #include <util/MIDIFile.h>
 #include <unordered_map>
 namespace yzrilyzr_simplesynth{
@@ -46,7 +45,7 @@ namespace yzrilyzr_simplesynth{
 		bind(NRPN_ID, val, bigRange);
 		nrpnMap[NRPN_ID].convertFuncB=convertFunc;
 	}
-	void procCC(Mixer * mixer, Channel * channel, ChannelControl * cc){
+	void procCC(IMixer * mixer, IChannel * channel, ChannelControl * cc){
 		/*if(cc->control == MIDIFile::CC::DATA_ENTRY_MSB){
 			int16_t nrpnid=channel->getNRPN();
 			NRPNBindStruct & str=nrpnMap[nrpnid];

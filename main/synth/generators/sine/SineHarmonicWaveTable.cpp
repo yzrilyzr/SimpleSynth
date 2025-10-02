@@ -13,13 +13,13 @@ namespace yzrilyzr_simplesynth{
 	SineHarmonicWaveTable::~SineHarmonicWaveTable(){
 		delete interpolator;
 	}
-	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<ObjectArray<DoubleArray *>> aa) : SineHarmonicWaveTable(nullptr, aa){}
-	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<ObjectArray<DoubleArray *>> aa) : Osc(freq){
+	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<Array<DoubleArray *>> aa) : SineHarmonicWaveTable(nullptr, aa){}
+	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<Array<DoubleArray *>> aa) : Osc(freq){
 		this->aa=aa;
 		this->interpolator=new LineInterpolator();
 	}
 	DoubleArray * SineHarmonicWaveTable::dBToAmp(double gain, DoubleArray * line){
-		for(int i=3;i < line->length;i++){
+		for(u_index i=3;i < line->length;i++){
 			(*line)[i]=gain * pow(10, (*line)[i] / 20.0);
 		}
 		return line;
@@ -29,7 +29,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sample SineHarmonicWaveTable::a(Note & note, double x){
 		u_sample y=0;
-		for(int harmonicOrder=0;harmonicOrder < aa->length;harmonicOrder++){
+		for(u_index harmonicOrder=0;harmonicOrder < aa->length;harmonicOrder++){
 			auto & ampLine=*(*aa)[harmonicOrder];
 			y+=getInterpolation(note, ampLine) * fast_sin(x * (harmonicOrder + 1.0), harmonicOrder);
 		}
@@ -38,7 +38,7 @@ namespace yzrilyzr_simplesynth{
 	double SineHarmonicWaveTable::getInterpolation(Note & note, DoubleArray & ampLine){
 		if(ampLine.length == 1) return ampLine[0];
 		if(ampLine.length < 5) throw Exception("WaveTable err");
-		size_t points=ampLine.length - 3;
+		u_index points=ampLine.length - 3;
 		auto tuning=note.cfg->tuning;
 		s_note_id id1=tuning->getIDByFrequency(ampLine[1]);
 		s_note_id id2=tuning->getIDByFrequency(ampLine[2]);

@@ -4,7 +4,7 @@
 #include "interface/NoteProcessor.h"
 #include "synth/source/AmplitudeSources.h"
 #include "synth/generators/Osc.h"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
 #include "dsp/RingBuffer.h"
 #include "util/Util.h"
 #include "dsp/BufferDelayer.h"

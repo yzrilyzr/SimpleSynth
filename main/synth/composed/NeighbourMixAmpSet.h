@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 		NeighbourMixAmpSet(std::shared_ptr<PhaseSrc> freq);
 		NeighbourMixAmpSet();
 		NeighbourMixAmpSet *add(int note, NoteProcPtr noteProcessor);
-		std::string toString() const override;
+		yzrilyzr_lang::String toString() const override;
 		bool noMoreData(Note &note) override;
 		NeighbourMixAmpSet *build();
 		u_sample getAmp(Note &note) override;

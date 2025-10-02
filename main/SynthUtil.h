@@ -7,7 +7,7 @@
 #include "io/InputStream.h"
 #include "util/MIDIFile.h"
 
-#include "array/SampleArray.h"
+#include "array/Array.hpp"
 
 namespace yzrilyzr_simplesynth{
 	class NoteProcessor;
@@ -19,19 +19,19 @@ namespace yzrilyzr_simplesynth{
 		TickChange(long startAtTick, float tick) : startAtTick(startAtTick), tick(tick){}
 		uint8_t getType() override{ throw - 1; }
 		ChannelEvent * clone() override{ throw - 1; }
-		std::string toString() const override;
+		yzrilyzr_lang::String toString() const override;
 	};
 	EBCLASS(SynthUtil){
 		public:
-		typedef void(*MIDICallback)(const std::string & deviceName, uint64_t ev);
+		typedef void(*MIDICallback)(const yzrilyzr_lang::String & deviceName, uint64_t ev);
 		static std::shared_ptr<MixerSequence> parseMIDI(yzrilyzr_io::InputStream & is);
-		//static std::shared_ptr<IChannel> getMIDIChannelOrNew(IMixer * mixer, const std::string & groupName, s_midichannel_id channelID);
+		//static std::shared_ptr<IChannel> getMIDIChannelOrNew(IMixer * mixer, const yzrilyzr_lang::String & groupName, s_midichannel_id channelID);
 		//static std::shared_ptr<IChannel> getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID);
 		static std::shared_ptr<MixerSequence> parseXM(yzrilyzr_io::InputStream & is);
 		static NoteProcPtr getDefault();
 		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2);
-		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const std::string & groupName);
-		static void sendMIDIEvent(ChannelEvent * event, const std::string & deviceName);
+		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const yzrilyzr_lang::String & groupName);
+		static void sendMIDIEvent(ChannelEvent * event, const yzrilyzr_lang::String & deviceName);
 		static ChannelEvent * MIDIBytes2Event(uint8_t ty, uint8_t data1, uint8_t data2);
 		static uint64_t Event2MIDIBytes(ChannelEvent * event);
 		static uint64_t MergeMIDIBytes(uint8_t ty, uint8_t data1, uint8_t data2);
@@ -50,6 +50,6 @@ namespace yzrilyzr_simplesynth{
 		FixedRandom(yzrilyzr_array::SampleArray * data);
 		FixedRandom();
 		//double next();
-		double next(size_t * index);
+		double next(u_index * index);
 	};
 }

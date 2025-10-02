@@ -43,7 +43,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		return nmd;
 	}
-	std::string AutoMod::toString() const{
+	String AutoMod::toString() const{
 		return StringFormat::object2string("AutoMod", a, modFreqDepth, modAmpDepth, modRate, modDelay, modShape);
 	}
 }

@@ -26,6 +26,6 @@ namespace yzrilyzr_simplesynth{
 	u_sample getAmp(Note & note) override;
 	bool noMoreData(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

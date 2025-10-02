@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "array/FloatArray.h"
+#include "array/Array.hpp"
 #include "collection/ArrayList.hpp"
 #include "collection/HashMap.hpp"
 #include "interface/InstrumentProvider.h"

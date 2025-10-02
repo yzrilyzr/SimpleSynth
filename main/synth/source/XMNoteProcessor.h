@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "util/XMFile.h"
-#include "array/SharedPtrArray.hpp"
+#include "array/Array.hpp"
 #include "synth/source/XMNoteProcessor.h"
 #include "synth/generators/sampler/WaveSampler.h"
 namespace yzrilyzr_simplesynth{

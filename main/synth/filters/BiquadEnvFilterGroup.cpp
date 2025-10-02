@@ -17,7 +17,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample BiquadEnvFilterGroup::getAmp(Note & note){
 		BiquadEnvFilterGroupKeyData & data=*getData(note);
 		u_sample_rate sr=note.cfg->sampleRate;
-		for(size_t i=0, j=filtersCfg.size();i < j;i++){
+		for(u_index i=0, j=filtersCfg.size();i < j;i++){
 			BiquadEnvFilterGroupConfig & bcfg=filtersCfg[i];
 			BiquadEnvFilterChange & change=data.changes[i];
 			double fEnv=IIRUtil::limitFreq(sr, bcfg.freqEnv->getAmp(note));
@@ -60,7 +60,7 @@ namespace yzrilyzr_simplesynth{
 		data->filters->resetMemory();
 		return data;
 	}
-	std::string BiquadEnvFilterGroup::toString() const{
+	String BiquadEnvFilterGroup::toString() const{
 		return StringFormat::object2string("BiquadEnvFilterGroup", a, type, filtersCfg);
 	}
 }

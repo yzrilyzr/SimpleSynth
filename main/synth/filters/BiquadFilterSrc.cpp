@@ -83,7 +83,7 @@ namespace yzrilyzr_simplesynth{
 		data->filter.resetMemory();
 		return data;
 	}
-	std::string BiquadFilterSrc::toString()const{
+	String BiquadFilterSrc::toString()const{
 		return StringFormat::object2string("BiquadFilterSrc", src, freqEnv, qEnv, (int)type);
 	}
 }

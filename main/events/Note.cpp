@@ -1,10 +1,10 @@
 #include "Note.h"
-
+using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	std::string Note::toString() const{
-		return yzrilyzr_lang::StringFormat::format("[Note:%d Vel:%.2f]", id, velocitySynth);
+	String Note::toString() const{
+		return StringFormat::format("[Note:%d Vel:%.2f]", id, velocitySynth);
 	}
-	void Note::set(Note & note){
+	void Note::set(const Note & note){
 			// 基础属性
 		id=note.id;
 		velocitySynth=note.velocitySynth;

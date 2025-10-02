@@ -32,7 +32,7 @@ namespace yzrilyzr_simplesynth{
 		MSEPointType type;
 		MSEPointMode mode;
 		float modeValue=0;
-		size_t index=0;
+		u_index index=0;
 	};
 	EBCLASS(MultiStageEnvelopeKeyData){
 		public:
@@ -58,7 +58,7 @@ namespace yzrilyzr_simplesynth{
 		NoteProcPtr clone() override;
 		void init(ChannelConfig & cfg) override;
 		u_sample getAmp(Note & note) override;
-		std::string toString() const override;
+		yzrilyzr_lang::String toString() const override;
 		MultiStageEnvelopeKeyData * init(MultiStageEnvelopeKeyData * data, Note & note) override;
 
 		private:

@@ -1,4 +1,5 @@
 ﻿#include "BanksHammer.h"
+using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	void BanksHammer::init(double sampleRate, double m, double K, double p, double Z, double alpha){
 		this->sampleRate=sampleRate;
@@ -48,7 +49,7 @@ namespace yzrilyzr_simplesynth{
 		this->unitDelay.init(0);
 		this->intvh.procDsp(v * this->sampleRate * 2);
 	}
-	std::string BanksHammer::toString()const{
+	String BanksHammer::toString()const{
 		return "BanksHammer";
 	}
 }

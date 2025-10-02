@@ -97,9 +97,9 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 	}
 
 	// 渲染窗口
-	ArrayList<ProjectObject *>::ListItr itr(&objects);
-	while(itr.hasNext()){
-		ProjectObject * p=itr.next();
+	auto itr=objects.iterator();
+	while(itr->hasNext()){
+		ProjectObject * p=itr->next();
 		// 如果窗口被选中，可以绘制高亮边框
 		if(p->isSelected){
 			ImDrawList * drawList=ImGui::GetForegroundDrawList();
@@ -115,7 +115,7 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 		}
 		p->renderWindow(*this);
 		if(!p->showWindow){
-			itr.remove();
+			itr->remove();
 		}
 	}
 	//输出窗口
@@ -230,11 +230,11 @@ void CurrentProjectContext::buildConnectLines(ProjectObject & obj, ParamRegister
 	}
 }
 void CurrentProjectContext::deleteSelected(){
-	ArrayList<ProjectObject *>::ListItr itr(&objects);
-	while(itr.hasNext()){
-		ProjectObject * p=itr.next();
+	auto itr=objects.iterator();
+	while(itr->hasNext()){
+		ProjectObject * p=itr->next();
 		if(p->isSelected){
-			itr.remove();
+			itr->remove();
 		}
 	}
 }

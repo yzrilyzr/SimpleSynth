@@ -9,7 +9,7 @@ namespace yzrilyzr_simplesynth{
 		ft=ft * 2.0 - 1.0;
 		return ft * note.velocitySynth;
 	}
-	std::string SawWave::toString()const{
+	String SawWave::toString()const{
 		return StringFormat::object2string("SawWave", getPhaseSource());
 	}
 }

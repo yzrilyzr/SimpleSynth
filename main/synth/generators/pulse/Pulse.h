@@ -27,6 +27,6 @@ namespace yzrilyzr_simplesynth{
 	u_sample getAmp(Note & note) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

@@ -25,14 +25,14 @@ namespace yzrilyzr_simplesynth{
 
 	MultiStageEnvelope::MultiStageEnvelope(){}
 	void MultiStageEnvelope::init(ChannelConfig & cfg){
-		size_t loopStartCount=0;
-		size_t DecayCount=0;
-		size_t SustainCount=0;
+		u_index loopStartCount=0;
+		u_index DecayCount=0;
+		u_index SustainCount=0;
 		decayPoint=nullptr;
 		loopPoint=nullptr;
 		sustainPoint=nullptr;
 		if(points.size() < 2)throw IllegalStateException("points.size() < 2");
-		size_t index=0;
+		u_index index=0;
 		for(auto & p : points){
 			bool isDecay=Flag::hasFlag(static_cast<int>(p.type), static_cast<int>(MSEPointType::DECAY));
 			bool isLoop=Flag::hasFlag(static_cast<int>(p.type), static_cast<int>(MSEPointType::LOOP_START));
@@ -115,9 +115,10 @@ namespace yzrilyzr_simplesynth{
 			data.currentVol=calcEnv(*data.start, *data.end, t);
 			return data.currentVol;
 		}
+		return 0;
 	}
 
-	std::string MultiStageEnvelope::toString() const{
+	String MultiStageEnvelope::toString() const{
 		return StringFormat::object2string("MultiStageEnvelope", points);
 	}
 
@@ -175,10 +176,13 @@ namespace yzrilyzr_simplesynth{
 				return InterpolateFunction::linear(y1, y2, InterpolateFunction::halfSine(t, a));
 			case MSEPointMode::STAGE:
 				return InterpolateFunction::linear(y1, y2, InterpolateFunction::stage(t, a));
+			case MSEPointMode::SMOOTH_STAGE:
+				return InterpolateFunction::linear(y1, y2, InterpolateFunction::stage(t, a));
 			case MSEPointMode::PULSE:
 				return InterpolateFunction::linear(y1, y2, InterpolateFunction::pulse(t, a));
 			case MSEPointMode::WAVE:
 				return InterpolateFunction::linear(y1, y2, InterpolateFunction::wave(t, a));
 		}
+		return t;
 	}
 } // namespace yzrilyzr_simplesynth

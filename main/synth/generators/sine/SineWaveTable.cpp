@@ -20,7 +20,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sample SineWaveTable::a(double x, u_freq notef){
 		u_sample y=0;
-		for(int i=0;i<aa->length;i+=2){
+		for(u_index i=0;i<aa->length;i+=2){
 			double f=(*aa)[i];
 			double a=(*aa)[i+1];
 			f=f/baseFreq;

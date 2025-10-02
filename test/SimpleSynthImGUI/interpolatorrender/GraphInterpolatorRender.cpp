@@ -4,7 +4,7 @@
 #include "lang/Boxing.h"
 #include "implot.h"
 #include "../SimpleSynthProject.h"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_dsp;
@@ -24,7 +24,7 @@ void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	}
 	if(ImGui::Button(ctx.LANG.getc("module.interpolator.graph.init"))){
 		paramRegPtr->xys=std::make_shared<DoubleArray>(PointSize.value * 2);
-		for(int i=0, j=paramRegPtr->xys->length / 2;i < j;i++){
+		for(u_index i=0, j=paramRegPtr->xys->length / 2;i < j;i++){
 			(*paramRegPtr->xys)[i * 2]=(float)i / (j - 1);
 			(*paramRegPtr->xys)[i * 2 + 1]=(float)i / (j - 1);
 		}
@@ -39,7 +39,7 @@ void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 		ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
 		auto xs=std::make_shared<DoubleArray>(paramRegPtr->xys->length / 2);
 		auto ys=std::make_shared<DoubleArray>(paramRegPtr->xys->length / 2);
-		for(int i=0;i < xs->length;i++){
+		for(u_index i=0;i < xs->length;i++){
 			(*xs)[i]=(*paramRegPtr->xys)[i * 2];
 			(*ys)[i]=(*paramRegPtr->xys)[i * 2 + 1];
 		}
@@ -55,7 +55,7 @@ void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 			double mx=mouse_pos.x;
 			double my=mouse_pos.y;
 			double disMin=1e9;
-			for(int i=0, j=paramRegPtr->xys->length / 2;i < j;i++){
+			for(u_index i=0, j=paramRegPtr->xys->length / 2;i < j;i++){
 				double px=(*paramRegPtr->xys)[i * 2];
 				double py=(*paramRegPtr->xys)[i * 2 + 1];
 				double dis=std::hypot(px - mx, py - my);

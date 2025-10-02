@@ -153,7 +153,7 @@ namespace yzrilyzr_simplesynth{
 		if(it == sampleMap.end()){
 			int8_t * byteArr=buf.array()->_array;
 			std::shared_ptr<ShortArray> arr=std::make_shared<ShortArray>(length / 2);
-			for(size_t si=0, bi=offset;bi < offset + length;){
+			for(u_index si=0, bi=offset;bi < offset + length;){
 				uint16_t val=0;
 				val=byteArr[bi++] & 0xff;
 				val|=(byteArr[bi++] & 0xff) << 8;

@@ -44,11 +44,11 @@ namespace yzrilyzr_simplesynth{
 		virtual NoteProcPtr clone(){
 			return NoteProcPtr(this);
 		}
-		void registerParamPhaseSrc(const std::string & name, std::shared_ptr<PhaseSrc> *value);
-		void registerParamSrc(const std::string & name, NoteProcPtr * value);
-		void registerParamOscSrc(const std::string & name, std::shared_ptr<Osc> *value);
-		void registerParamDSP(const std::string & name, std::shared_ptr<yzrilyzr_dsp::DSP> *value);
-		void registerParamSample(const std::string & name, std::shared_ptr<yzrilyzr_array::SampleProvider> *value);
-		std::string toString() const override;
+		void registerParamPhaseSrc(const yzrilyzr_lang::String & name, std::shared_ptr<PhaseSrc> *value);
+		void registerParamSrc(const yzrilyzr_lang::String & name, NoteProcPtr * value);
+		void registerParamOscSrc(const yzrilyzr_lang::String & name, std::shared_ptr<Osc> *value);
+		void registerParamDSP(const yzrilyzr_lang::String & name, std::shared_ptr<yzrilyzr_dsp::DSP> *value);
+		void registerParamSample(const yzrilyzr_lang::String & name, std::shared_ptr<yzrilyzr_array::SampleProvider> *value);
+		yzrilyzr_lang::String toString() const override;
 	};
 }

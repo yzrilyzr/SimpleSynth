@@ -27,12 +27,12 @@ namespace yzrilyzr_simplesynth{
 		buffer.fill(0);
 		u_freq freq=getInitSetFreq(note);
 		double bufferLength=note.cfg->sampleRate / freq;
-		size_t lengthInt=(size_t)ceil(bufferLength) + 3;
+		u_index lengthInt=(u_index)ceil(bufferLength) + 3;
 		buffer.ensureCapacity(bufferLength);
 		if(burstSampleData != nullptr){
 			auto & data=*burstSampleData;
 			double dataLen=data.length;
-			for(size_t i=0;i < lengthInt;i++){
+			for(u_index i=0;i < lengthInt;i++){
 				double dIndex=(double)i * dataLen / bufferLength;
 				int32_t iIndex=(int32_t)dIndex;
 				s_phase y0=data[RingBufferUtil::mod(iIndex - 1, dataLen)];
@@ -49,16 +49,16 @@ namespace yzrilyzr_simplesynth{
 			u_time cur=cfg.currentTime;
 			u_time dt=cfg.deltaTime;
 			NoteProcessor & pro=*burst;
-			for(size_t i=0;i < lengthInt;i++){
-				NoteUpdater::preUpdateNote(initNote, cfg);
+			for(u_index i=0;i < lengthInt;i++){
+				NoteUpdater::preUpdateNote(initNote,cfg);
 				buffer.write(pro.getAmp(initNote));
-				NoteUpdater::postUpdateNote(initNote, cfg);
+				NoteUpdater::postUpdateNote(initNote,cfg);
 				cfg.currentTime+=dt;
 			}
 			cfg.currentTime=cur;
 		} else{
-			static thread_local size_t randomIndex=0;
-			for(size_t i=0;i < lengthInt;i++){
+			static thread_local u_index randomIndex=0;
+			for(u_index i=0;i < lengthInt;i++){
 				buffer.write(random.next(&randomIndex) * note.velocitySynth);
 			}
 		}
@@ -99,7 +99,7 @@ namespace yzrilyzr_simplesynth{
 	u_freq KarplusStrongSrc::getSetFreq(Note & note){
 		return constFreq == 0?note.freqSynth:constFreq;
 	}
-	std::string KarplusStrongSrc::toString()const{
+	String KarplusStrongSrc::toString()const{
 		return StringFormat::object2string("KarplusStrong",
 										   getPhaseSource(), alpha,
 										   alphaInterpolator,

@@ -19,19 +19,19 @@ void gaussianSmooth(SampleArray & data, SampleArray & smoothed, u_sample sigma, 
 	// 预计算高斯核
 	std::vector<u_sample> kernel(windowSize);
 	float kernelSum=0.0f;
-	for(int j=-halfWindow; j <= halfWindow; j++){
+	for(u_index j=-halfWindow; j <= halfWindow; j++){
 		u_sample x=j;
 		kernel[j + halfWindow]=std::exp(-x * x / (2 * sigma * sigma));
 		kernelSum+=kernel[j + halfWindow];
 	}
 	// 归一化核
-	for(int j=0; j < windowSize; j++){
+	for(u_index j=0; j < windowSize; j++){
 		kernel[j]/=kernelSum;
 	}
 	// 应用高斯滤波
-	for(int i=0; i < length; i++){
+	for(u_index i=0; i < length; i++){
 		u_sample sum=0.0f;
-		for(int j=-halfWindow; j <= halfWindow; j++){
+		for(u_index j=-halfWindow; j <= halfWindow; j++){
 			int idx=RingBufferUtil::mod(i + j, length);
 			sum+=data[idx] * kernel[j + halfWindow];
 		}
@@ -79,31 +79,31 @@ void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 
 	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.random"))){
 		Random random;
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]=random.nextGaussian();
 		}
 	}
 	ImGui::SameLine();
 	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.sine"))){
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]=std::sin(_2PI * i / paramRegPtr->length);
 		}
 	}
 	ImGui::SameLine();
 	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.saw"))){
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0, 1, 0, 0);
 		}
 	}
 	ImGui::SameLine();
 	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.tri"))){
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0, 0.5, 0.5, 0);
 		}
 	}
 	ImGui::SameLine();
 	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.square"))){
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0.5, 0, 0, 0);
 		}
 	}
@@ -112,11 +112,11 @@ void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 
 	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.dc_filter"))){
 		u_sample sum=0;
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			sum+=paramRegPtr->array->_array[i];
 		}
 		sum/=(u_sample)paramRegPtr->length;
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]-=sum;
 		}
 	}
@@ -134,20 +134,20 @@ void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	}
 	ImGui::SameLine();
 	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.zoom_in"))){
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]*=1.1;
 		}
 	}
 	ImGui::SameLine();
 	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.zoom_out"))){
-		for(size_t i=0;i < paramRegPtr->length;i++){
+		for(u_index i=0;i < paramRegPtr->length;i++){
 			paramRegPtr->array->_array[i]*=0.9;
 		}
 	}
 	ImGui::SameLine();
 	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.move_left"))){
 		u_sample first=paramRegPtr->array->_array[0];
-		for(size_t i=0;i < paramRegPtr->length - 1;i++){
+		for(u_index i=0;i < paramRegPtr->length - 1;i++){
 			paramRegPtr->array->_array[i]=paramRegPtr->array->_array[i + 1];
 		}
 		paramRegPtr->array->_array[paramRegPtr->length - 1]=first;

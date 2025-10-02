@@ -31,8 +31,8 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	bool noMoreData(Note & note) override{
-		size_t noteid=(size_t)note.idSynth;
-		size_t vel=yzrilyzr_util::Util::clamp((size_t)(note.velocity * 127.0), 0, 127);
+		u_index noteid=(u_index)note.idSynth;
+		u_index vel=yzrilyzr_util::Util::clamp((int)(note.velocity * 127.0), 0, 127);
 		auto & reg1=buildRegion[noteid * CHANNEL_MAX_NOTE_ID + vel];
 		for(auto & ptr : reg1){
 			return ptr->noMoreData(note);
@@ -45,24 +45,24 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	void noteOn(ChannelConfig & cfg, s_note_id_i id, s_note_vel fvel) override{
-		size_t noteid=(size_t)id;
-		size_t vel=yzrilyzr_util::Util::clamp((size_t)(fvel * 127.0), 0, 127);
+		u_index noteid=(u_index)id;
+		u_index vel=yzrilyzr_util::Util::clamp((int)(fvel * 127.0), 0, 127);
 		auto & reg1=buildRegion[noteid * CHANNEL_MAX_NOTE_ID + vel];
 		for(auto & ptr : reg1){
 			ptr->noteOn(cfg, id, fvel);
 		}
 	}
 	void noteOff(ChannelConfig & cfg, s_note_id_i id, s_note_vel fvel) override{
-		size_t noteid=(size_t)id;
-		size_t vel=yzrilyzr_util::Util::clamp((size_t)(fvel * 127.0), 0, 127);
+		u_index noteid=(u_index)id;
+		u_index vel=yzrilyzr_util::Util::clamp((int)(fvel * 127.0), 0, 127);
 		auto & reg1=buildRegion[noteid * CHANNEL_MAX_NOTE_ID + vel];
 		for(auto & ptr : reg1){
 			ptr->noteOff(cfg, id, fvel);
 		}
 	}
 	u_sample getAmp(Note & note) override{
-		size_t noteid=(size_t)note.idSynth;
-		size_t vel=yzrilyzr_util::Util::clamp((size_t)(note.velocity * 127.0), 0, 127);
+		u_index noteid=(u_index)note.idSynth;
+		u_index vel=yzrilyzr_util::Util::clamp((int)(note.velocity * 127.0), 0, 127);
 		u_sample sum=0;
 		auto & reg1=buildRegion[noteid * CHANNEL_MAX_NOTE_ID + vel];
 		for(auto & ptr : reg1){
@@ -79,14 +79,14 @@ namespace yzrilyzr_simplesynth{
 	}
 	void build(){
 		for(auto & reg : region){
-			for(size_t id=reg.noteStart;id <= reg.noteEnd;id++){
-				for(size_t vel=reg.velStart;vel <= reg.velEnd;vel++){
+			for(u_index id=reg.noteStart;id <= reg.noteEnd;id++){
+				for(u_index vel=reg.velStart;vel <= reg.velEnd;vel++){
 					buildRegion[id * CHANNEL_MAX_NOTE_ID + vel].emplace_back(reg.ptr);
 				}
 			}
 		}
 	}
-	std::string toString() const override{
+	yzrilyzr_lang::String toString() const override{
 		return "RegionAmp";
 	}
 	};

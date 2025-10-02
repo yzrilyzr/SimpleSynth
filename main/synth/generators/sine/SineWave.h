@@ -8,6 +8,6 @@ namespace yzrilyzr_simplesynth{
 	SineWave() : SineWave(nullptr){}
 	SineWave(std::shared_ptr<PhaseSrc> freq) : Osc(freq){}
 	u_sample getAmp(Note & note) override;
-	std::string toString()const override;
+	yzrilyzr_lang::String toString()const override;
 	};
 }

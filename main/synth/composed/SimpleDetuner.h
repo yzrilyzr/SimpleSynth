@@ -1,6 +1,6 @@
 #pragma once
-#include "array/DoubleArray.h"
-#include "array/ObjectArray.hpp"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
 #include "SimpleSynth.h"
 #include "events/Note.h"
 #include "events/NoteData.hpp"
@@ -11,7 +11,7 @@
 namespace yzrilyzr_simplesynth{
 	EBCLASS(SimpleDetunerKeyData){
 	public:
-	yzrilyzr_array::ObjectArray<Note *> * notes=nullptr;
+	yzrilyzr_array::Array<Note *> * notes=nullptr;
 	};
 	ECLASS(SimpleDetuner, public AmpUnaryComposition, NoteData<SimpleDetunerKeyData>){
 	private:
@@ -32,7 +32,7 @@ namespace yzrilyzr_simplesynth{
 		offset(offset){}
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	SimpleDetunerKeyData * init(SimpleDetunerKeyData * data, Note & note) override;
 	};
 }

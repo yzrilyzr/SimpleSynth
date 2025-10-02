@@ -8,7 +8,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample SineWave::getAmp(Note & note){
 		return fast_sin(getPhase(note) * _2PI, note.freqSynth) * note.velocitySynth;
 	}
-	std::string SineWave::toString()const{
+	String SineWave::toString()const{
 		return StringFormat::object2string("SineWave", getPhaseSource());
 	}
 }

@@ -1,5 +1,5 @@
 ﻿#include "SimpleWaveTable.h"
-#include "array/FloatArray.h"
+#include "array/Array.hpp"
 #include "array/SampleProvider.h"
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{

@@ -44,7 +44,7 @@ namespace yzrilyzr_simplesynth{
 		this->_lpm=lpmSrc;
 		this->lpmAmp=pmAmp;
 	}
-	std::string Osc::toString()const{
+	String Osc::toString()const{
 		return StringFormat::format("Osc(%s)", _freq);
 	}
 }

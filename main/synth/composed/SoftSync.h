@@ -31,6 +31,6 @@ namespace yzrilyzr_simplesynth{
 	void setSyncInterpolator(std::shared_ptr<yzrilyzr_interpolator::Interpolator> interp);
 	NoteProcPtr clone() override;
 	SoftSyncKeyData * init(SoftSyncKeyData * data, Note & note) override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

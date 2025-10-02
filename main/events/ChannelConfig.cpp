@@ -1,12 +1,16 @@
 #include "events/ChannelConfig.h"
 #include "interface/IMixer.h"
 #include "events/ChannelEvent.h"
+#include "tuning/EqualTemperament.h"
+#include "interpolator/PowInterpolator.h"
+#include "instrument/SimpleMIDIInstrument.h"
+using namespace yzrilyzr_interpolator;
 namespace yzrilyzr_simplesynth{
 	ChannelConfig::~ChannelConfig(){}
 	void ChannelConfig::postInstantEvent(ChannelEvent * event){
 		if(mixer != nullptr)mixer->sendInstantEvent(event);
 	}
-	void ChannelConfig::setOnlyChannelConfig(ChannelConfig & other){
+	void ChannelConfig::setOnlyChannelConfig(const ChannelConfig & other){
 		Sustain=other.Sustain;
 		MonoMode=other.MonoMode;
 		Portamento=other.Portamento;
@@ -34,13 +38,14 @@ namespace yzrilyzr_simplesynth{
 		noteProcessor=other.noteProcessor;
 		tuning=other.tuning;
 		velocityMap=other.velocityMap;
+		dsp3d=other.dsp3d;
 		rpn.set(other.rpn);
 		nrpn.set(other.nrpn);
 		memcpy(noteHoldMap, other.noteHoldMap, sizeof(bool) * CHANNEL_MAX_NOTE_ID);
 		memcpy(sostenutoLock, other.sostenutoLock, sizeof(bool) * CHANNEL_MAX_NOTE_ID);
 	}
 	void ChannelConfig::allNotesOff(){
-		for(int i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
 			noteHoldMap[i]=false;
 		}
 	}
@@ -52,7 +57,7 @@ namespace yzrilyzr_simplesynth{
 				return;
 			}
 			// 非延音，锁定当前按下的音符
-			for(int i=0; i < CHANNEL_MAX_NOTE_ID; i++){
+			for(u_index i=0; i < CHANNEL_MAX_NOTE_ID; i++){
 				if(noteHoldMap[i])sostenutoLock[i]=true;
 			}
 			return;
@@ -64,14 +69,7 @@ namespace yzrilyzr_simplesynth{
 		sp_noteProcessor=val;
 		noteProcessor=val.get();
 	}
-	void ChannelConfig::setNoteTuning(std::shared_ptr<NoteTuning> val){
-		sp_tuning=val;
-		tuning=val.get();
-	}
-	void ChannelConfig::setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val){
-		sp_velocityMap=val;
-		velocityMap=val.get();
-	}
+	
 	void ChannelConfig::reset(){
 		Pan=0;
 		Volume=0.7f;
@@ -98,5 +96,51 @@ namespace yzrilyzr_simplesynth{
 		rpn.reset();
 		nrpn.reset();
 		Bank=0;
+	}
+	void ChannelConfig::setContext(IMixer * mixer,  IChannel * channel){
+		this->mixer=mixer;
+		this->channel=channel;
+	}
+	void ChannelConfig::setNoteTuning(std::shared_ptr<NoteTuning> val){
+		sp_tuning=val;
+		tuning=val.get();
+	}
+	void ChannelConfig::setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val){
+		sp_velocityMap=val;
+		velocityMap=val.get();
+	}
+	void ChannelConfig::setInstrumentProvider(std::shared_ptr<InstrumentProvider> instr){
+		sp_instrument=instr;
+	}
+	std::shared_ptr<InstrumentProvider> ChannelConfig::getInstrumentProvider()const{
+		return sp_instrument;
+	}
+	std::shared_ptr<NoteTuning> ChannelConfig::getNoteTuning()const{
+		return sp_tuning;
+	}
+	std::shared_ptr<yzrilyzr_interpolator::Interpolator> ChannelConfig::getNoteVelocityMap()const{
+		return sp_velocityMap;
+	}
+	void ChannelConfig::set3DEffect(std::shared_ptr<yzrilyzr_dsp::DSP3D> dsp3d){
+		this->sp_dsp3d=dsp3d;
+		this->dsp3d=dsp3d.get();
+	}
+	std::shared_ptr<yzrilyzr_dsp::DSP3D> ChannelConfig::get3DEffect(){
+		return sp_dsp3d;
+	}
+	void ChannelConfig::set(const ChannelConfig & other){
+		setOnlyChannelConfig(other);
+		sp_noteProcessor=other.sp_noteProcessor;
+		sp_instrument=other.sp_instrument;
+		sp_dsp3d=other.sp_dsp3d;
+		sp_velocityMap=other.sp_velocityMap;
+		sp_tuning=other.sp_tuning;
+	}
+	std::shared_ptr<ChannelConfig> ChannelConfig::DefaultConfig(){
+		std::shared_ptr<ChannelConfig> p=std::make_shared< ChannelConfig>();
+		p->setNoteTuning(std::make_shared<EqualTemperament>());
+		p->setInstrumentProvider(std::make_shared<SimpleMIDIInstrument>());
+		p->setNoteVelocityMap(std::make_shared<PowInterpolator>(2));
+		return p;
 	}
 }

@@ -9,7 +9,7 @@ namespace yzrilyzr_simplesynth{
 	NearestAmpSet::NearestAmpSet(std::shared_ptr<PhaseSrc> freq) : Osc(freq){}
 	NearestAmpSet::NearestAmpSet() : NearestAmpSet(nullptr){}
 
-	std::string NearestAmpSet::toString()const{
+	String NearestAmpSet::toString()const{
 		return StringFormat::format("NearestAmpSet(%s)", getPhaseSource());
 	}
 	bool NearestAmpSet::noMoreData(Note & note){
@@ -49,7 +49,7 @@ namespace yzrilyzr_simplesynth{
 		}
 
 		// 填充第一个有数据音符之前的部分
-		for(int i=0; i < firstNote; i++){
+		for(u_index i=0; i < firstNote; i++){
 			objptr->notes[i]=firstProcessor;
 		}
 
@@ -57,10 +57,10 @@ namespace yzrilyzr_simplesynth{
 		int prevNote=firstNote;
 		NoteProcPtr prevProcessor=firstProcessor;
 
-		for(int i=firstNote + 1; i <= lastNote; i++){
+		for(u_index i=firstNote + 1; i <= lastNote; i++){
 			if(objptr->notes[i] != nullptr){
 				// 填充两个有数据音符之间的部分
-				for(int j=prevNote + 1; j < i; j++){
+				for(u_index j=prevNote + 1; j < i; j++){
 					// 选择最近的处理器
 					if((j - prevNote) <= (i - j)){
 						objptr->notes[j]=prevProcessor;
@@ -74,7 +74,7 @@ namespace yzrilyzr_simplesynth{
 		}
 
 		// 填充最后一个有数据音符之后的部分
-		for(int i=lastNote + 1; i < CHANNEL_MAX_NOTE_ID; i++){
+		for(u_index i=lastNote + 1; i < CHANNEL_MAX_NOTE_ID; i++){
 			objptr->notes[i]=lastProcessor;
 		}
 

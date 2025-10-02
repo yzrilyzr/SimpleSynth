@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sample SineBasePowHarmonicWave::a(double x, int id){
 		u_sample y=0;
-		for(int i=0;i<aa->length;i++){
+		for(u_index i=0;i<aa->length;i++){
 			if((*aa)[i]==0) continue;
 			if(id+i*12>127) continue;
 			double ii=pow(2, i);

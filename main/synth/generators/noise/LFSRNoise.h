@@ -16,6 +16,6 @@ namespace yzrilyzr_simplesynth{
 	int nextBit();
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

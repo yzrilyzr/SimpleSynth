@@ -24,7 +24,7 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg) override;
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	NoteDSPKeyData * init(NoteDSPKeyData * data, Note & note) override;
 	};
 }

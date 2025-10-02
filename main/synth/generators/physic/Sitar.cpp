@@ -20,8 +20,8 @@ namespace yzrilyzr_simplesynth{
 		Osc::init(cfg);
 		int initI=Note::C4;
 		int * ids=new int[14]{initI, initI + 2, initI + 4, initI + 5, initI + 7, initI + 9, initI + 11, initI + 12, initI + 14, initI + 16, initI + 17, initI + 19, initI + 21, initI + 23};
-		static thread_local size_t randomIndex=0;
-		for(int i=0;i < resonanceStringsCount;i++){
+		static thread_local u_index randomIndex=0;
+		for(u_index i=0;i < resonanceStringsCount;i++){
 			(*resonanceStringFreq)[i]=cfg.tuning->getFrequency(ids[i] + random.next(&randomIndex) * 0.01 / 12.0);
 		}
 		delete[] ids;
@@ -34,7 +34,7 @@ namespace yzrilyzr_simplesynth{
 		u_sample allActiveString=Osc::postProcess(output);
 		u_sample resonSum=0;
 		DoubleArray & l_resonanceStringFreq=*resonanceStringFreq;
-		for(int i=0;i < resonanceStringsCount;i++){
+		for(u_index i=0;i < resonanceStringsCount;i++){
 			double delayLen=(i + 1) * 5 / 1000.0 * 44100;
 			resonanceStringDelays[i].ensureCapacity(delayLen);
 			resonanceStringDelays[i].write(allActiveString);
@@ -85,8 +85,8 @@ namespace yzrilyzr_simplesynth{
 		initBurstRandom(buffer, note, len);
 	}
 	void Sitar::initBurstRandom(RingBufferSample & buffer, Note & note, double delayIndex){
-		static thread_local size_t randomIndex=0;
-		for(int i=0, j=delayIndex + 3;i < j;i++){
+		static thread_local u_index randomIndex=0;
+		for(u_index i=0, j=delayIndex + 3;i < j;i++){
 			double x=(double)i / delayIndex;
 			double r1=(x * 2 - 1) / 4;
 			//r1+=(pwm(x,0.4,0.3,0.3,0)+1)/8;

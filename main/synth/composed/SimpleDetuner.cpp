@@ -7,17 +7,17 @@ namespace yzrilyzr_simplesynth{
 	u_sample SimpleDetuner::getAmp(Note & note){
 		u_sample sum=0;
 		SimpleDetunerKeyData & data=*getData(note);
-		ObjectArray<Note *> & notes=*data.notes;
+		Array<Note *> & notes=*data.notes;
 		int32_t c=notes.length;
 		if(c > 0){
 			int32_t initId=-c / 2;
 			ChannelConfig & cfg=*note.cfg;
-			for(size_t i=0;i < c;i++){
+			for(u_index i=0;i < c;i++){
 				Note & n1=*notes[i];
 				int32_t off=initId + i;
 				n1.velocity=note.velocity;
 				n1.pitchBend=note.pitchBend + static_cast<s_note_id>(off) * offset;
-				NoteUpdater::preUpdateNote(n1, cfg);
+				NoteUpdater::preUpdateNote(n1,cfg);
 				sum+=a->getAmp(n1);
 				NoteUpdater::postUpdateNote(n1, cfg);
 			}
@@ -26,20 +26,20 @@ namespace yzrilyzr_simplesynth{
 		return sum;
 	}
 	SimpleDetunerKeyData * SimpleDetuner::init(SimpleDetunerKeyData * data, Note & note){
-		size_t c=count;
+		u_index c=count;
 		if(data == nullptr){
 			data=new SimpleDetunerKeyData();
 			data->notes=nullptr;
 		}
 		if(data->notes == nullptr || data->notes->length != c){
 			delete data->notes;
-			data->notes=new ObjectArray<Note *>(c);
-			for(int i=0;i < c;i++){
+			data->notes=new Array<Note *>(c);
+			for(u_index i=0;i < c;i++){
 				int id=uniqueID.fetch_add(1);
 				(*data->notes)[i]=new Note(id);
 			}
 		}
-		for(int i=0;i < c;i++){
+		for(u_index i=0;i < c;i++){
 			Note * n=(*data->notes)[i];
 			n->set(note);
 			n->phaseSynth=(static_cast<float>(i) + 0.5f) / (c + 1);
@@ -49,7 +49,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr SimpleDetuner::clone(){
 		return std::make_shared<SimpleDetuner>(a->clone(), count, offset);
 	}
-	std::string SimpleDetuner::toString() const{
+	String SimpleDetuner::toString() const{
 		return StringFormat::object2string("SimpleDetuner", a, count, offset);
 	}
 }

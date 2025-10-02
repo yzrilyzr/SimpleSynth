@@ -17,7 +17,7 @@ namespace yzrilyzr_simplesynth{
 	CymbalOsc(std::shared_ptr<PhaseSrc> freqSrc, NoteProcPtr mul);
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	private:
 	static u_sample square(u_freq Hz, u_time time);
 	};

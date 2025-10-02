@@ -29,6 +29,6 @@ namespace yzrilyzr_simplesynth{
 	u_sample getAmp(Note & note) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	VVVFKeyData * init(VVVFKeyData * data, Note & note) override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

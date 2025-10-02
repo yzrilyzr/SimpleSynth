@@ -5,10 +5,11 @@
 #include "interface/IMixer.h"
 #include "events/ChannelConfig.h"
 #include "SynthUtil.h"
-#include "array/SampleArray.h"
+#include "array/Array.hpp"
 #include "dsp/Chorus.h"
 #include "dsp/Freeverb.h"
 #include "dsp/RMSCompute.h"
+using namespace yzrilyzr_lang;
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
@@ -48,7 +49,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 	static uint8_t triggerIDShifts[7]={0, 2, 4, 5, 7, 9, 11};
 	static bool isKeyDownState[36]={false};
 	if(sending){
-		for(size_t ii=0;ii < 28;ii++){
+		for(u_index ii=0;ii < 28;ii++){
 			ImGuiKey key=keyIDs[ii];
 			bool down=ImGui::IsKeyDown(key);
 			s_note_id noteid=36 + (ii / 7) * 12 + triggerIDShifts[ii % 7];
@@ -77,7 +78,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 						  });
 	}
 	static bool * bVal=nullptr;
-	for(int i=0;i < disableNames.size();i++){
+	for(u_index i=0;i < disableNames.size();i++){
 		if(i > 0)ImGui::SameLine();
 		if(i == 0)bVal=&ch->ENABLE_MIDI_CHANNEL_CONTROL;
 		else if(i == 1)bVal=&ch->ENABLE_MIDI_PROGRAM_CHANGE;
@@ -100,7 +101,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 			"window.channel.cc.portamento"
 							});
 	}
-	for(int i=0;i < ccControlNames.size();i++){
+	for(u_index i=0;i < ccControlNames.size();i++){
 		if(i > 0)ImGui::SameLine();
 		if(i == 0)bVal=&ch->getConfig().SoftPedal;
 		else if(i == 1)bVal=&ch->getConfig().Sostenuto;
@@ -134,7 +135,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 	static float * fVal=nullptr;
 	static const float fMin[]={0, 0, 0, 0, 0, 0, -1, -1, 0, 0};
 	static const float fMax[]={1, 1, 1, 1, 1, 1, 1, 1, 10, 1};
-	for(int i=0;i < 10;i++){
+	for(u_index i=0;i < 10;i++){
 		if(i == 0)fVal=&ch->getConfig().PortamentoTime;
 		else if(i == 1)fVal=&ch->getConfig().Modulation;
 		else if(i == 2)fVal=&ch->getConfig().ModRate;
@@ -156,7 +157,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 	static double rateMax=50;
 	static double feedBackMin=-1;
 	static double feedBackMax=1;
-	for(int i=0;i < 2;i++){
+	for(u_index i=0;i < 2;i++){
 		Chorus & c=ch->getChorus(i);
 		ImGui::PushID(i + 100);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.depth"), ImGuiDataType_Double, &c.depthMs, &def_min, &depthMax);
@@ -168,7 +169,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 	}
 	ImGui::Text(ctx.LANG.getc("window.channel.reverb"));
 	//static double rt60Max=10000;
-	for(int i=0;i < 2;i++){
+	for(u_index i=0;i < 2;i++){
 		Freeverb & c=ch->getReverb(i);
 		ImGui::PushID(i + 200);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.reverb.damper"), ImGuiDataType_Double, &c.damper, &def_min, &def_max);

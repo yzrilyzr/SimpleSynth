@@ -19,16 +19,16 @@ namespace yzrilyzr_simplesynth{
 		if(cc.isMSB()){
 			switch(data.select){
 				case 10000:
-					width=data.dataMSB / 127.0;
+					width=data.dataMSB / PNData::MSB_MAX;
 					break;
 				case 10001:
-					rise=data.dataMSB / 127.0;
+					rise=data.dataMSB / PNData::MSB_MAX;
 					break;
 				case 10002:
-					fall=data.dataMSB / 127.0;
+					fall=data.dataMSB / PNData::MSB_MAX;
 					break;
 				case 10003:
-					delay=data.dataMSB / 127.0;
+					delay=data.dataMSB / PNData::MSB_MAX;
 					break;
 			}
 		}
@@ -36,7 +36,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr Pulse::clone(){
 		return std::make_shared<Pulse>(getPhaseSource(), width, rise, fall, delay);
 	}
-	std::string Pulse::toString()const{
+	String Pulse::toString()const{
 		return StringFormat::object2string("Pulse", getPhaseSource(), width, rise, fall, delay);
 	}
 }

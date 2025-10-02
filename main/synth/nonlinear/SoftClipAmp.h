@@ -13,6 +13,6 @@ namespace yzrilyzr_simplesynth{
 	SoftClipAmp(NoteProcPtr a, double inputGain, double threshold, double outputGain);
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

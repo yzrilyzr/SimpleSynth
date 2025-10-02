@@ -4,6 +4,8 @@
 namespace yzrilyzr_simplesynth{
 	EBCLASS(PNData){
 	public:
+	static constexpr float LSB_MAX=16383.0;
+	static constexpr float MSB_MAX=127.0;
 	bool active=false;
 	uint16_t select=0;
 	uint16_t data=0;
@@ -32,7 +34,7 @@ namespace yzrilyzr_simplesynth{
 		dataLSB=v;
 		data=(dataMSB << 7) | dataLSB;
 	}
-	void set(PNData & other){
+	void set(const PNData & other){
 		active=other.active;
 		select=other.select;
 		data=other.data;

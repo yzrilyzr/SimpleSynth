@@ -17,6 +17,6 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr clone() override{
 		return std::make_shared<AmpMultiplier>(a->clone(), b->clone());
 	}
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	};
 }

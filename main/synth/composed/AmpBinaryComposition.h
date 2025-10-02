@@ -8,7 +8,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr a=nullptr;
 	NoteProcPtr b=nullptr;
 	AmpBinaryComposition(NoteProcPtr a1, NoteProcPtr b1);
-	std::string toString() const override;
+	yzrilyzr_lang::String toString() const override;
 	void init(ChannelConfig & cfg) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	};

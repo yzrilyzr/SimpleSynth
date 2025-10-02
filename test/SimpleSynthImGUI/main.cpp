@@ -1,6 +1,5 @@
 ﻿#define SDL_MAIN_HANDLED
 #define IMGUI_ENABLE_FREETYPE
-#include "Channel.h"
 #include "ImGuiFileDialog.h"
 #include "Mixer2.h"
 #include "SDL.h"
@@ -10,7 +9,7 @@
 #include "imgui.h"
 #include "implot.h"
 #include "instrument/ReplaceableInstrument.h"
-#include "instrument/SimpleMidiInstrument.h"
+#include "instrument/SimpleMIDIInstrument.h"
 #include "io/File.h"
 #include "lang/Runtime.h"
 #include "lang/System.h"
@@ -65,9 +64,9 @@ MenuRegister allSubModule;
 CurrentProjectContext ctx;
 void saveFileDlg(){
 	IGFD::FileDialogConfig cfg;
-	cfg.fileName=ctx.LANG.get("save_file_dialog.default_file_name");
+	cfg.fileName=ctx.LANG.get("save_file_dialog.default_file_name").tostring();
 	cfg.flags=ImGuiFileDialogFlags_Modal;
-	ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", ctx.LANG.get("save_file_dialog.title"), ".ssp", cfg);
+	ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", ctx.LANG.get("save_file_dialog.title").tostring(), ".ssp", cfg);
 }
 void newProject(){
 	ctx.file="";
@@ -84,13 +83,13 @@ void openFileDlg(){
 	// 打开文件对话框
 	ImGuiFileDialog::Instance()->OpenDialog(
 		"OpenFileDlgKey",    // 对话框唯一标识key
-		ctx.LANG.get("open_file_dialog.title"),         // 对话框标题
+		ctx.LANG.get("open_file_dialog.title").tostring(),         // 对话框标题
 		".ssp",      // 文件过滤器
 		config              // 配置参数
 	);
 }
 MenuRegister::MenuRegisterObject notfound;
-MenuRegister::MenuRegisterObject findObjectAt(const std::string & category, const std::string & name, MenuRegister & at1){
+MenuRegister::MenuRegisterObject findObjectAt(const String & category, const String & name, MenuRegister & at1){
 	for(auto & obj : at1.regObjects[category]){
 		if(obj.name == name){
 			return obj;
@@ -104,7 +103,7 @@ MenuRegister::MenuRegisterObject findObjectAt(const std::string & category, cons
 	notfound.name="##/NOT_FOUND/##";
 	return notfound;
 }
-void name2obj(const std::string & category, const std::string & name, std::string * name1, std::string * category1, std::string * showName, std::shared_ptr<ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender){
+void name2obj(const String & category, const String & name, String * name1, String * category1, String * showName, std::shared_ptr<ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender){
 	auto mobj=findObjectAt(category, name, allNoteProcessor);
 	if(mobj.name == notfound.name)mobj=findObjectAt(category, name, allDSP);
 	if(mobj.name == notfound.name)mobj=findObjectAt(category, name, allInterpolator);
@@ -198,8 +197,8 @@ int openMIDIDevice(){
 	for(UINT i=0; i < numDevices; ++i){
 		MIDIINCAPS mic;
 		if(midiInGetDevCaps(i, &mic, sizeof(MIDIINCAPS)) == MMSYSERR_NOERROR){
-			std::string deviceName(mic.szPname);
-			if(deviceName.find("SimpleSynthIn") != std::wstring::npos){
+			String deviceName(mic.szPname);
+			if(deviceName.contains("SimpleSynthIn")){
 				// 找到 SimpleSynth 设备
 				MMRESULT result=midiInOpen(&hMidiIn, i, reinterpret_cast<DWORD_PTR>(MidiInProc), 0, CALLBACK_FUNCTION);
 				if(result != MMSYSERR_NOERROR){
@@ -235,9 +234,9 @@ int main(int argc, char * argv[]){
 	mixer=new Mixer2(floatBufferLen);
 	mixer->setSynthMode(Mixer2::MODE_THREAD_POOL, -1);
 	mixer->setSampleRate(ctx.sampleRate);
-	std::shared_ptr<SimpleMidiInstrument> simple=std::make_shared<SimpleMidiInstrument>();
+	std::shared_ptr<SimpleMIDIInstrument> simple=std::make_shared<SimpleMIDIInstrument>();
 	std::shared_ptr <ReplaceableInstrument> rin=std::make_shared<ReplaceableInstrument>(simple);
-	mixer->setInstrumentProvider(rin);
+	mixer->getGlobalConfig().setInstrumentProvider(rin);
 	ctx.setMixer(mixer);
 	//rin->setDrumSet(std::make_shared<TR808DrumSet>());
 	SDL_AudioSpec spec;
@@ -255,13 +254,16 @@ int main(int argc, char * argv[]){
 	SDL_PauseAudio(0);
 	openMIDIDevice();
 	mixer->setUseLimiter(false);
-	std::string currentDir="../../../../";
-	ctx.LANG.add(std::make_shared<Locale>("zh", "CN"), std::make_shared<Properties>(File(currentDir + "zh_CN.properties")));
-	ctx.LANG.add(std::make_shared<Locale>("en", "US"), std::make_shared<Properties>(File(currentDir + "en_US.properties")));
-	ctx.LANG.add(std::make_shared<Locale>("ja", ""), std::make_shared<Properties>(File(currentDir + "ja.properties")));
-	ctx.LANG.add(std::make_shared<Locale>("ko", ""), std::make_shared<Properties>(File(currentDir + "ko.properties")));
-	ctx.LANG.add(std::make_shared<Locale>("fr", "FR"), std::make_shared<Properties>(File(currentDir + "fr_FR.properties")));
-	ctx.LANG.add(std::make_shared<Locale>("de", "DE"), std::make_shared<Properties>(File(currentDir + "de_DE.properties")));
+	for(File & f : File("lang").listFiles()){
+		String name=f.getName();
+		if(!name.endsWith(".properties"))continue;
+		name=name.substring(0, name.length() - 11);
+		auto sp=name.split("_");
+		String l1=sp[0];
+		String l2="";
+		if(sp.size() == 2)l2=sp[1];
+		ctx.LANG.add(std::make_shared<Locale>(l1, l2), std::make_shared<Properties>(f));
+	}
 	registerAllNoteProcessor(ctx.LANG, allNoteProcessor);
 	registerAllDSP(ctx.LANG, allDSP);
 	registerAllInterpolator(ctx.LANG, allInterpolator);
@@ -340,12 +342,12 @@ int main(int argc, char * argv[]){
 	// - Our Emscripten build process allows embedding fonts to be accessible at runtime from the "fonts/" folder. See Makefile.emscripten for details.
 	//io.Fonts->AddFontDefault();
 
-	File currentDirF(currentDir + "/fonts");
-	for(auto a : currentDirF.listFiles()){
+	for(auto f : File("fonts").listFiles()){
+		if(!f.getName().endsWith(".ttf"))continue;
 		ImFontConfig config;
 		config.GlyphExtraSpacing=ImVec2(0, 0);
 		config.GlyphOffset=ImVec2(0, 0);
-		io.Fonts->AddFontFromFileTTF(a.getAbsolutePath().c_str(), 25.0, &config, io.Fonts->GetGlyphRangesChineseFull());
+		io.Fonts->AddFontFromFileTTF(f.getAbsolutePath().c_str(), 25.0, &config, io.Fonts->GetGlyphRangesChineseFull());
 	}
 	io.Fonts->Build();
 	io.Fonts->AddFontDefault();
@@ -432,7 +434,7 @@ int main(int argc, char * argv[]){
 				for(auto & pp : ctx.LANG.getMap()){
 					auto sec=pp.second;
 					bool select=pp.first == ctx.LANG.getCurrentLocale();
-					if(ImGui::MenuItem(sec->get("lang").c_str(), nullptr, &select)){
+					if(ImGui::MenuItem(sec->get("lang").c_str(UTF8), nullptr, &select)){
 						ctx.LANG.setCurrentLocale(pp.first);
 						allNoteProcessor.clear();
 						allDSP.clear();
@@ -447,7 +449,6 @@ int main(int argc, char * argv[]){
 				ImGui::EndMenu();
 			}
 			ImGui::Separator();
-
 			mainMenuBar(ctx.LANG.getc("menu.notesrc"), allNoteProcessor, ctx);
 			mainMenuBar(ctx.LANG.getc("menu.dsp"), allDSP, ctx);
 			mainMenuBar(ctx.LANG.getc("menu.interpolator"), allInterpolator, ctx);
@@ -465,9 +466,8 @@ int main(int argc, char * argv[]){
 		}
 		if(ImGuiFileDialog::Instance()->Display("OpenFileDlgKey")){
 			if(ImGuiFileDialog::Instance()->IsOk()){
-				std::string filePathName=ImGuiFileDialog::Instance()->GetFilePathName();
 				try{
-					ctx.openFile(filePathName);
+					ctx.openFile(ImGuiFileDialog::Instance()->GetFilePathName());
 				} catch(Exception & e){
 					std::cout << e.what() << std::endl;
 				}

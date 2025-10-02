@@ -38,12 +38,12 @@ namespace yzrilyzr_simplesynth{
 		return data;
 	}
 	Matrix6x6Modulation::Matrix6x6Modulation(){
-		for(size_t i=0;i < MATRIX_SIZE;i++){
+		for(u_index i=0;i < MATRIX_SIZE;i++){
 			registerSub("OP" + std::to_string(i + 1), &op[i]);
 		}
 	}
 	void Matrix6x6Modulation::init(ChannelConfig & cfg){
-		for(size_t i=0;i < MATRIX_SIZE;i++){
+		for(u_index i=0;i < MATRIX_SIZE;i++){
 			op[i].init(cfg);
 		}
 	}
@@ -51,13 +51,13 @@ namespace yzrilyzr_simplesynth{
 		u_freq origFreq=note.freqSynth;
 		s_phase origPhas=note.phaseSynth;
 		u_sample sum=0;
-		for(size_t to=0;to < MATRIX_SIZE;to++){
+		for(u_index to=0;to < MATRIX_SIZE;to++){
 			u_sample fmDepth=0;
 			u_sample rmDepth=1;
 			FMOp & top=op[to];
 			MatrixOpKeyData & data=*top.getData(note);
 			data.oscFreq=origFreq * top.freqMul + top.freqOff;
-			for(size_t from=0;from < MATRIX_SIZE;from++){
+			for(u_index from=0;from < MATRIX_SIZE;from++){
 				FMOp & fop=op[from];
 				MatrixOpKeyData & data1=*fop.getData(note);
 				fmDepth+=data1.oscFreq * data1.lastOutput * fmMatrix[from][to];

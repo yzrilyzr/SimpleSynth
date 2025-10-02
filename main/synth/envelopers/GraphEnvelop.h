@@ -3,8 +3,8 @@
 #include "interface/NoteProcessor.h"
 #include "Enveloper.h"
 #include "events/NoteData.hpp"
-#include "array/ObjectArray.hpp"
-#include "array/DoubleArray.h"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
 
 namespace yzrilyzr_simplesynth{
 	struct GraphPoint{
@@ -43,6 +43,6 @@ namespace yzrilyzr_simplesynth{
 	std::shared_ptr <NoteProcessor> clone() override{
 		return std::make_shared<GraphEnvelop>(sustainPointIndex, loopStartPointIndex, loopEndPointIndex, points);
 	}
-	std::string toString()const override;
+	yzrilyzr_lang::String toString()const override;
 	};
 }

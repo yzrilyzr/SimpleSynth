@@ -40,7 +40,7 @@ namespace yzrilyzr_simplesynth{
 		// 找到最接近的音级
 		double minDiff=1e9;
 		int bestDegree=0;
-		for(int i=0; i < 12; i++){
+		for(u_index i=0; i < 12; i++){
 			double diff=fabs(withinOctave - ratios[i]);
 			if(diff < minDiff){
 				minDiff=diff;

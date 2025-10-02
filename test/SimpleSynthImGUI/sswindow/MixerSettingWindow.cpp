@@ -4,7 +4,7 @@
 #include "interface/IChannel.h"
 #include "interface/IMixer.h"
 #include "SynthUtil.h"
-#include "array/SampleArray.h"
+#include "array/Array.hpp"
 #include "dsp/Chorus.h"
 #include "dsp/Freeverb.h"
 #include "dsp/RMSCompute.h"
@@ -20,10 +20,11 @@
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
+using namespace yzrilyzr_lang;
 void mixerSettingWindow(CurrentProjectContext & ctx){
 	ImGui::Begin(ctx.LANG.getc("window.mixer.title"));
 	IMixer & mixer=*ctx.mixer;
-	ImGui::Text(ctx.LANG.getf("window.mixer.queue_info", mixer.getCurrentProcessingNoteCount(), mixer.getPostedEventCount()).c_str());
+	ImGui::Text(ctx.LANG.getf("window.mixer.queue_info", mixer.getCurrentProcessingNoteCount(), mixer.getPostedEventCount()).c_str(UTF8));
 	ImGui::ProgressBar(ctx.processTime / mixer.getProcessStandardTime());
 	static bool limiter=true;
 	ImGui::Checkbox(ctx.LANG.getc("window.mixer.limiter"), &limiter);
@@ -56,7 +57,7 @@ void mixerSettingWindow(CurrentProjectContext & ctx){
 		else if(tuningType == 5)t=std::make_shared<Kirnberger>();
 		else if(tuningType == 6)t=std::make_shared<Vallotti>();
 		else if(tuningType == 7)t=std::make_shared<Young>();
-		mixer.setNoteTuning(t);
+		mixer.getGlobalConfig().setNoteTuning(t);
 		for(auto channel : mixer.getAllChannels()){
 			TuningChange * event=new TuningChange();
 			event->value=t;

@@ -1,6 +1,6 @@
 #pragma once
 #include "SimpleSynth.h"
-#include "array/SampleArray.h"
+#include "array/Array.hpp"
 #include "collection/LinkedList.hpp"
 #include "dsp/DSP.h"
 #include "events/ChannelEvent.h"
@@ -60,21 +60,21 @@ namespace yzrilyzr_simplesynth{
 		std::set<NoteProcPtr> programCache;
 		NoteTaskPool workingNotesPool;
 		bool lastSnapshotChange=true;
-		ChannelData(const std::string & groupName, s_midichannel_id channelID, uint32_t bufSize);
+		ChannelData(const yzrilyzr_lang::String & groupName, s_midichannel_id channelID, uint32_t bufSize);
 		void setSampleRate(u_sample_rate sr)override;
 		u_sample * getOutput(uint32_t chIndex)const override;
 		ChannelConfig & getConfig()override;
-		yzrilyzr_dsp::Chorus & getChorus(size_t ch)const override;
-		yzrilyzr_dsp::Freeverb & getReverb(size_t ch)const override;
-		yzrilyzr_dsp::Phaser & getPhaser(size_t ch)const override;
+		yzrilyzr_dsp::Chorus & getChorus(u_index ch)const override;
+		yzrilyzr_dsp::Freeverb & getReverb(u_index ch)const override;
+		yzrilyzr_dsp::Phaser & getPhaser(u_index ch)const override;
 		void reset()override;
 	};
 	ECLASS(Mixer2, public IMixer){
 		public:
-		Mixer2(size_t bufferSize);
+		Mixer2(u_index bufferSize);
 		~Mixer2();
-		void setBufferSize(size_t bs)override;
-		size_t getBufferSize()const override;
+		void setBufferSize(u_index bs)override;
+		u_index getBufferSize()const override;
 		void setSynthMode(int8_t mode, int32_t cores)override;
 		void mix()override;
 		void sendInstantEvent(ChannelEvent * event)override;
@@ -83,15 +83,15 @@ namespace yzrilyzr_simplesynth{
 		void setSampleRate(u_sample_rate sam)override;
 		void resetLimiter()override;            // 重置限制器状态
 		void reset()override;
-		size_t getCurrentProcessingNoteCount()override;
-		size_t getPostedEventCount()override;
+		u_index getCurrentProcessingNoteCount()override;
+		u_index getPostedEventCount()override;
 		s_sample_index getCurrentSampleIndex() const override;
 		bool hasData() override;
 		u_sample * getOutput(uint32_t chIndex)const override;
 		std::vector<std::shared_ptr<IChannel>> getAllChannels()const override;
-		std::shared_ptr<IChannel> getMIDIChannel(const std::string & group, s_midichannel_id ch)override;
+		std::shared_ptr<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)override;
 		std::shared_ptr<yzrilyzr_dsp::DSPChain> * getEQ()override;
-		bool hasMIDIChannel(const std::string & group, s_midichannel_id id)override;
+		bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)override;
 		private:
 		static constexpr int const FLAG_RESET=0b1;
 		std::shared_ptr<yzrilyzr_array::SampleArray> output[2]; // 输出缓冲区指针数组
@@ -99,16 +99,17 @@ namespace yzrilyzr_simplesynth{
 		std::deque<ChannelEvent *> instantEventQueue; // 即时事件队列
 		std::deque<ChannelEvent *> postEventQueue; // 即时事件队列
 		yzrilyzr_util::FixedThreadPool * threadPool=nullptr;
+		std::vector<std::future<void>> futures;
 		int32_t synthMode=0;
 		uint64_t mixerCurrentSampleIndex=0;
 		std::shared_ptr<yzrilyzr_dsp::Limiter>nonDrumSetLimiter[2];      // 非鼓组限制器
 		std::shared_ptr<yzrilyzr_dsp::Limiter>drumSetLimiter[2];      // 鼓组限制器
 		std::shared_ptr<yzrilyzr_dsp::Limiter>masterLimiter[2];      // 主限制器
 		std::shared_ptr<yzrilyzr_dsp::DSPChain> finalEQ[2];               // 最终均衡器链
-		std::unordered_map<std::string, std::unordered_map<s_midichannel_id, std::shared_ptr<ChannelData>>> channelData;
+		std::unordered_map<yzrilyzr_lang::String, std::unordered_map<s_midichannel_id, std::shared_ptr<ChannelData>>> channelData;
 		std::vector<std::shared_ptr<ChannelData>> allChannelData;
 		yzrilyzr_util::Flag flags;
-		std::shared_ptr<ChannelData> getOrCreateMIDIChannelData(const std::string & groupName, s_midichannel_id channelID);
+		std::shared_ptr<ChannelData> getOrCreateMIDIChannelData(const yzrilyzr_lang::String & groupName, s_midichannel_id channelID);
 		void mReset();
 		void mResetLimiter();
 		void procEvent(ChannelData & data, ChannelConfig & cfg, ChannelEvent & event);
@@ -121,27 +122,28 @@ namespace yzrilyzr_simplesynth{
 		void procNotePitchBend(ChannelData & data, ChannelConfig & cfg, NotePitchBend & event); // 处理音符弯音事件
 		void procInstrument(ChannelData & data, ChannelConfig & cfg, ProgramChange & event); // 处理乐器变更事件
 		void procTuningChange(ChannelData & data, ChannelConfig & cfg, TuningChange & event); // 处理乐器变更事件
-		void procDataEntry(ChannelData & data, ChannelConfig & cfg);
-		void procNRPN(bool lsb, uint16_t nrpnController, uint16_t value);
+		void procDataEntry(bool lsb, ChannelData & data, ChannelConfig & cfg);
+		void procNRPN(bool lsb, ChannelData & data, uint16_t nrpnController, uint16_t value);
 		void procNoteTask(NoteTask & task);
 		void procNoteMix(ChannelData & data, std::vector< NoteTask *> *noteTasks);
+		void waitForAllTasks();
 		void setDataSnapshotBaseInfo(ChannelData & data);
 		void transferSnapshot(ChannelData & data, int32_t startInc);
 		void closeNotSustainNotes(ChannelData & data, ChannelConfig & cfg);
 		private:
 		void processChannelSnapshots();
-		void processInstantEvents(u_time deltaTime, size_t bufSize);
-		void processScheduledEvents(u_time deltaTime, size_t bufSize);
+		void processInstantEvents(u_time deltaTime, u_index bufSize);
+		void processScheduledEvents(u_time deltaTime, u_index bufSize);
 		void synthesizeNotes();
 		void prepareNoteMixTasks(std::unordered_map<ChannelData *, std::vector<NoteTask *>>&noteMixTasks);
 		void submitNoteMixTasks(std::unordered_map<ChannelData *, std::vector<NoteTask *>>&noteMixTasks);
 		void cleanupFinishedNotes();
-		void mixNonDrumChannelsToOutput(size_t chc, size_t bufSize);
-		void processNonDrumLimiters(size_t chc, size_t bufSize);
-		void mixDrumChannelsToOutput(size_t chc, size_t bufSize);
-		void processDrumLimiters(size_t chc, size_t bufSize);
-		void mixDrumToMainOutput(size_t chc, size_t bufSize);
-		void processMasterEffects(size_t chc, size_t bufSize);
-		void finalizeMix(size_t bufSize);
+		void mixNonDrumChannelsToOutput(u_index chc, u_index bufSize);
+		void processNonDrumLimiters(u_index chc, u_index bufSize);
+		void mixDrumChannelsToOutput(u_index chc, u_index bufSize);
+		void processDrumLimiters(u_index chc, u_index bufSize);
+		void mixDrumToMainOutput(u_index chc, u_index bufSize);
+		void processMasterEffects(u_index chc, u_index bufSize);
+		void finalizeMix(u_index bufSize);
 	};
 }

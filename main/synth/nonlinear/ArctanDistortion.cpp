@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr ArctanDistortion::clone(){
 		return std::make_shared<ArctanDistortion>(a->clone(), inputGain, alpha, outputGain);
 	}
-	std::string ArctanDistortion::toString() const{
+	String ArctanDistortion::toString() const{
 		return StringFormat::object2string("ArctanDistortion", a, inputGain, alpha, outputGain);
 	}
 }
