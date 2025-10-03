@@ -5,19 +5,19 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
 	DigitalWaveGuide::DigitalWaveGuide(){}
-	DigitalWaveGuide::DigitalWaveGuide(double z, double delayLen1, double delayLen2){
+	DigitalWaveGuide::DigitalWaveGuide(u_sample z, u_sample delayLen1, u_sample delayLen2){
 		init(z, delayLen1, delayLen2);
 	}
-	void DigitalWaveGuide::init(double z, double delayLen1, double delayLen2){
+	void DigitalWaveGuide::init(u_sample z, u_sample delayLen1, u_sample delayLen2){
 		// 初始化延迟缓冲区（大小为延迟长度，使用RingBufferSample）
 		delayLength1=delayLen1;
 		delayLength2=delayLen2;
-		delayBuffers[0].ensureCapacity((double)delayLen1);
-		delayBuffers[1].ensureCapacity((double)delayLen2);
+		delayBuffers[0].ensureCapacity((u_sample)delayLen1);
+		delayBuffers[1].ensureCapacity((u_sample)delayLen2);
 		initNode(z);
 	}
 	DigitalWaveGuide::~DigitalWaveGuide(){}
-	void DigitalWaveGuide::initNode(double z){
+	void DigitalWaveGuide::initNode(u_sample z){
 		leftNode.initialize(z);
 		rightNode.initialize(z);
 	}
@@ -85,8 +85,8 @@ namespace yzrilyzr_simplesynth{
 	}
 	// 处理延迟信号（核心延迟线逻辑）
 	void DigitalWaveGuide::processDelay(){
-		double delayedRight; // 右侧延迟信号
-		double delayedLeft;  // 左侧延迟信号
+		u_sample delayedRight; // 右侧延迟信号
+		u_sample delayedLeft;  // 左侧延迟信号
 
 		// 处理右侧延迟（对应原del1逻辑）
 		if(delayLength1 <= 2){
@@ -113,7 +113,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	// 更新信号流（核心信号处理）
 	void DigitalWaveGuide::updateSignals(){
-		double signal=(leftLoad - leftNode.signals[0]);
+		u_sample signal=(leftLoad - leftNode.signals[0]);
 		// 应用色散处理（commute模式）
 		if(commuteFlag){
 			for(auto & d : dispersion){
@@ -133,7 +133,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	// 初始化alpha系数（能量分配权重）
 	void DigitalWaveGuide::initAlphaCoefficients(){
-		double totalImpedance; // 总阻抗（z为阻抗参数）
+		u_sample totalImpedance; // 总阻抗（z为阻抗参数）
 
 		// 计算左侧alpha系数
 		totalImpedance=leftNode.impedance;
@@ -155,7 +155,7 @@ namespace yzrilyzr_simplesynth{
 			rightNodeAlphas[k]=2.0 * rightConnectedNodes[k]->impedance / totalImpedance;
 		}
 	}
-	void DigitalWaveGuide::setDispersion(std::vector<std::shared_ptr<DSP>> dispersion, std::shared_ptr<DSP> lowpass, double fracDelay){
+	void DigitalWaveGuide::setDispersion(std::vector<std::shared_ptr<DSP>> dispersion, std::shared_ptr<DSP> lowpass, u_sample fracDelay){
 		commuteFlag=true;
 		this->dispersion=dispersion;
 		this->lowpass=lowpass;

@@ -699,12 +699,17 @@ namespace yzrilyzr_simplesynth{
 		if(cfg.noteProcessor == nullptr){
 			NoteProcPtr ins=nullptr;
 			u_sample_rate sampleRate=getSampleRate();
-			auto instrp=cfg.getInstrumentProvider();
-			if(data.isDrumSetChannel())ins=instrp->getDrumSet(cfg.Bank, sampleRate);
-			else ins=instrp->get(0, 0, sampleRate);
+			auto instrp=cfg.instrument;
+			if(data.isDrumSetChannel()){
+				ins=instrp->getDrumSet(cfg.Bank, sampleRate);
+				cfg.Sustain=true;
+			}
+			else{
+				ins=instrp->get(0, 0, sampleRate);
+				cfg.Sustain=false;
+			}
 			if(ins != nullptr){
 				cfg.setNoteProcessor(ins);
-				cfg.Sustain=true;
 				ins->init(cfg);
 			}
 		}
@@ -1056,7 +1061,7 @@ namespace yzrilyzr_simplesynth{
 	void Mixer2::procInstrument(ChannelData & data, ChannelConfig & cfg, ProgramChange & event){
 		if(!data.ENABLE_MIDI_PROGRAM_CHANGE)return;
 		NoteProcPtr ptr=nullptr;
-		auto instr=data.getConfig().getInstrumentProvider();
+		auto instr=data.getConfig().instrument;
 		u_sample_rate sampleRate=getSampleRate();
 		if(event.noteProcessor != nullptr){
 			ptr=event.noteProcessor;

@@ -7,14 +7,14 @@ namespace yzrilyzr_simplesynth{
 	EBCLASS(DWGNode){
 	public:
 		// 信号数组：[0]和[1]分别表示两个方向的波信号
-	double signals[2]={0.0, 0.0};
+	u_sample signals[2]={0.0, 0.0};
 	// 节点阻抗（Impedance），用于能量分配计算
-	double impedance=0.0;
+	u_sample impedance=0.0;
 	// 负载值（Load），模拟外部负载对节点的影响
-	double load=0.0;
+	u_sample load=0.0;
 
 	// 初始化节点参数
 	// @param z：节点的阻抗值
-	void initialize(double z);
+	void initialize(u_sample z);
 	};
 }

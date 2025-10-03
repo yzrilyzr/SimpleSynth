@@ -35,7 +35,7 @@ namespace yzrilyzr_simplesynth{
 		u_sample resonSum=0;
 		DoubleArray & l_resonanceStringFreq=*resonanceStringFreq;
 		for(u_index i=0;i < resonanceStringsCount;i++){
-			double delayLen=(i + 1) * 5 / 1000.0 * 44100;
+			u_sample delayLen=(i + 1) * 5 / 1000.0 * 44100;
 			resonanceStringDelays[i].ensureCapacity(delayLen);
 			resonanceStringDelays[i].write(allActiveString);
 			u_sample resonanceDelayOut=BufferDelayer::cubicSplineDelay(resonanceStringDelays[i], delayLen) * 0.2;
@@ -54,7 +54,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample Sitar::getAmp(Note & note){
 		RingBufferSample & buffer=*getData(note);
 		u_freq freq2=getSetFreq(note);
-		double len=RingBufferUtil::freq2delayIndex(freq2, note.cfg->sampleRate);
+		u_sample len=RingBufferUtil::freq2delayIndex(freq2, note.cfg->sampleRate);
 		u_sample string1=procKS(buffer, 0.75, 1, 0, len);
 		string1=Util::clamp(string1 * 2, static_cast<u_sample>(-1.0), static_cast<u_sample>(1.0));
 		return string1;
@@ -67,11 +67,11 @@ namespace yzrilyzr_simplesynth{
 	u_freq Sitar::getSetFreq(Note & note){
 		return note.freqSynth;
 	}
-	u_sample Sitar::procKS(RingBufferSample & buffer, double alpha, double feedback, u_sample input, double delayLen){
+	u_sample Sitar::procKS(RingBufferSample & buffer, u_sample alpha, u_sample feedback, u_sample input, u_sample delayLen){
 		buffer.ensureCapacity(delayLen);
 		u_sample delayed=BufferDelayer::cubicSplineDelay(buffer, delayLen);
 		u_sample newest=buffer.newest();
-		double alpha2=pow(alpha, delayLen / 367.0);
+		u_sample alpha2=pow(alpha, delayLen / 367.0);
 		u_sample sum=newest * (1 - alpha2) + delayed * alpha2;
 		sum+=input;
 		buffer.write(sum * feedback);
@@ -80,15 +80,15 @@ namespace yzrilyzr_simplesynth{
 	void Sitar::initBuffer(RingBufferSample & buffer, Note & note){
 		buffer.reset();
 		u_freq freq=note.cfg->tuning->getFrequencyByID(note.id);
-		double len=RingBufferUtil::freq2delayIndex(freq, note.cfg->sampleRate);
+		u_sample len=RingBufferUtil::freq2delayIndex(freq, note.cfg->sampleRate);
 		buffer.ensureCapacity(len);
 		initBurstRandom(buffer, note, len);
 	}
-	void Sitar::initBurstRandom(RingBufferSample & buffer, Note & note, double delayIndex){
+	void Sitar::initBurstRandom(RingBufferSample & buffer, Note & note, u_sample delayIndex){
 		static thread_local u_index randomIndex=0;
 		for(u_index i=0, j=delayIndex + 3;i < j;i++){
-			double x=(double)i / delayIndex;
-			double r1=(x * 2 - 1) / 4;
+			u_sample x=(u_sample)i / delayIndex;
+			u_sample r1=(x * 2 - 1) / 4;
 			//r1+=(pwm(x,0.4,0.3,0.3,0)+1)/8;
 			r1+=random.next(&randomIndex);
 			buffer.write(r1 * note.velocitySynth);

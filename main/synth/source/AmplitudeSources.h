@@ -23,14 +23,14 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(_MulPhase, public PhaseSrc){
 	private:
 	std::shared_ptr<PhaseSrc> src;
-	double r;
+	u_sample r;
 	public:
 	_MulPhase() : src(nullptr), r(0){
 		static u_sample min=-100, max=100;
 		registerParamPhaseSrc("Src", &src);
-		registerParam("Multiply", yzrilyzr_util::ParamType::Double, &r, &min, &max);
+		registerParam("Multiply", yzrilyzr_util::ParamType::Sample, &r, &min, &max);
 	}
-	_MulPhase(std::shared_ptr<PhaseSrc> src, double r) : src(src), r(r){}
+	_MulPhase(std::shared_ptr<PhaseSrc> src, u_sample r) : src(src), r(r){}
 	void init()override{
 		if(src == nullptr)throw yzrilyzr_lang::NullPointerException("src == null");
 		src->init();
@@ -86,7 +86,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample value;
 	_ConstAmp() : value(1){
 		static u_sample min=-100, max=100;
-		registerParam("Value", yzrilyzr_util::ParamType::Double, &value, &min, &max);
+		registerParam("Value", yzrilyzr_util::ParamType::Sample, &value, &min, &max);
 	}
 	_ConstAmp(u_sample value) : value(value){}
 	inline u_sample getAmp(Note & note) override final{
@@ -135,7 +135,7 @@ namespace yzrilyzr_simplesynth{
 #ifndef NoteFreqAmp
 #define NoteFreqAmp std::make_shared<_NoteFreqAmp>()
 #endif
-	static std::shared_ptr<PhaseSrc> MulPhase(std::shared_ptr<PhaseSrc> freq, double r){
+	static std::shared_ptr<PhaseSrc> MulPhase(std::shared_ptr<PhaseSrc> freq, u_sample r){
 		return std::make_shared<_MulPhase>(freq, r);
 	}
 	static std::shared_ptr<PhaseSrc> AddPhase(std::shared_ptr<PhaseSrc> a, std::shared_ptr<PhaseSrc> b){
@@ -144,7 +144,7 @@ namespace yzrilyzr_simplesynth{
 	static std::shared_ptr<PhaseSrc> ConstPhase(u_freq hz){
 		return std::make_shared<_ConstPhase>(hz);
 	}
-	static NoteProcPtr ConstAmp(double value){
+	static NoteProcPtr ConstAmp(u_sample value){
 		return std::make_shared<_ConstAmp>(value);
 	}
 	static NoteProcPtr SineAmp(u_freq hz){
@@ -172,7 +172,7 @@ namespace yzrilyzr_simplesynth{
 		return std::make_shared< yzrilyzr_simplesynth::AmpAdder>(a, b);
 	}
 	template<typename T>
-	std::shared_ptr<AmpAdder> operator+(std::shared_ptr<T> a, double b){
+	std::shared_ptr<AmpAdder> operator+(std::shared_ptr<T> a, u_sample b){
 		return std::make_shared< yzrilyzr_simplesynth::AmpAdder>(a, ConstAmp(b));
 	}
 	template<typename T>
@@ -180,7 +180,7 @@ namespace yzrilyzr_simplesynth{
 		return std::make_shared< yzrilyzr_simplesynth::AmpMultiplier>(a, b);
 	}
 	template<typename T>
-	std::shared_ptr<AmpMultiplier> operator*(std::shared_ptr<T> a, double b){
+	std::shared_ptr<AmpMultiplier> operator*(std::shared_ptr<T> a, u_sample b){
 		return std::make_shared< yzrilyzr_simplesynth::AmpMultiplier>(a, ConstAmp(b));
 	}
 }

@@ -63,6 +63,8 @@ BYTE sysexBuffer[SYSEX_BUFFER_SIZE]={0};
 
 std::shared_mutex mixerDspLock;
 
+std::optional<std::future<void>> g_mixFuture;
+
 void closeAndExit(){
 	midiInStop(hMidiIn);
 	midiInClose(hMidiIn);
@@ -73,9 +75,9 @@ void closeAndExit(){
 }
 
 void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
+	mixer2->awaitMix();
 	u_time t=(u_time)System::nanoTime();
-
-	mixer2->mix();
+	//mixer2->mix();
 	for(uint32_t sample=0, j=0, chc=mixer2->getOutputChannelCount(), buf=mixer2->getBufferSize(); sample < buf; sample++){
 		for(u_index ch=0; ch < chc; ch++){
 			double f1=mixer2->getOutput(ch)[sample];
@@ -89,8 +91,9 @@ void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
 	}
 	u_time_f processTime=(u_time_f)((u_time_f)(System::nanoTime() - t) / 1000000000.0);
 	if(processTime > mixer2->getProcessStandardTime()){
-		//std::cout << "Too Heavy" << std::endl;
+		std::cout << "Too Heavy" << std::endl;
 	}
+	mixer2->asyncMix();
 }
 void CALLBACK MidiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2){
 	switch(wMsg){

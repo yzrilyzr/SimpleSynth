@@ -8,7 +8,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${JNI_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/yzrutil/main")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/SimpleSynth/main")
 
-SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE yzrutil)
 target_link_libraries(${PROJECT_NAME} PRIVATE SimpleSynth)

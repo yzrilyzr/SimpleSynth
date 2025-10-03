@@ -41,8 +41,8 @@ namespace yzrilyzr_simplesynth{
 			if(!enabled)continue;
 			RingBufferSample & re=*resonators[i];
 			u_freq freq=resonatorFreq[i];
-			double fdbk=resonatorFeedback[i];
-			double delayIndex=RingBufferUtil::freq2delayIndex(freq, sampleRate);
+			u_sample fdbk=resonatorFeedback[i];
+			u_sample delayIndex=RingBufferUtil::freq2delayIndex(freq, sampleRate);
 			re.ensureCapacity(delayIndex);
 			u_sample delayed=BufferDelayer::cubicSplineDelay(re, delayIndex);
 			re.write(output + delayed * RingBufferUtil::feedbackCoeff(fdbk, freq));
@@ -74,16 +74,16 @@ namespace yzrilyzr_simplesynth{
 		sumString*=stringEnv->getAmp(note) * static_cast<u_sample>(stringOutputLevel);
 		return sumString;
 	}
-	u_sample Sakura::procString(RingBufferSample & stringBuf, RingBufferSample & combBuf, Note & note, u_sample input, double sampleRate, double vAlpha, double vFeedback, double fMul, double combFeedback){
+	u_sample Sakura::procString(RingBufferSample & stringBuf, RingBufferSample & combBuf, Note & note, u_sample input, u_sample sampleRate, u_sample vAlpha, u_sample vFeedback, u_sample fMul, u_sample combFeedback){
 		u_freq noteFreq=note.freqSynth * fMul;
 		u_freq combFreq=noteFreq / combPosition;
-		double delayIndex1=RingBufferUtil::freq2delayIndex(noteFreq, sampleRate);
-		double delayIndexComb=RingBufferUtil::freq2delayIndex(combFreq, sampleRate);
+		u_sample delayIndex1=RingBufferUtil::freq2delayIndex(noteFreq, sampleRate);
+		u_sample delayIndexComb=RingBufferUtil::freq2delayIndex(combFreq, sampleRate);
 		stringBuf.ensureCapacity(delayIndex1);
 		combBuf.ensureCapacity(delayIndexComb);
 		u_sample delayed=BufferDelayer::cubicSplineDelay(stringBuf, delayIndex1) * RingBufferUtil::feedbackCoeff(vFeedback, noteFreq);
 		u_sample delayedComb=BufferDelayer::cubicSplineDelay(combBuf, delayIndexComb) * RingBufferUtil::feedbackCoeff(combFeedback, combFreq);
-		double alpha2=pow(vAlpha, Util::clamp(delayIndex1, 0.0, 800.0) / 367.0);
+		u_sample alpha2=pow(vAlpha, Util::clamp(delayIndex1,static_cast<u_sample>(0.0), static_cast<u_sample>(800.0)) / 367.0);
 		delayed=stringBuf.newest() * (1 - alpha2) + delayed * alpha2;
 		stringBuf.write(input + delayed);
 		combBuf.write(input + delayedComb);

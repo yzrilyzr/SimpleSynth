@@ -1,7 +1,7 @@
 ﻿#include "BanksHammer.h"
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	void BanksHammer::init(double sampleRate, double m, double K, double p, double Z, double alpha){
+	void BanksHammer::init(u_sample sampleRate, u_sample m, u_sample K, u_sample p, u_sample Z, u_sample alpha){
 		this->sampleRate=sampleRate;
 		this->p=p;
 		this->K=K;
@@ -18,13 +18,13 @@ namespace yzrilyzr_simplesynth{
 		this->oldvin=0;
 		this->intvh.procDsp(0);
 	}
-	double BanksHammer::load(double vin){
-		double rvin=(vin + this->oldvin) * 0.5;
-		double F1, F2;
-		double vs=(rvin + this->F * this->Z2i);
-		double deltaV=this->vh - vs;
-		double deltaY=this->intv.procDsp(deltaV);
-		double up=(deltaY > 0.0f)?pow(deltaY, this->p):0.0;
+	u_sample BanksHammer::load(u_sample vin){
+		u_sample rvin=(vin + this->oldvin) * 0.5;
+		u_sample F1, F2;
+		u_sample vs=(rvin + this->F * this->Z2i);
+		u_sample deltaV=this->vh - vs;
+		u_sample deltaY=this->intv.procDsp(deltaV);
+		u_sample up=(deltaY > 0.0f)?pow(deltaY, this->p):0.0;
 		up=up * this->K;
 		this->a=-this->F * this->mi;
 		this->vh=this->intvh.procDsp(this->a);
@@ -39,7 +39,7 @@ namespace yzrilyzr_simplesynth{
 		F2=this->F=this->unitDelay.procDsp(up);
 		return (F1 + F2) * 0.5;
 	}
-	void BanksHammer::trigger(double v){
+	void BanksHammer::trigger(u_sample v){
 		this->F=0.0;
 		this->vh=0.0;
 		this->intv.resetMemory();

@@ -13,9 +13,9 @@ namespace yzrilyzr_simplesynth{
 		 * @param alpha
 		 */
 	virtual ~Hammer()=default;
-	virtual void init(double sampleRate, double m, double K, double p, double Z, double alpha)=0;
-	virtual double load(double in)=0;
-	virtual void trigger(double v)=0;
+	virtual void init(u_sample sampleRate, u_sample m, u_sample K, u_sample p, u_sample Z, u_sample alpha)=0;
+	virtual u_sample load(u_sample in)=0;
+	virtual void trigger(u_sample v)=0;
 	yzrilyzr_lang::String toString()const override{ return "Hammer"; }
 	};
 }

@@ -220,12 +220,12 @@ namespace yzrilyzr_simplesynth{
 		this->data=SynthUtil::NOISE;
 		//this->index=0;
 	}
-	double FixedRandom::next(u_index * index){
-		double d=(*data)[*index];
+	u_sample FixedRandom::next(u_index * index){
+		u_sample d=(*data)[*index];
 		*index=(*index + 1) % data->length;
 		return d;
 	}
-	SampleArray * SynthUtil::noise(int32_t length, int32_t sampleRate, u_freq f1, u_freq f2){
+	SampleArray * SynthUtil::noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2){
 		SampleArray * randomData=new SampleArray(length);
 		std::shared_ptr<IIR> iir=IIRUtil::newButterworthIIRFilter(sampleRate, FilterPassType::BANDPASS, 2, f1, f2);
 		iir->init(sampleRate);

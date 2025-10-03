@@ -27,8 +27,8 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_dsp::RingBufferSample * init(yzrilyzr_dsp::RingBufferSample * buffer, Note & note) override;
 	private:
 	u_freq getSetFreq(Note & note);
-	u_sample procKS(yzrilyzr_dsp::RingBufferSample & buffer, double alpha, double feedback, u_sample input, double delayLen);
+	u_sample procKS(yzrilyzr_dsp::RingBufferSample & buffer, u_sample alpha, u_sample feedback, u_sample input, u_sample delayLen);
 	void initBuffer(yzrilyzr_dsp::RingBufferSample & buffer, Note & note);
-	void initBurstRandom(yzrilyzr_dsp::RingBufferSample & buffer, Note & note, double len1);
+	void initBurstRandom(yzrilyzr_dsp::RingBufferSample & buffer, Note & note, u_sample len1);
 	};
 }

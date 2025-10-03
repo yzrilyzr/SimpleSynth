@@ -45,7 +45,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample getAmp(Note & note) override;
 	BowedStringKeyData * init(BowedStringKeyData * data, Note & note) override;
 	private:
-	u_sample procKS(yzrilyzr_dsp::RingBufferSample & buffer, double alpha, double feedback, u_sample input, u_freq freq2);
+	u_sample procKS(yzrilyzr_dsp::RingBufferSample & buffer, u_sample alpha, u_sample feedback, u_sample input, u_freq freq2);
 	u_freq getSetFreq(Note & note);
 	};
 }

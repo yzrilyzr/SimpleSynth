@@ -1,11 +1,11 @@
 #include "DWGNode.h"
 
 namespace yzrilyzr_simplesynth{
-	// ³õÊ¼»¯½Úµã£ºÖØÖÃĞÅºÅÖµ²¢ÉèÖÃ×è¿¹
-	void DWGNode::initialize(double z){
-		signals[0]=0.0;  // ÖØÖÃ·½Ïò0µÄĞÅºÅ
-		signals[1]=0.0;  // ÖØÖÃ·½Ïò1µÄĞÅºÅ
-		impedance=z;     // ÉèÖÃ×è¿¹Öµ
-		load=0.0;        // ÖØÖÃ¸ºÔØ
+	// åˆå§‹åŒ–èŠ‚ç‚¹ï¼šé‡ç½®ä¿¡å·å€¼å¹¶è®¾ç½®é˜»æŠ—
+	void DWGNode::initialize(u_sample z){
+		signals[0]=0.0;  // é‡ç½®æ–¹å‘0çš„ä¿¡å·
+		signals[1]=0.0;  // é‡ç½®æ–¹å‘1çš„ä¿¡å·
+		impedance=z;     // è®¾ç½®é˜»æŠ—å€¼
+		load=0.0;        // é‡ç½®è´Ÿè½½
 	}
 }

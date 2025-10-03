@@ -46,12 +46,12 @@ namespace yzrilyzr_simplesynth{
 	float combOutputLevel=1;
 	//resonator
 	float resonatorFeedback[8]={0};
-	double resonatorFreq[8]={1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0};
+	u_sample resonatorFreq[8]={1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0};
 	bool resonatorEnabled[8]={false};
 	float resonatorOutputLevel=1;
 	//
 	yzrilyzr_dsp::RingBufferSample * resonators[8]={nullptr};
-	double sampleRate=0;
+	u_sample sampleRate=0;
 	Sakura();
 	~Sakura();
 	void init(ChannelConfig & cfg) override;
@@ -61,7 +61,7 @@ namespace yzrilyzr_simplesynth{
 	bool noMoreData(Note & note)override;
 	SakuraKeyData * init(SakuraKeyData * buffer, Note & note) override;
 	//static u_sample exciteClickFunc(s_phase mod);
-	u_sample procString(yzrilyzr_dsp::RingBufferSample & string, yzrilyzr_dsp::RingBufferSample & comb, Note & note, u_sample input, double sampleRate, double vAlpha, double vFeedback, double fMul, double combFeedback);
+	u_sample procString(yzrilyzr_dsp::RingBufferSample & string, yzrilyzr_dsp::RingBufferSample & comb, Note & note, u_sample input, u_sample sampleRate, u_sample vAlpha, u_sample vFeedback, u_sample fMul, u_sample combFeedback);
 	};
 	EBCLASS(SakuraBuilder){
 	private:
@@ -74,41 +74,41 @@ namespace yzrilyzr_simplesynth{
 		sakura->exciter=paramRegPtr;
 		return *this;
 	}
-	SakuraBuilder & exciter(double noiseMix, double noiseRate){
+	SakuraBuilder & exciter(u_sample noiseMix, u_sample noiseRate){
 		sakura->noiseMixRatio=noiseMix;
 		sakura->noiseRate=noiseRate;
 		return *this;
 	}
-	SakuraBuilder & exciterHiCut(double freq, double q){
+	SakuraBuilder & exciterHiCut(u_sample freq, u_sample q){
 		sakura->exciterHiCutFreq=freq;
 		sakura->exciterHiCutQ=q;
 		return *this;
 	}
-	SakuraBuilder & exciterHiCutEnv(u_time_ms aTime, u_time_ms hTime, u_time_ms dTime, double sLevel){
+	SakuraBuilder & exciterHiCutEnv(u_time_ms aTime, u_time_ms hTime, u_time_ms dTime, u_sample sLevel){
 		sakura->exciterHiCutEnv->attackTime=aTime / 1000.0;
 		sakura->exciterHiCutEnv->holdTime=hTime / 1000.0;
 		sakura->exciterHiCutEnv->decayTime=dTime / 1000.0;
 		sakura->exciterHiCutEnv->sustainVolume=sLevel;
 		return *this;
 	}
-	SakuraBuilder & exciterLowCut(u_freq freq, double q){
+	SakuraBuilder & exciterLowCut(u_freq freq, u_sample q){
 		sakura->exciterLowCutFreq=freq;
 		sakura->exciterLowCutQ=q;
 		return *this;
 	}
-	SakuraBuilder & string1(double freqMul, double feedback, double alpha){
+	SakuraBuilder & string1(u_sample freqMul, u_sample feedback, u_sample alpha){
 		sakura->stringFMul1=freqMul;
 		sakura->stringVFeedback1=feedback;
 		sakura->stringVAlpha1=alpha;
 		return *this;
 	}
-	SakuraBuilder & string2(double freqMul, double feedback, double alpha){
+	SakuraBuilder & string2(u_sample freqMul, u_sample feedback, u_sample alpha){
 		sakura->stringFMul2=freqMul;
 		sakura->stringVFeedback2=feedback;
 		sakura->stringVAlpha2=alpha;
 		return *this;
 	}
-	SakuraBuilder & stringMix(double mix){
+	SakuraBuilder & stringMix(u_sample mix){
 		sakura->stringMix=mix;
 		return *this;
 	}
@@ -121,24 +121,24 @@ namespace yzrilyzr_simplesynth{
 		sakura->stringEnv->releaseTime=rTime / 1000.0;
 		return *this;
 	}
-	SakuraBuilder & stringLevel(double mul){
+	SakuraBuilder & stringLevel(u_sample mul){
 		sakura->stringOutputLevel=mul;
 		return *this;
 	}
-	SakuraBuilder & comb(double pos, double feedback1, double feedback2, double outputLevel){
+	SakuraBuilder & comb(u_sample pos, u_sample feedback1, u_sample feedback2, u_sample outputLevel){
 		sakura->combPosition=pos;
 		sakura->combFeedback1=feedback1;
 		sakura->combFeedback2=feedback2;
 		sakura->combOutputLevel=outputLevel;
 		return *this;
 	}
-	SakuraBuilder & resonator(int which, double freq, double feedback){
+	SakuraBuilder & resonator(int which, u_sample freq, u_sample feedback){
 		sakura->resonatorEnabled[which]=true;
 		sakura->resonatorFreq[which]=freq;
 		sakura->resonatorFeedback[which]=feedback;
 		return *this;
 	}
-	SakuraBuilder & resonatorLevel(double mul){
+	SakuraBuilder & resonatorLevel(u_sample mul){
 		sakura->resonatorOutputLevel=mul;
 		return *this;
 	}

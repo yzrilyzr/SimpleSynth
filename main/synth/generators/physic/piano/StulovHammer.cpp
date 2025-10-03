@@ -1,7 +1,7 @@
 #include "StulovHammer.h"
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	void StulovHammer::init(double sampleRate, double m, double K, double p, double Z, double alpha){
+	void StulovHammer::init(u_sample sampleRate, u_sample m, u_sample K, u_sample p, u_sample Z, u_sample alpha){
 		this->sampleRate=sampleRate;
 		this->p=p;
 		this->K=K;
@@ -17,22 +17,22 @@ namespace yzrilyzr_simplesynth{
 		this->v=0;
 		this->upprev=0;
 	}
-	double StulovHammer::load(double in){
+	u_sample StulovHammer::load(u_sample in){
 		for(u_index j=0;j < S;j++){
-			double up;
-			double v1=0;
-			double x1=0;
+			u_sample up;
+			u_sample v1=0;
+			u_sample x1=0;
 			up=(x > 0)?pow(x, p):0;
-			double dupdt=(up - upprev) * dti;
+			u_sample dupdt=(up - upprev) * dti;
 			for(u_index k=0;k < S;k++){
 				F=K * (up + alpha * dupdt);
 				if(this->F < 0) this->F=0;
 				a=-F * mi;
 				v1=v + a * dt;
 				x1=x + (v1 - (in + F * Z2i)) * dt;
-				double upnew=(x1 > 0)?pow(x1, p):0;
-				double dupdtnew=(upnew - upprev) * 0.5 * dti;
-				double change=dupdtnew - dupdt;
+				u_sample upnew=(x1 > 0)?pow(x1, p):0;
+				u_sample dupdtnew=(upnew - upprev) * 0.5 * dti;
+				u_sample change=dupdtnew - dupdt;
 				dupdt=dupdt + 0.5 * change;
 			}
 			upprev=up;
@@ -41,7 +41,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		return F;
 	}
-	void StulovHammer::trigger(double v){
+	void StulovHammer::trigger(u_sample v){
 		this->v=v;
 		this->x=0.0f;
 	}

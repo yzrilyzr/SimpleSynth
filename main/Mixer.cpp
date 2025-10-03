@@ -341,7 +341,7 @@ namespace yzrilyzr_simplesynth{
 		this->channelID=id;
 		if(id == 9){
 			setDrumSetChannel(true);
-			channelConfig.setNoteProcessor(channelConfig.getInstrumentProvider()->getDrumSet(channelConfig.Bank, getSampleRate()));
+			channelConfig.setNoteProcessor(channelConfig.instrument->getDrumSet(channelConfig.Bank, getSampleRate()));
 		}
 	}
 	u_time_f Channel::getProcessTime() const{
@@ -908,7 +908,7 @@ namespace yzrilyzr_simplesynth{
 	void Channel::procInstrument(ProgramChange & event){
 		if(!ENABLE_MIDI_PROGRAM_CHANGE)return;
 		NoteProcPtr src=nullptr;
-		std::shared_ptr<InstrumentProvider> instr=channelConfig.getInstrumentProvider();
+		auto instr=channelConfig.instrument;
 		if(event.noteProcessor != nullptr){
 			src=event.noteProcessor;
 		} else if(instr == nullptr){

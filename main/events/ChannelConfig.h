@@ -66,6 +66,7 @@ namespace yzrilyzr_simplesynth{
 		NoteTuning * tuning=nullptr;
 		yzrilyzr_interpolator::Interpolator * velocityMap=nullptr;
 		yzrilyzr_dsp::DSP3D * dsp3d=nullptr;
+		InstrumentProvider * instrument=nullptr;
 		//
 		void setContext(IMixer * mixer,  IChannel * channel);
 		void postInstantEvent(ChannelEvent * event);
@@ -77,14 +78,14 @@ namespace yzrilyzr_simplesynth{
 		~ChannelConfig();
 		//
 		public:		
-		std::shared_ptr<InstrumentProvider> getInstrumentProvider()const;
+		//std::shared_ptr<InstrumentProvider> getInstrumentProvider()const;
 		void setInstrumentProvider(std::shared_ptr<InstrumentProvider> instr);
-		std::shared_ptr<NoteTuning> getNoteTuning()const;
+		//std::shared_ptr<NoteTuning> getNoteTuning()const;
 		void setNoteTuning(std::shared_ptr<NoteTuning> tun);
-		std::shared_ptr<yzrilyzr_interpolator::Interpolator> getNoteVelocityMap()const;
+		//std::shared_ptr<yzrilyzr_interpolator::Interpolator> getNoteVelocityMap()const;
 		void setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val);
 		void set3DEffect(std::shared_ptr<yzrilyzr_dsp::DSP3D> dsp3d);
-		std::shared_ptr<yzrilyzr_dsp::DSP3D> get3DEffect();
+		//std::shared_ptr<yzrilyzr_dsp::DSP3D> get3DEffect();
 		void set(const ChannelConfig & other);
 		static std::shared_ptr<ChannelConfig> DefaultConfig();
 	};

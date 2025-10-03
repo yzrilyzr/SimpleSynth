@@ -39,6 +39,7 @@ namespace yzrilyzr_simplesynth{
 		tuning=other.tuning;
 		velocityMap=other.velocityMap;
 		dsp3d=other.dsp3d;
+		instrument=other.instrument;
 		rpn.set(other.rpn);
 		nrpn.set(other.nrpn);
 		memcpy(noteHoldMap, other.noteHoldMap, sizeof(bool) * CHANNEL_MAX_NOTE_ID);
@@ -111,8 +112,9 @@ namespace yzrilyzr_simplesynth{
 	}
 	void ChannelConfig::setInstrumentProvider(std::shared_ptr<InstrumentProvider> instr){
 		sp_instrument=instr;
+		instrument=instr.get();
 	}
-	std::shared_ptr<InstrumentProvider> ChannelConfig::getInstrumentProvider()const{
+	/*std::shared_ptr<InstrumentProvider> ChannelConfig::getInstrumentProvider()const{
 		return sp_instrument;
 	}
 	std::shared_ptr<NoteTuning> ChannelConfig::getNoteTuning()const{
@@ -120,14 +122,14 @@ namespace yzrilyzr_simplesynth{
 	}
 	std::shared_ptr<yzrilyzr_interpolator::Interpolator> ChannelConfig::getNoteVelocityMap()const{
 		return sp_velocityMap;
-	}
+	}*/
 	void ChannelConfig::set3DEffect(std::shared_ptr<yzrilyzr_dsp::DSP3D> dsp3d){
 		this->sp_dsp3d=dsp3d;
 		this->dsp3d=dsp3d.get();
 	}
-	std::shared_ptr<yzrilyzr_dsp::DSP3D> ChannelConfig::get3DEffect(){
+	/*std::shared_ptr<yzrilyzr_dsp::DSP3D> ChannelConfig::get3DEffect(){
 		return sp_dsp3d;
-	}
+	}*/
 	void ChannelConfig::set(const ChannelConfig & other){
 		setOnlyChannelConfig(other);
 		sp_noteProcessor=other.sp_noteProcessor;

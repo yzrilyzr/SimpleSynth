@@ -20,15 +20,15 @@ namespace yzrilyzr_simplesynth{
 		// 右侧连接的节点数组
 		DWGNode * rightConnectedNodes[2];
 		// 左侧节点的alpha系数（用于能量分配计算）
-		double leftNodeAlphas[2];
+		u_sample leftNodeAlphas[2];
 		// 右侧节点的alpha系数
-		double rightNodeAlphas[2];
+		u_sample rightNodeAlphas[2];
 		// 延迟缓冲区（替代原DWGDelay，存储声波延迟样本）
 		yzrilyzr_dsp::RingBufferSample delayBuffers[2];
 		// 第一个延迟线的长度（采样数）
-		double delayLength1;
+		u_sample delayLength1;
 		// 第二个延迟线的长度（采样数）
-		double delayLength2;
+		u_sample delayLength2;
 		// 左侧已连接的节点数量
 		int leftNodeCount=0;
 		// 右侧已连接的节点数量
@@ -38,25 +38,25 @@ namespace yzrilyzr_simplesynth{
 		// 右侧核心节点（波导端点）
 		DWGNode rightNode;
 		// 左侧负载值（模拟声学负载）
-		double leftLoad;
+		u_sample leftLoad;
 		// 右侧负载值
-		double rightLoad;
+		u_sample rightLoad;
 		// 左侧alpha系数（核心节点的能量分配权重）
-		double leftAlpha;
+		u_sample leftAlpha;
 		// 右侧alpha系数
-		double rightAlpha;
+		u_sample rightAlpha;
 		// 交换标志（控制信号处理流程是否交换）
 		bool commuteFlag=false;
-		double damper=1;
+		u_sample damper=1;
 		std::vector<std::shared_ptr<yzrilyzr_dsp::DSP>> dispersion;
 		std::shared_ptr<yzrilyzr_dsp::DSP> lowpass=nullptr;
 		yzrilyzr_dsp::RingBufferSample fracDelay;
-		double fracDelayLen;
+		u_sample fracDelayLen;
 		~DigitalWaveGuide();
 		DigitalWaveGuide();
-		DigitalWaveGuide(double z, double delayLen1, double delayLen2);
-		void init(double z, double delayLen1, double delayLen2);
-		void initNode(double z);
+		DigitalWaveGuide(u_sample z, u_sample delayLen1, u_sample delayLen2);
+		void init(u_sample z, u_sample delayLen1, u_sample delayLen2);
+		void initNode(u_sample z);
 		/**
 		 * d1.r - l.d2（左侧节点与右侧节点连接）
 		 */
@@ -81,6 +81,6 @@ namespace yzrilyzr_simplesynth{
 		void processDelay();
 		void updateSignals();
 		void initAlphaCoefficients();
-		void setDispersion(std::vector<std::shared_ptr<yzrilyzr_dsp::DSP>> dispersion, std::shared_ptr<yzrilyzr_dsp::DSP> lowpass, double fracDelay);
+		void setDispersion(std::vector<std::shared_ptr<yzrilyzr_dsp::DSP>> dispersion, std::shared_ptr<yzrilyzr_dsp::DSP> lowpass, u_sample fracDelay);
 	};
 }

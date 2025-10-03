@@ -26,14 +26,14 @@ namespace yzrilyzr_simplesynth{
 		buffer.reset();
 		buffer.fill(0);
 		u_freq freq=getInitSetFreq(note);
-		double bufferLength=note.cfg->sampleRate / freq;
+		u_sample bufferLength=note.cfg->sampleRate / freq;
 		u_index lengthInt=(u_index)ceil(bufferLength) + 3;
 		buffer.ensureCapacity(bufferLength);
 		if(burstSampleData != nullptr){
 			auto & data=*burstSampleData;
-			double dataLen=data.length;
+			u_sample dataLen=data.length;
 			for(u_index i=0;i < lengthInt;i++){
-				double dIndex=(double)i * dataLen / bufferLength;
+				u_sample dIndex=(u_sample)i * dataLen / bufferLength;
 				int32_t iIndex=(int32_t)dIndex;
 				s_phase y0=data[RingBufferUtil::mod(iIndex - 1, dataLen)];
 				s_phase y1=data[RingBufferUtil::mod(iIndex, dataLen)];
@@ -87,11 +87,11 @@ namespace yzrilyzr_simplesynth{
 		KarplusStrongSrcKeyData & data=*getData(note);
 		RingBufferSample & buffer=data.buffer;
 		u_freq freq2=getSetFreq(note);
-		double len=RingBufferUtil::freq2delayIndex(freq2, note.cfg->sampleRate);
+		u_sample len=RingBufferUtil::freq2delayIndex(freq2, note.cfg->sampleRate);
 		buffer.ensureCapacity(len);
 		u_sample delayed=BufferDelayer::cubicSplineDelay(buffer, len);
 		u_sample newest=buffer.newest();
-		double alpha2=pow(data.alpha, Util::clamp(len, 0.0, 800.0) / 367.0);
+		u_sample alpha2=pow(data.alpha, Util::clamp(len, static_cast<u_sample>(0.0), static_cast<u_sample>(800.0)) / 367.0);
 		u_sample sum=newest * (1 - alpha2) + delayed * alpha2;
 		buffer.write(sum);
 		return sum;

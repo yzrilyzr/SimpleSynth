@@ -41,7 +41,7 @@ namespace yzrilyzr_simplesynth{
 		if(time > 0.3) input=0;
 		input*=note.velocitySynth;
 		input=data.filter->procDsp(input);
-		double alpha=0.4 + 0.4 * note.velocitySynth;
+		u_sample alpha=0.4 + 0.4 * note.velocitySynth;
 		return procKS(buffer, alpha, 0.95, input, freq2) * 0.2;
 	}
 	BowedStringKeyData * BowedString::init(BowedStringKeyData * data, Note & note){
@@ -54,12 +54,12 @@ namespace yzrilyzr_simplesynth{
 		data->ringBuffer.fill(0);
 		return data;
 	}
-	u_sample BowedString::procKS(RingBufferSample & buffer, double alpha, double feedback, u_sample input, u_freq freq2){
-		double len=sampleRate / freq2;
+	u_sample BowedString::procKS(RingBufferSample & buffer, u_sample alpha, u_sample feedback, u_sample input, u_freq freq2){
+		u_sample len=sampleRate / freq2;
 		buffer.ensureCapacity(len);
 		u_sample delayed=BufferDelayer::cubicSplineDelay(buffer, len - 1);
 		u_sample newest=buffer.newest();
-		double alpha2=pow(alpha, len / 367.0);
+		u_sample alpha2=pow(alpha, len / 367.0);
 		u_sample sum=newest * (1 - alpha2) + delayed * alpha2;
 		sum+=input;
 		buffer.write(sum * feedback);

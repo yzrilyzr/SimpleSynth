@@ -83,8 +83,8 @@ namespace yzrilyzr_simplesynth{
 		sampleOffsetLength(0, sampleData->length);
 		return *this;
 	}
-	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::SampleArray> array){
-		sample(std::make_shared<yzrilyzr_array::SampleArrayProvider>(array));
+	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::DoubleArray> array){
+		sample(std::make_shared<yzrilyzr_array::DoubleArrayProvider>(array));
 		return *this;
 	}
 	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::FloatArray> array){

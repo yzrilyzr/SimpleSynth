@@ -5,7 +5,7 @@
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	ArctanDistortion::ArctanDistortion(NoteProcPtr a, double inputGain, double alpha, double outputGain) : AmpUnaryComposition(a){
+	ArctanDistortion::ArctanDistortion(NoteProcPtr a, u_sample inputGain, double alpha, u_sample outputGain) : AmpUnaryComposition(a){
 		this->inputGain=abs(inputGain);
 		this->outputGain=abs(outputGain);
 		this->alpha=abs(alpha);

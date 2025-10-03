@@ -21,8 +21,8 @@ namespace yzrilyzr_simplesynth{
 			BiquadEnvFilterGroupConfig & bcfg=filtersCfg[i];
 			BiquadEnvFilterChange & change=data.changes[i];
 			double fEnv=IIRUtil::limitFreq(sr, bcfg.freqEnv->getAmp(note));
-			double qEnv=Util::clamp(bcfg.qEnv->getAmp(note), 0.001, 10000.0);
-			double gEnv=Util::clamp(bcfg.gainEnv->getAmp(note), -1000.0, 1000.0);
+			double qEnv=Util::clamp(bcfg.qEnv->getAmp(note), static_cast<u_sample>(0.001), static_cast<u_sample>(10000.0));
+			double gEnv=Util::clamp(bcfg.gainEnv->getAmp(note), static_cast<u_sample>(-1000.0), static_cast<u_sample>(1000.0));
 			if(fEnv != change.freq || qEnv != change.q || gEnv != change.gain){
 				change.freq=fEnv;
 				change.q=qEnv;

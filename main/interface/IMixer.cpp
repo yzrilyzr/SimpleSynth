@@ -64,4 +64,13 @@ namespace yzrilyzr_simplesynth{
 	std::mutex & IMixer::getChannelLock(){
 		return channelLock;
 	}
+	void IMixer::asyncMix(){
+		mixFuture=std::async(std::launch::async, [this](){ this->mix(); });
+	}
+	void IMixer::awaitMix(){
+		if(mixFuture.has_value()){
+			mixFuture->get();
+			mixFuture.reset();
+		}
+	}
 }

@@ -35,7 +35,7 @@ namespace yzrilyzr_simplesynth{
 		static ChannelEvent * MIDIBytes2Event(uint8_t ty, uint8_t data1, uint8_t data2);
 		static uint64_t Event2MIDIBytes(ChannelEvent * event);
 		static uint64_t MergeMIDIBytes(uint8_t ty, uint8_t data1, uint8_t data2);
-		static yzrilyzr_array::SampleArray * noise(int32_t length, int32_t sampleRate, u_freq f1, u_freq f2);
+		static yzrilyzr_array::SampleArray * noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2);
 		static yzrilyzr_array::SampleArray * NOISE;
 		static void deleteStatic();
 		static bool isInstrumentProviderSustainable(s_program_id program);
@@ -49,7 +49,6 @@ namespace yzrilyzr_simplesynth{
 		public:
 		FixedRandom(yzrilyzr_array::SampleArray * data);
 		FixedRandom();
-		//double next();
-		double next(u_index * index);
+		u_sample next(u_index * index);
 	};
 }

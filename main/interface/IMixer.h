@@ -5,6 +5,8 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <future>
+#include <optional>
 
 namespace yzrilyzr_dsp{
 	class DSPChain;
@@ -31,6 +33,7 @@ namespace yzrilyzr_simplesynth{
 		std::mutex channelLock;
 		u_time_f processTime=0;
 		ChannelConfig globalChannelConfig;
+		std::optional<std::future<void>> mixFuture;
 		
 		public:
 		static constexpr const int8_t MODE_SINGLE_THREAD=0;
@@ -40,6 +43,8 @@ namespace yzrilyzr_simplesynth{
 		static constexpr const char * const DEFAULT_MIDI_CHANNEL_GROUP_NAME="DefaultMIDIChannelGroup";
 
 		virtual void mix()=0;
+		virtual void asyncMix();
+		virtual void awaitMix();
 
 		virtual u_index getBufferSize()const=0;
 		virtual void setBufferSize(u_index bs)=0;
