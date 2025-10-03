@@ -12,6 +12,9 @@
 #include "events/ChannelEvent.h"
 #include "controller.h"
 #include "util/MIDIFile.h"
+#include "dsp/Chorus.h"
+#include "dsp/Freeverb.h"
+#include "dsp/Phaser.h"
 
 using namespace Steinberg;
 using namespace Steinberg::Vst;
@@ -64,11 +67,7 @@ namespace yzrilyzr_simplesynth_vst{
 		}
 		return kResultOk;
 	}
-
-	//------------------------------------------------------------------------
-	tresult PLUGIN_API SimpleSynthProcessor::process(Vst::ProcessData & data){
-		//--- First : Read inputs parameter changes-----------
-
+	void SimpleSynthProcessor::processParameter(Vst::ProcessData & data){
 		if(data.inputParameterChanges){
 			int32 numParamsChanged=data.inputParameterChanges->getParameterCount();
 			for(int32 index=0; index < numParamsChanged; index++){
@@ -108,12 +107,72 @@ namespace yzrilyzr_simplesynth_vst{
 								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::VOLUME, static_cast<uint8_t>(value * 127.0)));
 								break;
 							}
-							
+							case kParamPan:
+							{
+								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PAN, static_cast<uint8_t>(value * 127.0)));
+								break;
+							}
+							case kParamChorus:
+							{
+								u_index numChannels=mixer->getOutputChannelCount();
+								for(u_index i=0;i < numChannels;i++){
+									mixer->getMIDIChannel(chID)->getChorus(i).wetRatio=value;
+								}
+								break;
+							}
+							case kParamReverb:
+							{
+								u_index numChannels=mixer->getOutputChannelCount();
+								for(u_index i=0;i < numChannels;i++){
+									mixer->getMIDIChannel(chID)->getReverb(i).wetRatio=value;
+								}
+								break;
+							}
+							case kParamPhaser:
+							{
+								u_index numChannels=mixer->getOutputChannelCount();
+								for(u_index i=0;i < numChannels;i++){
+									mixer->getMIDIChannel(chID)->getPhaser(i).wetRatio=value;
+								}
+								break;
+							}
+							case kParamPortamento:
+							{
+								if(value == 0){
+									mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PORTAMENTO_SWITCH, 0));
+								} else{
+									mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PORTAMENTO_SWITCH, 127));
+									mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PORTAMENTO_TIME, static_cast<uint8_t>(value * 127.0)));
+								}
+								break;
+							}
+							case kParamMod:
+							{
+								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::MODULATION, static_cast<uint8_t>(value * 127.0)));
+								break;
+							}
+							case kParamPitchBend:
+							{
+								mixer->sendInstantEvent(new ChannelPitchBend(chID, value - 0.5));
+								break;
+							}
+							case kParamSoftPedal:
+							{
+								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::SOFT_PEDAL_SWITCH, value > 0.5?127:0));
+								break;
+							}
+							case kParamSostenuto:
+							{
+								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::SOSTENUTO_SWITCH, value > 0.5?127:0));
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
+	}
+	void SimpleSynthProcessor::processEvent(Vst::ProcessData & data){
 		if(data.inputEvents){
 			for(int i=0; i < data.inputEvents->getEventCount(); ++i){
 				Vst::Event event;
@@ -131,6 +190,12 @@ namespace yzrilyzr_simplesynth_vst{
 				}
 			}
 		}
+	}
+	//------------------------------------------------------------------------
+	tresult PLUGIN_API SimpleSynthProcessor::process(Vst::ProcessData & data){
+		//--- First : Read inputs parameter changes-----------
+		processParameter(data);
+		processEvent(data);
 		auto cbkSamples=data.numSamples;
 		if(cbkSamples > 0 && data.numOutputs > 0){
 			auto & bus=data.outputs[0];
@@ -158,6 +223,17 @@ namespace yzrilyzr_simplesynth_vst{
 						fifoBuffer[ch].write(mixer->getOutput(ch), 0, bufLen);
 					}
 				}
+				float time=mixer->getProcessTime() / mixer->getProcessStandardTime();
+				if(data.outputParameterChanges){
+					Vst::IParamValueQueue * paramQueue=nullptr;
+					int32 index=-1;
+					paramQueue=data.outputParameterChanges->getParameterData(index);
+					if(!paramQueue){
+						paramQueue=data.outputParameterChanges->addParameterData(kParamLoadTime, index);
+					}
+					int32 pointIndex=-1;
+					paramQueue->addPoint(0, time, pointIndex);
+				}
 				int size=sizeof(u_sample);
 			#ifdef DSP_SINGLE_PRECISION
 				if(data.symbolicSampleSize == kSample32){
@@ -166,7 +242,7 @@ namespace yzrilyzr_simplesynth_vst{
 						fifoBuffer[ch].read(out, 0, cbkSamples);
 						fifoBuffer[ch].compact();
 					}
-				}else if(data.symbolicSampleSize == kSample64){
+				} else if(data.symbolicSampleSize == kSample64){
 					u_sample * tmp=new u_sample[cbkSamples];
 					for(Steinberg::int32 ch=0;ch < numChannels;ch++){
 						auto out=bus.channelBuffers64[ch];
@@ -191,14 +267,14 @@ namespace yzrilyzr_simplesynth_vst{
 						}
 					}
 					delete[] tmp;
-				}else if(data.symbolicSampleSize == kSample64){
+				} else if(data.symbolicSampleSize == kSample64){
 					for(Steinberg::int32 ch=0;ch < numChannels;ch++){
 						auto out=bus.channelBuffers64[ch];
 						fifoBuffer[ch].read(out, 0, cbkSamples);
 						fifoBuffer[ch].compact();
 					}
 				}
-			#endif // DSP_DOUBLE_PRECISION				
+			#endif // DSP_DOUBLE_PRECISION
 			}
 		}
 

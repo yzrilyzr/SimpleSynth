@@ -57,6 +57,8 @@ if(SMTG_ENABLE_VSTGUI_SUPPORT)
     smtg_target_add_plugin_resources(${PROJECT_NAME}
         RESOURCES
             "resource/editor.uidesc"
+            "resource/switch.png"
+            "resource/lang.properties"
     )
 endif(SMTG_ENABLE_VSTGUI_SUPPORT)
 

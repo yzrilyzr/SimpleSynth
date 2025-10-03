@@ -318,6 +318,7 @@ namespace yzrilyzr_simplesynth{
 		return output[chIndex]->_array;
 	}
 	void Mixer::sendInstantEvent(ChannelEvent * event){
+		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
 		std::shared_ptr<Channel> ch=std::dynamic_pointer_cast<Channel>(getMIDIChannel(event->groupName, event->channelID));
 		ch->sendInstantEvent(event);
 	}

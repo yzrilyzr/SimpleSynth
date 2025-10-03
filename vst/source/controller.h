@@ -16,6 +16,16 @@ namespace yzrilyzr_simplesynth_vst{
 		kParamIsDrum=103,  //是否鼓组
 		kParamVolume=104,  // 音量
 		kParamLimiter=105,  // 限制器
+		kParamPan=106,
+		kParamChorus=107,
+		kParamReverb=108,
+		kParamPortamento=109,
+		kParamMod=110,
+		kParamPitchBend=111,
+		kParamSoftPedal=112,
+		kParamLoadTime=113,
+		kParamSostenuto=114,
+		kParamPhaser=115,
 		kProgramSelectorBaseTag=10000
 	};
 

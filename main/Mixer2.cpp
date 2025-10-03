@@ -97,13 +97,13 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	yzrilyzr_dsp::Chorus & ChannelData::getChorus(u_index ch)const{
-		return static_cast<Chorus &>(*choruser[ch]);
+		return *std::dynamic_pointer_cast<Chorus>(choruser[ch]);
 	}
 	yzrilyzr_dsp::Freeverb & ChannelData::getReverb(u_index ch)const{
-		return static_cast<Freeverb &>(*choruser[ch]);
+		return *std::dynamic_pointer_cast<Freeverb>(reverber[ch]);
 	}
 	yzrilyzr_dsp::Phaser & ChannelData::getPhaser(u_index ch)const{
-		return static_cast<Phaser &>(*choruser[ch]);
+		return *std::dynamic_pointer_cast<Phaser>(phaser[ch]);
 	}
 	void ChannelData::reset(){}
 	u_sample * ChannelData::getOutput(uint32_t chIndex)const{
@@ -588,10 +588,12 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer2::sendInstantEvent(ChannelEvent * event){
 		std::unique_lock <std::mutex > lock(eventLock);
+		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
 		instantEventQueue.push_back(event);
 	}
 	void Mixer2::postEvent(ChannelEvent * event, u_time startAt){
 		std::unique_lock <std::mutex > lock(eventLock);
+		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
 		event->startAtTime=startAt;
 		postEventQueue.push_back(event);
 	}
