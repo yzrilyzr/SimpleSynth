@@ -7,7 +7,7 @@ using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
 	AmpWithCC::~AmpWithCC(){}
 	AmpWithCC::AmpWithCC() :AmpWithCC(nullptr, nullptr){}
-	AmpWithCC::AmpWithCC(NoteProcPtr a, std::shared_ptr<yzrilyzr_array::IntArray> cc) : AmpUnaryComposition(a){
+	AmpWithCC::AmpWithCC(NoteProcPtr a,const yzrilyzr_array::IntArray& cc) : AmpUnaryComposition(a){
 		this->cc=cc;
 	}
 	u_sample AmpWithCC::getAmp(Note & note){
@@ -18,8 +18,8 @@ namespace yzrilyzr_simplesynth{
 	}
 	void AmpWithCC::init(ChannelConfig & cfg){
 		AmpUnaryComposition::init(cfg);
-		for(uint32_t i=0;i < cc->length;i+=2){
-			ChannelControl * cc1=new ChannelControl((*cc)[i], (*cc)[i + 1]);
+		for(uint32_t i=0;i < cc.length;i+=2){
+			ChannelControl * cc1=new ChannelControl(cc[i], cc[i + 1]);
 			cfg.postInstantEvent(cc1);
 		}
 	}

@@ -83,19 +83,19 @@ namespace yzrilyzr_simplesynth{
 		sampleOffsetLength(0, sampleData->length);
 		return *this;
 	}
-	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::DoubleArray> array){
-		sample(std::make_shared<yzrilyzr_array::DoubleArrayProvider>(array));
+	WaveSamplerBuilder & sample(const yzrilyzr_array::DoubleArray &array){
+		sample(std::make_shared < yzrilyzr_array::DoubleArrayProvider>(array));
 		return *this;
 	}
-	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::FloatArray> array){
-		sample(std::make_shared<yzrilyzr_array::FloatArrayProvider>(array));
+	WaveSamplerBuilder & sample(const yzrilyzr_array::FloatArray &array){
+		sample(std::make_shared < yzrilyzr_array::FloatArrayProvider>(array));
 		return *this;
 	}
-	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::ShortArray> array){
+	WaveSamplerBuilder & sample(const yzrilyzr_array::ShortArray &array){
 		sample(std::make_shared<yzrilyzr_array::ShortArrayProvider>(array));
 		return *this;
 	}
-	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::ByteArray> array){
+	WaveSamplerBuilder & sample(const yzrilyzr_array::ByteArray& array){
 		sample(std::make_shared<yzrilyzr_array::ByteArrayProvider>(array));
 		return *this;
 	}

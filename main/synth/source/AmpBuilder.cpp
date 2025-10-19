@@ -79,7 +79,7 @@ namespace yzrilyzr_simplesynth{
 		else this->_src=std::make_shared<AmpMultiplier>(this->_src, mul1);
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::multyKey(std::shared_ptr<IntArray> noteShift, std::shared_ptr<yzrilyzr_array::DoubleArray> velocityMul){
+	AmpBuilder & AmpBuilder::multyKey(const IntArray& noteShift,const DoubleArray &velocityMul){
 		this->_src=std::make_shared<MultiKeyTrigger>(_src, noteShift, velocityMul);
 		return *this;
 	}
@@ -105,7 +105,7 @@ namespace yzrilyzr_simplesynth{
 		std::dynamic_pointer_cast<Osc>(this->_src)->setPhaseSource(src);
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::cc(std::shared_ptr<IntArray> cc){
+	AmpBuilder & AmpBuilder::cc(const yzrilyzr_array::IntArray & cc){
 		this->_src=std::make_shared<AmpWithCC>(this->_src, cc);
 		return *this;
 	}
@@ -240,7 +240,7 @@ namespace yzrilyzr_simplesynth{
 						   std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){
 		return mul(std::make_shared<AHDSREnvelop>(delayTime, attackTime, holdTime, decayTime, decayToVolume, canSustain, releaseTime, forceReleaseTime, aCurve, dCurve, rCurve));
 	}
-	AmpBuilder & AmpBuilder::GraphEnv(int32_t sustainPointIndex, DoubleArray * pointValues){
+	AmpBuilder & AmpBuilder::GraphEnv(int32_t sustainPointIndex, const DoubleArray & pointValues){
 		return mul(std::make_shared<GraphEnvelop>(sustainPointIndex, pointValues));
 	}
 	AmpBuilder & AmpBuilder::MultiStageEnv(const std::vector<MSEPoint> &points){

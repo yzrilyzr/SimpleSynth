@@ -5,14 +5,14 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	GraphEnvelop::GraphEnvelop(int32_t sustainPointIndex,const DoubleArray * pointValues) :GraphEnvelop(sustainPointIndex, -1, -1, pointValues){}
-	GraphEnvelop::GraphEnvelop(int32_t sustainPointIndex, int32_t loopStartIndex, int32_t loopEndIndex, const DoubleArray * pointValues) :
+	GraphEnvelop::GraphEnvelop(int32_t sustainPointIndex,const DoubleArray & pointValues) :GraphEnvelop(sustainPointIndex, -1, -1, pointValues){}
+	GraphEnvelop::GraphEnvelop(int32_t sustainPointIndex, int32_t loopStartIndex, int32_t loopEndIndex, const DoubleArray & pointValues) :
 		sustainPointIndex(sustainPointIndex),
 		loopStartPointIndex(loopStartIndex),
 		loopEndPointIndex(loopEndIndex){
-		this->points.reserve(pointValues->length / 2);
-		for(uint32_t i=0, j=0;i < pointValues->length;i+=2, j++){
-			this->points.emplace_back((*pointValues)[i] / 1000.0, (*pointValues)[i + 1]);
+		this->points.reserve(pointValues.length / 2);
+		for(uint32_t i=0, j=0;i < pointValues.length;i+=2, j++){
+			this->points.emplace_back(pointValues[i] / 1000.0, pointValues[i + 1]);
 		}
 	}
 	GraphEnvelop::GraphEnvelop(int32_t sustainPointIndex, const std::vector<GraphPoint> & points) :

@@ -39,125 +39,126 @@ void gaussianSmooth(SampleArray & data, SampleArray & smoothed, u_sample sigma, 
 	}
 }
 void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	std::shared_ptr<SampleArrayProvider> paramRegPtr=std::dynamic_pointer_cast<SampleArrayProvider, ParamRegister>(obj.paramRegPtr);
-	auto & data=obj.storeData;
-	if(data.find("SampleLength") == data.end()){
-		data["SampleLength"]=std::make_shared<Integer>(256);
-	}
-	Integer & SampleLength=*std::dynamic_pointer_cast<Integer>(data["SampleLength"]);
-	ImGui::InputInt(ctx.LANG.getc("module.sample.length"), &SampleLength.value);
-	if(SampleLength.value < 1)SampleLength.value=1;
-	if(data.find("SampleData") != data.end()){
-		paramRegPtr->array=std::dynamic_pointer_cast<SampleArray>(data["SampleData"]);
-		paramRegPtr->length=paramRegPtr->array->length;
-	}
-	if(ImGui::Button(ctx.LANG.getc("module.sample.init"))){
-		paramRegPtr->array=std::make_shared<SampleArray>(SampleLength.value);
-		paramRegPtr->length=SampleLength.value;
-		data["SampleData"]=paramRegPtr->array;
-	}
-	if(!paramRegPtr->array)return;
-	if(ImPlot::BeginPlot(ctx.LANG.getc("module.sample.data"), ImVec2(500, 500))){
-		ImPlot::SetupAxis(ImAxis_Y1, ctx.LANG.getc("module.sample.wave"), ImPlotAxisFlags_NoLabel);
-		ImPlot::SetupAxisLimits(ImAxis_Y1, -1.0, 1.0, ImPlotCond_Always);
-		ImPlot::SetupAxis(ImAxis_X1, "Index", ImPlotAxisFlags_NoLabel);
-		ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, paramRegPtr->length - 1, ImPlotCond_Always);
-		ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
-		ImPlot::PlotLine(ctx.LANG.getc("module.sample.wave"), paramRegPtr->array->_array, paramRegPtr->length);
+	// TODO fix
+	//std::shared_ptr<SampleArrayProvider> paramRegPtr=std::dynamic_pointer_cast<SampleArrayProvider, ParamRegister>(obj.paramRegPtr);
+	//auto & data=obj.storeData;
+	//if(data.find("SampleLength") == data.end()){
+	//	data["SampleLength"]=std::make_shared<Integer>(256);
+	//}
+	//Integer & SampleLength=*std::dynamic_pointer_cast<Integer>(data["SampleLength"]);
+	//ImGui::InputInt(ctx.LANG.getc("module.sample.length"), &SampleLength.value);
+	//if(SampleLength.value < 1)SampleLength.value=1;
+	//if(data.find("SampleData") != data.end()){
+	//	paramRegPtr->array=std::dynamic_pointer_cast<SampleArray>(data["SampleData"]);
+	//	paramRegPtr->length=paramRegPtr->array.length;
+	//}
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.init"))){
+	//	paramRegPtr->array=std::make_shared<SampleArray>(SampleLength.value);
+	//	paramRegPtr->length=SampleLength.value;
+	//	data["SampleData"]=paramRegPtr->array;
+	//}
+	//if(!paramRegPtr->array)return;
+	//if(ImPlot::BeginPlot(ctx.LANG.getc("module.sample.data"), ImVec2(500, 500))){
+	//	ImPlot::SetupAxis(ImAxis_Y1, ctx.LANG.getc("module.sample.wave"), ImPlotAxisFlags_NoLabel);
+	//	ImPlot::SetupAxisLimits(ImAxis_Y1, -1.0, 1.0, ImPlotCond_Always);
+	//	ImPlot::SetupAxis(ImAxis_X1, "Index", ImPlotAxisFlags_NoLabel);
+	//	ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, paramRegPtr->length - 1, ImPlotCond_Always);
+	//	ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
+	//	ImPlot::PlotLine(ctx.LANG.getc("module.sample.wave"), paramRegPtr->array->_array, paramRegPtr->length);
 
-		ImPlotPoint mouse_pos=ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
-		bool is_mouse_in_plot=ImPlot::IsPlotHovered(); // 判断鼠标是否在绘图区域内
-		if(is_mouse_in_plot && ImGui::IsMouseDown(ImGuiMouseButton_Left)){
-			int index=mouse_pos.x;
-			if(index >= 0 && index < paramRegPtr->array->length){
-				paramRegPtr->array->_array[index]=mouse_pos.y;
-			}
-		}
-		ImPlot::EndPlot();
-	}
-	ImGui::Text(ctx.LANG.getc("module.sample.fast_fill"));
+	//	ImPlotPoint mouse_pos=ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
+	//	bool is_mouse_in_plot=ImPlot::IsPlotHovered(); // 判断鼠标是否在绘图区域内
+	//	if(is_mouse_in_plot && ImGui::IsMouseDown(ImGuiMouseButton_Left)){
+	//		int index=mouse_pos.x;
+	//		if(index >= 0 && index < paramRegPtr->array->length){
+	//			paramRegPtr->array->_array[index]=mouse_pos.y;
+	//		}
+	//	}
+	//	ImPlot::EndPlot();
+	//}
+	//ImGui::Text(ctx.LANG.getc("module.sample.fast_fill"));
 
-	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.random"))){
-		Random random;
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]=random.nextGaussian();
-		}
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.sine"))){
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]=std::sin(_2PI * i / paramRegPtr->length);
-		}
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.saw"))){
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0, 1, 0, 0);
-		}
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.tri"))){
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0, 0.5, 0.5, 0);
-		}
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.fill.square"))){
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0.5, 0, 0, 0);
-		}
-	}
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.fill.random"))){
+	//	Random random;
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array->_array[i]=random.nextGaussian();
+	//	}
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.fill.sine"))){
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array->_array[i]=std::sin(_2PI * i / paramRegPtr->length);
+	//	}
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.fill.saw"))){
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0, 1, 0, 0);
+	//	}
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.fill.tri"))){
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0, 0.5, 0.5, 0);
+	//	}
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.fill.square"))){
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array->_array[i]=PWM::pwm((double)i / paramRegPtr->length, 0.5, 0, 0, 0);
+	//	}
+	//}
 
-	ImGui::Text(ctx.LANG.getc("module.sample.utils"));
+	//ImGui::Text(ctx.LANG.getc("module.sample.utils"));
 
-	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.dc_filter"))){
-		u_sample sum=0;
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			sum+=paramRegPtr->array->_array[i];
-		}
-		sum/=(u_sample)paramRegPtr->length;
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]-=sum;
-		}
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.light_smooth"))){
-		auto sm=std::make_shared<SampleArray>(paramRegPtr->length);
-		gaussianSmooth(*paramRegPtr->array, *sm, 0.5, 3);
-		data["SampleData"]=sm;
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.strong_smooth"))){
-		auto sm=std::make_shared<SampleArray>(paramRegPtr->length);
-		gaussianSmooth(*paramRegPtr->array, *sm, 5, 13);
-		data["SampleData"]=sm;
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.zoom_in"))){
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]*=1.1;
-		}
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.zoom_out"))){
-		for(u_index i=0;i < paramRegPtr->length;i++){
-			paramRegPtr->array->_array[i]*=0.9;
-		}
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.move_left"))){
-		u_sample first=paramRegPtr->array->_array[0];
-		for(u_index i=0;i < paramRegPtr->length - 1;i++){
-			paramRegPtr->array->_array[i]=paramRegPtr->array->_array[i + 1];
-		}
-		paramRegPtr->array->_array[paramRegPtr->length - 1]=first;
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("module.sample.utils.move_right"))){
-		u_sample last=paramRegPtr->array->_array[paramRegPtr->length - 1];
-		for(int32_t i=paramRegPtr->length - 1;i >= 0;i--){
-			paramRegPtr->array->_array[i]=paramRegPtr->array->_array[i - 1];
-		}
-		paramRegPtr->array->_array[0]=last;
-	}
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.dc_filter"))){
+	//	u_sample sum=0;
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		sum+=paramRegPtr->array._array[i];
+	//	}
+	//	sum/=(u_sample)paramRegPtr->length;
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array._array[i]-=sum;
+	//	}
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.light_smooth"))){
+	//	auto sm=std::make_shared<SampleArray>(paramRegPtr->length);
+	//	gaussianSmooth(*paramRegPtr->array, *sm, 0.5, 3);
+	//	data["SampleData"]=sm;
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.strong_smooth"))){
+	//	auto sm=std::make_shared<SampleArray>(paramRegPtr->length);
+	//	gaussianSmooth(*paramRegPtr->array, *sm, 5, 13);
+	//	data["SampleData"]=sm;
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.zoom_in"))){
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array->_array[i]*=1.1;
+	//	}
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.zoom_out"))){
+	//	for(u_index i=0;i < paramRegPtr->length;i++){
+	//		paramRegPtr->array->_array[i]*=0.9;
+	//	}
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.move_left"))){
+	//	u_sample first=paramRegPtr->array->_array[0];
+	//	for(u_index i=0;i < paramRegPtr->length - 1;i++){
+	//		paramRegPtr->array->_array[i]=paramRegPtr->array->_array[i + 1];
+	//	}
+	//	paramRegPtr->array->_array[paramRegPtr->length - 1]=first;
+	//}
+	//ImGui::SameLine();
+	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.move_right"))){
+	//	u_sample last=paramRegPtr->array->_array[paramRegPtr->length - 1];
+	//	for(int32_t i=paramRegPtr->length - 1;i >= 0;i--){
+	//		paramRegPtr->array->_array[i]=paramRegPtr->array->_array[i - 1];
+	//	}
+	//	paramRegPtr->array->_array[0]=last;
+	//}
 }

@@ -20,6 +20,7 @@
 #include "util/Util.h"
 #include "windows.h"
 #include "yzrutil.h"
+#include "util/Convert.h"
 #include <iostream>
 #include <string>
 
@@ -398,9 +399,9 @@ int main(int argc, char * argv[]){
 			} else if(str == ""){
 				mixer2->reset();
 			} else if(str.startsWith("cali")){
-				auto & split=str.split(" ");//channel program
-				uint8_t channel=std::stoi(split[1].tostring());
-				uint8_t program=std::stoi(split[2].tostring());
+				auto split=str.split(" ");//channel program
+				uint8_t channel=parseInt(split[1].tostring());
+				uint8_t program=parseInt(split[2].tostring());
 				calibrate(channel, program);
 			} else if(str == "def"){
 				rin->setDrumSet(std::make_shared<SimpleDrumSet>());
@@ -416,7 +417,7 @@ int main(int argc, char * argv[]){
 			} else if(str == "exportsamplerate"){
 				std::cout << "Input new sample rate" << std::endl;
 				std::getline(std::cin, a);
-				exportSampleRate=stoi(a);
+				exportSampleRate=parseInt(a);
 				std::cout << "ExportSampleRate: " << (int)exportSampleRate << std::endl;
 			} else if(str == "limiter"){
 				exportLimiter=!exportLimiter;
@@ -433,9 +434,9 @@ int main(int argc, char * argv[]){
 				std::cout << "ExportSampleRate: " << (int)exportSampleRate << std::endl;
 			} else if(str.startsWith("midi ")){
 				auto & split=str.split(" ");
-				uint8_t ty=std::stoi(split[1].tostring(), nullptr, 16);
-				uint8_t data1=std::stoi(split[2].tostring(), nullptr, 16);
-				uint8_t data2=std::stoi(split[3].tostring(), nullptr, 16);
+				uint8_t ty=parseInt(split[1].tostring(), 16);
+				uint8_t data1=parseInt(split[2].tostring(), 16);
+				uint8_t data2=parseInt(split[3].tostring(), 16);
 				SynthUtil::sendMIDIBytes(mixer2.get(), ty, data1, data2);
 			}
 		} catch(Exception e){

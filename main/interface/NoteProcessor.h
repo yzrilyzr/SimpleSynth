@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "SimpleSynth.h"
-
 #include "util/ParamRegister.h"
 
 namespace yzrilyzr_util{

@@ -137,6 +137,8 @@ namespace yzrilyzr_simplesynth{
 		sp_dsp3d=other.sp_dsp3d;
 		sp_velocityMap=other.sp_velocityMap;
 		sp_tuning=other.sp_tuning;
+		if(mixer == nullptr)mixer=other.mixer;
+		if(channel == nullptr)channel=other.channel;
 	}
 	std::shared_ptr<ChannelConfig> ChannelConfig::DefaultConfig(){
 		std::shared_ptr<ChannelConfig> p=std::make_shared< ChannelConfig>();

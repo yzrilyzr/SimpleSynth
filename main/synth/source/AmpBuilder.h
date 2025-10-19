@@ -24,10 +24,10 @@ namespace yzrilyzr_simplesynth{
 	AmpBuilder & src(double src); // 设置音频源为固定值
 	AmpBuilder & freqSrc(double src); // 设置频率源为固定值
 	AmpBuilder & freqSrc(std::shared_ptr<PhaseSrc> src); // 设置频率源为PhaseSrc对象
-	AmpBuilder & cc(std::shared_ptr<yzrilyzr_array::IntArray> cc); // 设置控制变化(CC)数组
+	AmpBuilder & cc(const yzrilyzr_array::IntArray &cc); // 设置控制变化(CC)数组
 	AmpBuilder & noteShift(int8_t shift); // 音符移调
-	AmpBuilder & multyKey(std::shared_ptr<yzrilyzr_array::IntArray> noteShift,
-						  std::shared_ptr<yzrilyzr_array::DoubleArray> velocityMul); // 一个note可以合成多个Note
+	AmpBuilder & multyKey(const yzrilyzr_array::IntArray & noteShift,
+						  const yzrilyzr_array::DoubleArray &velocityMul); // 一个note可以合成多个Note
 
 	// 振幅调整
 	AmpBuilder & add(double add); // 叠加固定值（取最长时长）
@@ -72,7 +72,7 @@ namespace yzrilyzr_simplesynth{
 						std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
 						std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
 						std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // 带强制释放的DAHDSR包络
-	AmpBuilder & GraphEnv(int32_t sustainPointIndex, yzrilyzr_array::DoubleArray * pointValues); // 图形包络
+	AmpBuilder & GraphEnv(int32_t sustainPointIndex,const yzrilyzr_array::DoubleArray &pointValues); // 图形包络
 	AmpBuilder & MultiStageEnv(const std::vector<MSEPoint> &points);
 
 
@@ -88,7 +88,7 @@ namespace yzrilyzr_simplesynth{
 	AmpBuilder & detune(int32_t count, s_note_id offset); // 失谐效果（一次合成多个note）
 
 	// 滤波处理
-	AmpBuilder & FIR(u_sample_rate sampleRate, uint16_t n, yzrilyzr_array::DoubleArray * Wn); // FIR滤波
+	AmpBuilder & FIR(u_sample_rate sampleRate, uint16_t n, const yzrilyzr_array::DoubleArray & Wn); // FIR滤波
 	AmpBuilder & IIR(u_sample_rate sampleRate, uint16_t n, u_freq f1, u_freq f2); // IIR带通滤波
 	AmpBuilder & IIR(u_sample_rate sampleRate, yzrilyzr_dsp::FilterPassType type, uint16_t n,
 					 u_freq f1, u_freq f2); // 通用IIR滤波

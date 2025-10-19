@@ -152,12 +152,12 @@ namespace yzrilyzr_simplesynth{
 		auto it=sampleMap.find(hash);
 		if(it == sampleMap.end()){
 			int8_t * byteArr=buf.array()->_array;
-			std::shared_ptr<ShortArray> arr=std::make_shared<ShortArray>(length / 2);
+			ShortArray arr(length / 2);
 			for(u_index si=0, bi=offset;bi < offset + length;){
 				uint16_t val=0;
 				val=byteArr[bi++] & 0xff;
 				val|=(byteArr[bi++] & 0xff) << 8;
-				(*arr)[si++]=val;
+				arr[si++]=val;
 			}
 			it=sampleMap.emplace(hash, std::make_shared<ShortArrayProvider>(arr)).first;
 		}

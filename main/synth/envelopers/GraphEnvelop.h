@@ -33,8 +33,8 @@ namespace yzrilyzr_simplesynth{
 	GraphEnvelop(){
 		//registerParam("InputGain", ParamType::Double, &inputGain, &gainMin, &gainMax);
 	}
-	GraphEnvelop(int32_t sustainPointIndex, const yzrilyzr_array::DoubleArray * pointValues);
-	GraphEnvelop(int32_t sustainPointIndex, int32_t loopStartIndex, int32_t loopEndIndex, const yzrilyzr_array::DoubleArray * pointValues);
+	GraphEnvelop(int32_t sustainPointIndex, const yzrilyzr_array::DoubleArray & pointValues);
+	GraphEnvelop(int32_t sustainPointIndex, int32_t loopStartIndex, int32_t loopEndIndex, const yzrilyzr_array::DoubleArray & pointValues);
 	GraphEnvelop(int32_t sustainPointIndex, const std::vector<GraphPoint> &points);
 	GraphEnvelop(int32_t sustainPointIndex, int32_t loopStartIndex, int32_t loopEndIndex,const std::vector<GraphPoint> &points);
 	bool noMoreData(Note & note) override;

@@ -407,8 +407,9 @@ namespace yzrilyzr_simplesynth{
 		panner[0]=std::make_shared<AmpMultiply>();
 		panner[1]=std::make_shared<AmpMultiply>();
 		//
-		choruser[0]=std::make_shared<Chorus>(0.027, 30, 0.3, 0);
-		choruser[1]=std::make_shared<Chorus>(0.021, 30, 0.3, 0);
+		Random rand;
+		choruser[0]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.027, rand.nextDouble()), 30, 0.3, 0);
+		choruser[1]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.021, rand.nextDouble()), 30, 0.3, 0);
 		//
 		phaser[0]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
 		phaser[1]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
@@ -423,9 +424,6 @@ namespace yzrilyzr_simplesynth{
 		addDSPToChain(choruser);
 		addDSPToChain(phaser);
 		addDSPToChain(reverber);
-		Random rand;
-		getChorus(0).setInitPhase(rand.nextDouble());
-		getChorus(1).setInitPhase(rand.nextDouble());
 		lastActiveTime=System::currentTimeMillis();
 	}
 	void Channel::fillBuffer(){
@@ -989,36 +987,6 @@ namespace yzrilyzr_simplesynth{
 	}
 	Freeverb & Channel::getReverb(u_index ch)const{
 		return *(std::dynamic_pointer_cast<Freeverb>(reverber[ch]));
-	}
-	void Channel::setChorus(u_normal_01_f chorus){
-		//std::cout << "Ch:" << channelID << "	Chorus:" << chorus << std::endl;
-		for(u_index i=0;i < channelCount;i++){
-			auto & au=getChorus(i);
-			au.depthMs=50.0f * chorus;
-			au.init(getSampleRate());
-		}
-	}
-	void Channel::setReverb(u_normal_01_f reverb){
-		//std::cout << "Ch:" << channelID << "	Reverb:" << reverb << std::endl;
-		for(u_index i=0;i < channelCount;i++){
-			auto & au=getReverb(i);
-			au.roomSize=reverb * 0.9f;
-			au.damper=Util::clamp(0.3f - reverb * 0.3f, 0.0f, 0.3f);
-			au.wetRatio=Util::clamp(reverb, 0.0f, 0.5f);
-			au.init(getSampleRate());
-		}
-	}
-	void Channel::setDetune(u_normal_01_f detune){
-		//std::cout << "Ch:" << channelID << "	Detune:" << detune << std::endl;
-		this->channelConfig.Detune=detune;
-	}
-	void Channel::setPhaser(u_normal_01_f cphase){
-		//std::cout << "Ch:" << channelID << "	Phaser:" << cphase << std::endl;
-		for(u_index i=0; i < channelCount; i++){
-			auto & au=getPhaser(i);
-			au.wetRatio=cphase;
-			au.init(getSampleRate());
-		}
 	}
 	void Channel::setSostenuto(bool sostenuto){
 		this->channelConfig.Sostenuto=sostenuto;

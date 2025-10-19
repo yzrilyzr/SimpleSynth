@@ -15,21 +15,21 @@ namespace yzrilyzr_simplesynth{
 	 */
 	ECLASS(SineHarmonicWaveTable, public Osc){
 	private:
-	std::shared_ptr<yzrilyzr_array::Array<yzrilyzr_array::DoubleArray *>> aa;
-	yzrilyzr_interpolator::Interpolator * interpolator;
+	yzrilyzr_array::Array<yzrilyzr_array::DoubleArray> aa;
+	std::shared_ptr < yzrilyzr_interpolator::Interpolator> interpolator;
 	public:
 	~SineHarmonicWaveTable();
-	SineHarmonicWaveTable(std::shared_ptr<yzrilyzr_array::Array<yzrilyzr_array::DoubleArray *>> aa);
-	SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<yzrilyzr_array::Array<yzrilyzr_array::DoubleArray *>> aa);
+	SineHarmonicWaveTable(const yzrilyzr_array::Array<yzrilyzr_array::DoubleArray> &aa);
+	SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, const yzrilyzr_array::Array<yzrilyzr_array::DoubleArray> &aa);
 	/**
 	 * 分贝转倍数
 	 * line[i]为分贝数（相对于1）
 	 */
-	static yzrilyzr_array::DoubleArray * dBToAmp(double gain, yzrilyzr_array::DoubleArray * line);
+	static yzrilyzr_array::DoubleArray dBToAmp(double gain,const yzrilyzr_array::DoubleArray &line);
 	u_sample getAmp(Note & note) override;
 	private:
 	u_sample a(Note & note, double x);
-	double getInterpolation(Note & note, yzrilyzr_array::DoubleArray & ampLine);
+	double getInterpolation(Note & note,const yzrilyzr_array::DoubleArray & ampLine);
 	yzrilyzr_lang::String toString() const override{
 		return yzrilyzr_lang::StringFormat::format("SineHarmonicWaveTable(%s)", getPhaseSource());
 	}

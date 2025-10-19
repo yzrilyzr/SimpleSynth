@@ -261,7 +261,7 @@ int main(int argc, char * argv[]){
 		auto sp=name.split("_");
 		String l1=sp[0];
 		String l2="";
-		if(sp.size() == 2)l2=sp[1];
+		if(sp.length == 2)l2=sp[1];
 		ctx.LANG.add(std::make_shared<Locale>(l1, l2), std::make_shared<Properties>(f));
 	}
 	registerAllNoteProcessor(ctx.LANG, allNoteProcessor);

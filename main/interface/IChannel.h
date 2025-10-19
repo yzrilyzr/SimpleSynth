@@ -24,6 +24,10 @@ namespace yzrilyzr_simplesynth{
 		virtual yzrilyzr_dsp::Chorus & getChorus(u_index ch)const=0;
 		virtual yzrilyzr_dsp::Freeverb & getReverb(u_index ch)const=0;
 		virtual yzrilyzr_dsp::Phaser & getPhaser(u_index ch)const=0;
+		void setDetune(u_normal_01_f v);
+		void setChorus(u_normal_01_f v);
+		void setPhaser(u_normal_01_f v);
+		void setReverb(u_normal_01_f v);
 		virtual void reset()=0;
 		yzrilyzr_lang::String getName() const;
 		void setName(const yzrilyzr_lang::String & name);

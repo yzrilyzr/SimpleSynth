@@ -4,7 +4,7 @@
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
 	std::shared_ptr<SampleProvider> SimpleWaveTable::Piano_Wave=
-		std::make_shared<FloatArrayProvider>(std::make_shared<FloatArray>(new float[166]{
+		std::make_shared<FloatArrayProvider>(FloatArray({
 			(float)-0.035889767,
 			(float)-0.12808618,
 			(float)-0.20731224,
@@ -171,5 +171,5 @@ namespace yzrilyzr_simplesynth{
 			(float)0.22122867,
 			(float)0.1386761,
 			(float)0.054139838
-	}, 166));
+	}));
 }

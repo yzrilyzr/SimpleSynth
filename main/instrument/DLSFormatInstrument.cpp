@@ -1,34 +1,34 @@
 #include "DLSFormatInstrument.h"
+#include "SimpleSynth.h"
+#include "SynthUtil.h"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
+#include "array/Array.hpp"
+#include "array/SampleProvider.h"
+#include "collection/ArrayList.hpp"
+#include "interface/NoteProcessor.h"
+#include "io/InputStream.h"
+#include "soundbank/dls/DLSInstrument.h"
+#include "soundbank/dls/DLSModulator.h"
+#include "soundbank/dls/DLSRegion.h"
+#include "soundbank/dls/DLSSample.h"
+#include "soundbank/dls/DLSSampleLoop.h"
+#include "soundbank/dls/DLSSampleOptions.h"
+#include "soundbank/dls/DLSSoundbank.h"
 #include "synth/composed/NonInterpolateAmpSet.h"
 #include "synth/composed/RegionAmp.h"
 #include "synth/envelopers/AHDSREnvelop.h"
 #include "synth/envelopers/EnvUtil.h"
 #include "synth/generators/sampler/WaveSampler.h"
 #include "synth/source/AmpBuilder.h"
-#include "interface/NoteProcessor.h"
-#include "SynthUtil.h"
-#include "SimpleSynth.h"
-#include <algorithm>
-#include "array/Array.hpp"
-#include "array/Array.hpp"
-#include "array/SampleProvider.h"
-#include "array/Array.hpp"
-#include <cmath>
-#include "collection/ArrayList.hpp"
-#include <cstdint>
-#include <cstring>
-#include "io/InputStream.h"
-#include <memory>
-#include "soundbank/dls/DLSSoundbank.h"
-#include "soundbank/dls/DLSModulator.h"
-#include "soundbank/dls/DLSSample.h"
-#include "soundbank/dls/DLSRegion.h"
-#include "soundbank/dls/DLSInstrument.h"
-#include "soundbank/dls/DLSSampleLoop.h"
-#include "soundbank/dls/DLSSampleOptions.h"
+#include "synth\source\AmplitudeSources.h"
 #include "util/Util.h"
 #include "yzrutil.h"
-#include "synth\source\AmplitudeSources.h"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <memory>
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_collection;
 using namespace yzrilyzr_io;
@@ -50,32 +50,32 @@ namespace yzrilyzr_simplesynth{
 		switch(sample.format){
 			case DLSSampleFormat::SIGNED:
 				if(sample.bits == 16){
-					std::shared_ptr<ShortArray> arr=std::make_shared<ShortArray>(byteArr->length / 2);
+					ShortArray arr(byteArr->length / 2);
 					for(u_index si=0, bi=0;bi < byteArr->length;){
 						uint16_t val=0;
 						val=(*byteArr)[bi++] & 0xff;
 						val|=((*byteArr)[bi++] & 0xff) << 8;
-						(*arr)[si++]=val;
+						arr[si++]=val;
 					}
 					return std::make_shared<ShortArrayProvider>(arr);
 				} else if(sample.bits == 8){
-					std::shared_ptr<ByteArray> arr=std::make_shared<ByteArray>(byteArr->length);
-					memcpy(arr->_array, byteArr->_array, byteArr->length);
+					ByteArray arr(byteArr->length);
+					memcpy(arr._array, byteArr->_array, byteArr->length);
 					return std::make_shared<ByteArrayProvider>(arr);
 				}
 				break;
 
 			case DLSSampleFormat::UNSIGNED:
 				if(sample.bits == 8){
-					std::shared_ptr<ByteArray> arr=std::make_shared<ByteArray>(byteArr->length);
-					memcpy(arr->_array, byteArr->_array, byteArr->length);
+					ByteArray arr(byteArr->length);
+					memcpy(arr._array, byteArr->_array, byteArr->length);
 					return std::make_shared<ByteArrayProvider>(arr);
 				}
 				break;
 
 			case DLSSampleFormat::FLOAT:
 				if(sample.bits == 32){
-					std::shared_ptr<FloatArray> arr=std::make_shared<FloatArray>(byteArr->length / 4);
+					FloatArray arr(byteArr->length / 4);
 					for(u_index si=0, bi=0;bi < byteArr->length;){
 						uint32_t val=0;
 						val=(*byteArr)[bi++] & 0xff;
@@ -83,7 +83,7 @@ namespace yzrilyzr_simplesynth{
 						val|=((*byteArr)[bi++] & 0xff) << 16;
 						val|=((*byteArr)[bi++] & 0xff) << 24;
 						uint32_t * valp=&val;
-						(*arr)[si++]=*((float *)valp);
+						arr[si++]=*((float *)valp);
 					}
 					return std::make_shared<FloatArrayProvider>(arr);
 				}

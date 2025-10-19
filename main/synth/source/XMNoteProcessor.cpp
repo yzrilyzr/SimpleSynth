@@ -24,7 +24,7 @@ namespace yzrilyzr_simplesynth{
 			volEnvelop=std::make_shared<GraphEnvelop>(volEnv.sustain_enabled?volEnv.sustain_point:-1,
 													  volEnv.loop_enabled?volEnv.loop_start_point:-1,
 													  volEnv.loop_enabled?volEnv.loop_end_point:-1,
-													  &pts);
+													  pts);
 		} else{
 			volEnvelop=std::make_shared<AHDSREnvelop>(0, 1, 1, 1, 1, true, 100, 50, Pow(-5), Pow(5), Pow(5));
 		}
@@ -39,7 +39,7 @@ namespace yzrilyzr_simplesynth{
 			panEnvelop=std::make_shared< GraphEnvelop>(panEnv.sustain_enabled?panEnv.sustain_point:-1,
 													   panEnv.loop_enabled?panEnv.loop_start_point:-1,
 													   panEnv.loop_enabled?panEnv.loop_end_point:-1,
-													   &pts);
+													   pts);
 		}
 		for(u_index i=0;i < instrument->num_samples;i++){
 			XMFile::SampleData & xsample=xmInstrument->samples[i];

@@ -3,7 +3,8 @@
 #include "interface/NoteTuning.h"
 #include "interpolator/LineInterpolator.h"
 #include "lang/Exception.h"
-#include "dsp\FastSin.h"
+#include "dsp/FastSin.h"
+#include "array/Arrays.h"
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_util;
@@ -11,31 +12,32 @@ using namespace yzrilyzr_lang;
 using namespace yzrilyzr_dsp;
 namespace yzrilyzr_simplesynth{
 	SineHarmonicWaveTable::~SineHarmonicWaveTable(){
-		delete interpolator;
+		
 	}
-	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<Array<DoubleArray *>> aa) : SineHarmonicWaveTable(nullptr, aa){}
-	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<Array<DoubleArray *>> aa) : Osc(freq){
+	SineHarmonicWaveTable::SineHarmonicWaveTable(const Array<DoubleArray> &aa) : SineHarmonicWaveTable(nullptr, aa){}
+	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq,const Array<DoubleArray> &naa) : Osc(freq){
 		this->aa=aa;
-		this->interpolator=new LineInterpolator();
+		this->interpolator=std::make_shared<LineInterpolator>();
 	}
-	DoubleArray * SineHarmonicWaveTable::dBToAmp(double gain, DoubleArray * line){
-		for(u_index i=3;i < line->length;i++){
-			(*line)[i]=gain * pow(10, (*line)[i] / 20.0);
+	DoubleArray SineHarmonicWaveTable::dBToAmp(double gain,const DoubleArray& line){
+		DoubleArray ampArr=Arrays::copyOf(line, line.length);
+		for(u_index i=3;i < line.length;i++){
+			ampArr[i]=gain * pow(10, line[i] / 20.0);
 		}
-		return line;
+		return ampArr;
 	}
 	u_sample SineHarmonicWaveTable::getAmp(Note & note){
 		return a(note, getPhase(note) * _2PI) * note.velocitySynth;
 	}
 	u_sample SineHarmonicWaveTable::a(Note & note, double x){
 		u_sample y=0;
-		for(u_index harmonicOrder=0;harmonicOrder < aa->length;harmonicOrder++){
-			auto & ampLine=*(*aa)[harmonicOrder];
+		for(u_index harmonicOrder=0;harmonicOrder < aa.length;harmonicOrder++){
+			auto & ampLine=aa[harmonicOrder];
 			y+=getInterpolation(note, ampLine) * fast_sin(x * (harmonicOrder + 1.0), harmonicOrder);
 		}
 		return y;
 	}
-	double SineHarmonicWaveTable::getInterpolation(Note & note, DoubleArray & ampLine){
+	double SineHarmonicWaveTable::getInterpolation(Note & note,const DoubleArray & ampLine){
 		if(ampLine.length == 1) return ampLine[0];
 		if(ampLine.length < 5) throw Exception("WaveTable err");
 		u_index points=ampLine.length - 3;

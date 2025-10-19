@@ -8,8 +8,8 @@ using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	MultiKeyTrigger::~MultiKeyTrigger(){}
 	MultiKeyTrigger::MultiKeyTrigger() :MultiKeyTrigger(nullptr, nullptr, nullptr){}
-	MultiKeyTrigger::MultiKeyTrigger(NoteProcPtr a, std::shared_ptr<IntArray> noteShift, std::shared_ptr<DoubleArray> velocityMul) : AmpUnaryComposition(a){
-		this->notesCount=noteShift->length;
+	MultiKeyTrigger::MultiKeyTrigger(NoteProcPtr a, const IntArray & noteShift, const DoubleArray & velocityMul) : AmpUnaryComposition(a){
+		this->notesCount=noteShift.length;
 		this->idShift=noteShift;
 		this->velocityMul=velocityMul;
 	}
@@ -20,7 +20,7 @@ namespace yzrilyzr_simplesynth{
 		ChannelConfig & cfg=*note.cfg;
 		for(u_index i=0;i < notesCount;i++){
 			Note & n1=*notes[i];
-			NoteUpdater::preUpdateNote(n1,cfg);
+			NoteUpdater::preUpdateNote(n1, cfg);
 			sum+=a->getAmp(n1);
 			NoteUpdater::postUpdateNote(n1, cfg);
 		}
@@ -42,8 +42,8 @@ namespace yzrilyzr_simplesynth{
 		for(u_index i=0;i < notesCount;i++){
 			Note * n=data->notes[i];
 			n->set(note);
-			n->id=note.id + (*idShift)[i];
-			n->velocity=note.velocity * (*velocityMul)[i];
+			n->id=note.id + idShift[i];
+			n->velocity=note.velocity * velocityMul[i];
 		}
 		return data;
 	}

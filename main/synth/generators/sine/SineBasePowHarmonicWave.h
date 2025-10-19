@@ -10,11 +10,11 @@ namespace yzrilyzr_simplesynth{
 	 */
 	ECLASS(SineBasePowHarmonicWave, public Osc){
 	private:
-	std::shared_ptr<yzrilyzr_array::DoubleArray> aa;
+	yzrilyzr_array::DoubleArray aa;
 	public:
 		~SineBasePowHarmonicWave();
-		SineBasePowHarmonicWave(std::shared_ptr<yzrilyzr_array::DoubleArray> freqAndAmp);
-		SineBasePowHarmonicWave(std::shared_ptr<PhaseSrc> freq, std::shared_ptr<yzrilyzr_array::DoubleArray> freqAndAmp);
+		SineBasePowHarmonicWave(const yzrilyzr_array::DoubleArray & freqAndAmp);
+		SineBasePowHarmonicWave(std::shared_ptr<PhaseSrc> freq, const yzrilyzr_array::DoubleArray& freqAndAmp);
 		u_sample getAmp(Note &note) override;
 	private:
 		u_sample a(double x, int id);

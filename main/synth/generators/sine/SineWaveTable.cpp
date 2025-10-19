@@ -9,9 +9,9 @@ namespace yzrilyzr_simplesynth{
 	SineWaveTable::~SineWaveTable(){
 		
 	}
-	SineWaveTable::SineWaveTable(double baseFreq, std::shared_ptr<yzrilyzr_array::DoubleArray> freqAndAmp): SineWaveTable(nullptr, baseFreq, freqAndAmp){
+	SineWaveTable::SineWaveTable(double baseFreq,const yzrilyzr_array::DoubleArray& freqAndAmp): SineWaveTable(nullptr, baseFreq, freqAndAmp){
 	}
-	SineWaveTable::SineWaveTable(std::shared_ptr<PhaseSrc> freq, double baseFreq, std::shared_ptr<yzrilyzr_array::DoubleArray> freqAndAmp): Osc(freq){
+	SineWaveTable::SineWaveTable(std::shared_ptr<PhaseSrc> freq, double baseFreq,const yzrilyzr_array::DoubleArray &freqAndAmp): Osc(freq){
 		this->aa=freqAndAmp;
 		this->baseFreq=baseFreq;
 	}
@@ -20,9 +20,9 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sample SineWaveTable::a(double x, u_freq notef){
 		u_sample y=0;
-		for(u_index i=0;i<aa->length;i+=2){
-			double f=(*aa)[i];
-			double a=(*aa)[i+1];
+		for(u_index i=0;i<aa.length;i+=2){
+			double f=aa[i];
+			double a=aa[i+1];
 			f=f/baseFreq;
 			u_freq ff=f * notef;
 			if(ff >20000) continue;

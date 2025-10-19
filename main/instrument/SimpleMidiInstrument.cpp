@@ -77,9 +77,9 @@ namespace yzrilyzr_simplesynth{
 							 .build(), 1)
 						 .ADSR(0, 1000, 0.25, true, 1000, Line(), Pow(5), Pow(2))
 						 .build())
-					.ADSR(10, 2500, 0.5, true, 1000, Pow(5), Pow(5), Pow(2))
+					.ADSR(10, 8000, 0.5, false, 1000, Pow(5), Pow(5), Pow(2))
 					.noteDSP(std::make_shared<Chorus>(1.0, 2.0, 1.0, 0.0))
-					.noteDSP(std::make_shared<Delayer>(220, 0.8, 0.05))
+					.noteDSP(std::make_shared<Delayer>(220, -0.8, 0.05))
 					.build();
 			case MIDIFile::Instruments::PIANO_ELECTRIC_PIANO_2:
 				return AmpBuilder(Matrix6x6ModulationBuilder()//alg 5
@@ -97,7 +97,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(0.3)
 					.ADSR(1, 9000, 0, false, 100, Pow(-5), Pow(3), Pow(1))
 					.noteDSP(std::make_shared<Chorus>(1.0, 2.0, 1.0, 0.0))
-					.noteDSP(std::make_shared<Delayer>(220, 0.8, 0.05))
+					.noteDSP(std::make_shared<Delayer>(220, -0.8, 0.05))
 					.build();
 			case MIDIFile::Instruments::PIANO_HARPSICHORD:
 				return AmpBuilder()
@@ -125,10 +125,10 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder(Matrix6x6ModulationBuilder()
 								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 8281, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0.9998, 0.0, 0.0, 1.0, 0.84)
 								  .setOp(1, AmpBuilder(SineW()).ADSR(1, 4450, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 6.0, 0.0, 0.0, 1.0, 0.52)
-								  .setOp(2, AmpBuilder(SineW()).ADSR(21, 1600, 0, false, 100, Pow(50), Pow(5), Pow(5)).build(), 3.0007, 0.0, 0.0, 1.0, 0.63)
-								  .setOp(3, AmpBuilder(SineW()).ADSR(70, 1200, 0, false, 100, Pow(50), Pow(5), Pow(5)).build(), 12.9989, 0.0, 0.0, 1.0, 0)
-								  .setOp(4, AmpBuilder(SineW()).ADSR(96, 2000, 0, false, 100, Pow(50), Pow(5), Pow(5)).build(), 4.0, 0.0, 0.0, 1.0, 0.73)
-								  .setOp(5, AmpBuilder(SineW()).ADSR(65, 1400, 0, false, 100, Pow(50), Pow(5), Pow(5)).build(), 12.0035, 0.0, 0.0, 1.0, 0)
+								  .setOp(2, AmpBuilder(SineW()).ADSR(21, 1600, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 3.0007, 0.0, 0.0, 1.0, 0.63)
+								  .setOp(3, AmpBuilder(SineW()).ADSR(70, 1200, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 12.9989, 0.0, 0.0, 1.0, 0)
+								  .setOp(4, AmpBuilder(SineW()).ADSR(96, 2000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 4.0, 0.0, 0.0, 1.0, 0.73)
+								  .setOp(5, AmpBuilder(SineW()).ADSR(65, 1400, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 12.0035, 0.0, 0.0, 1.0, 0)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 3, 2, 3.2)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 4, 3.2)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 5, 0.006)
@@ -181,9 +181,9 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().ks(0.9).ADSR(10, 5000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build();
 			case MIDIFile::Instruments::ORGAN_HAMMOND_ORGAN:
 				return AmpBuilder()
-					.src(std::make_shared<SineBasePowHarmonicWave>(std::make_shared<DoubleArray>(new double[5]{
+					.src(std::make_shared<SineBasePowHarmonicWave>(DoubleArray({
 					0.9, 0.9, 1.0, 0.7, 0.6
-				}, 5)))
+				})))
 					.detune(2, 0.1)
 					.biquad(sampleRate, HIGHSHELF, 2000.0, 0.5, -12.0)
 					.mul(0.4)
@@ -288,7 +288,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(0.5)
 					.ks(0.5)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.IIR(sampleRate, 1, 10.1, 20000.0)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -296,11 +296,11 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder(
 					KarplusStrongBuilder()
 					.burst(AmpBuilder(std::make_shared<SquareWave>()).add(std::make_shared<NoiseSrc>()).mul(0.5).build())
-					.alpha(std::make_shared<GraphInterpolator>(std::make_shared<DoubleArray>(new double[10]{0, 0.5, 55, 0.5, 61, 0.7, 62, 0.95, 128, 0.95}, 10)))
+					.alpha(std::make_shared<GraphInterpolator>(DoubleArray({0, 0.5, 55, 0.5, 61, 0.7, 62, 0.95, 128, 0.95})))
 					.build()
 				)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.IIR(sampleRate, 1, 10.1, 20000.0)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -308,7 +308,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(AmpBuilder().src(std::make_shared<Pulse>(0.1, 0.3, 0.1, 0)).add(std::make_shared<NoiseSrc>()).mul(0.5).build())
 					.ks(0.5)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.IIR(sampleRate, 1, 10.1, 20000.0)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -316,7 +316,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(AmpBuilder().src(std::make_shared<SquareWave>()).add(std::make_shared<NoiseSrc>()).mul(0.5).build())
 					.ks(0.75)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.IIR(sampleRate, 1, 10.1, 20000.0)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -324,7 +324,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(AmpBuilder().src(std::make_shared<SquareWave>()).add(std::make_shared<NoiseSrc>()).mul(0.5).build())
 					.ks(0.5)
 					.ADSR(10, 400, 0, false, 100, Pow(5), Pow(5), Pow(5))
-					.IIR(sampleRate, 1, 10.1, 20000.0)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -416,7 +416,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::BASS_SLAP_BASS_2:
 				return AmpBuilder().src(std::make_shared<Pulse>(0.3, 0.4, 0.3, 0))
 					.ks(0.9)
-					.IIR(sampleRate, 2, 10.1, 20000.0)
+					.biquad(sampleRate,HIGHPASS,10,0.7,0)
 					.mul(1.2)
 					.ADSR(10, 1000, 0.3, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -648,7 +648,7 @@ namespace yzrilyzr_simplesynth{
 						 .resonator(2, 136.6, 0)
 						 .resonatorLevel(0.177)
 						 .build())
-					.multyKey(std::make_shared<IntArray>(new int32_t[3]{0, 12, 24}, 3), std::make_shared<DoubleArray>(new double[3]{0.5, 0.5, 0.5}, 3))
+					.multyKey(IntArray({0, 12, 24}), DoubleArray({0.5, 0.5, 0.5}))
 					.mul(3)
 					.ADSR(1, 1000, 0, false, 100, Pow(5), Pow(5), Pow(5))
 					.build();
@@ -660,14 +660,14 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::ENSEMBLE_VOICE_OOHS:
 				return AmpBuilder()
-					.src(std::make_shared<SineWaveTable>(269.53125, std::make_shared<DoubleArray>(new double[12]{
+					.src(std::make_shared<SineWaveTable>(269.53125, DoubleArray({
 					269.53125, 1.0,
 						525, 0.005,
 						784, 0.01,
 						1051, 0.01,
 						1308, 0.005,
 						3122, 0.01
-				}, 12)))
+				})))
 					.autoMod(0.1, 0.3, 5, 0.8)
 					.addMul(
 						AmpBuilder(std::make_shared<NoiseSrc>())
@@ -744,7 +744,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(0.8)
 					.ADSR(5, 5000, 0, false, 300, Pow(-5), Pow(8), Pow(5))
 					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.IIR(sampleRate, 1, 20, 20000)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.build();
 			case MIDIFile::Instruments::LEAD_SQUARE:
 				return AmpBuilder().src(NearestAmpSetBuilder()
@@ -755,7 +755,7 @@ namespace yzrilyzr_simplesynth{
 					.detune(3, 0.15)
 					.autoMod(0.3, 0.3, 5.3, 0.75)
 					.mul(0.707)
-					.IIR(sampleRate, 1, 50, 18000)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.AHDSR(5, 30, 300, 0.75, true, 300, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -1059,9 +1059,9 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::PERCUSSIVE_STEEL_DRUMS:
 				return AmpBuilder()
-					.src(std::make_shared<SineWaveTable>(269.53125, std::make_shared<DoubleArray>(new double[30]{
+					.src(std::make_shared<SineWaveTable>(269.53125, DoubleArray({
 					269.53125, 1.0, 363.28125, 0.07235363857701663, 398.4375, 0.12799743578985023, 433.59375, 0.08737175770435823, 515.625, 0.6206402594994691, 539.0625, 0.3597885911495093, 597.65625, 0.08264700342927812, 656.25, 0.7188440200746729, 785.15625, 0.3795586131241527, 855.46875, 0.011978267525183701, 914.0625, 0.07184674145688824, 1054.6875, 0.22712185759377435, 1171.875, 0.051998250533269966, 1312.5, 0.030940107100424292, 4464.84375, 0.012544763401347499
-				}, 30)))
+				})))
 					.biquadEnv(AmpBuilder().src(ConstAmp(60))
 							   .ADSR(30, 1, 1, true, 100, Line(), Line(), Line())
 							   .add(ConstAmp(60))
@@ -1099,7 +1099,7 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::PERCUSSIVE_REVERSE_CYMBAL:
 				return AmpBuilder(std::make_shared<CymbalOsc>(NoteFreqAmp * (1 / 800.0)))
-					.ADSR(2000, 5, 1, false, 100, Pow(2), Pow(2), Pow(5)).build();
+					.ADSR(2000, 5, 1, false, 2000, Pow(2), Pow(2), Pow(2)).build();
 			case MIDIFile::Instruments::EFFECTS_SEASHORE:
 				return AmpBuilder().src(std::make_shared<NoiseSrc>())
 					.IIR(sampleRate, 1, 103.3, 4060.0)

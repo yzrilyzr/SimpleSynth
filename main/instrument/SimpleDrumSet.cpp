@@ -36,9 +36,9 @@ namespace yzrilyzr_simplesynth{
 			.build();
 	}
 	std::shared_ptr<SineWaveTable> SimpleDrumSet::risset(){
-		return std::make_shared<SineWaveTable>(100, std::make_shared <DoubleArray>(new double[6]{
+		return std::make_shared<SineWaveTable>(100, DoubleArray({
 			100, 1, 160, 0.1, 226, 0.12
-		}, 6));
+		}));
 	}
 
 	NoteProcPtr SimpleDrumSet::kickBassRaw(){
@@ -171,22 +171,34 @@ namespace yzrilyzr_simplesynth{
 			.build());
 		add(MIDIFile::DrumSet::SNARE_ACOUSTIC,
 			AmpBuilder()
-			.src(std::make_shared<SimpleDrumAmp>(risset(), 180, 130, 0.3f))
+			.src(std::make_shared<SimpleDrumAmp>(risset(), 180, 130, 0.3f, SimpleDrumAmp::MODE_FIXED, Pow(-5)))
 			.arctanDistortion(1, 5, 1.5)
 			.addMul(AmpBuilder()
 					.src(std::make_shared<NoiseSrc>())
-					.biquad(sampleRate, FilterPassType::BANDPASS, 4000, 0.6, 0)
-					.build(), 0.5)
+					.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
+							 .biquad(sampleRate, FilterPassType::BELL, 740, 0.5, 5)
+							 .biquad(sampleRate, FilterPassType::BELL, 1337, 0.5, 5)
+							 .biquad(sampleRate, FilterPassType::BELL, 5000, 0.5, 10)
+							 .biquad(sampleRate, FilterPassType::HIGHPASS, 700, 0.5, 0)
+							 .build())
+					.build(), 0.2)
+			.mul(0.8)
 			.ADSR(10, 300, 0, false, 10, Pow(-10), Pow(5), Pow(5))
 			.build());
 		add(MIDIFile::DrumSet::SNARE_ELECTRIC,
 			AmpBuilder()
-			.src(std::make_shared<SimpleDrumAmp>(risset(), 200, 160, 0.3f))
+			.src(std::make_shared<SimpleDrumAmp>(risset(), 200, 160, 0.3f, SimpleDrumAmp::MODE_FIXED, Pow(-5)))
 			.arctanDistortion(1, 5, 1.5)
 			.addMul(AmpBuilder()
 					.src(std::make_shared<NoiseSrc>())
-					.biquad(sampleRate, FilterPassType::BANDPASS, 5000, 0.6, 0)
-					.build(), 0.5)
+					.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
+							 .biquad(sampleRate, FilterPassType::BELL, 740, 0.5, 5)
+							 .biquad(sampleRate, FilterPassType::BELL, 1337, 0.5, 5)
+							 .biquad(sampleRate, FilterPassType::BELL, 5000, 0.5, 10)
+							 .biquad(sampleRate, FilterPassType::HIGHPASS, 700, 0.5, 0)
+							 .build())
+					.build(), 0.2)
+			.mul(0.8)
 			.ADSR(10, 300, 0, false, 10, Pow(-10), Pow(5), Pow(5))
 			.build());
 		add(MIDIFile::DrumSet::HAND_CLAP,
@@ -466,9 +478,9 @@ namespace yzrilyzr_simplesynth{
 			.build());
 		add(MIDIFile::DrumSet::TIMBALE_LOW,
 			AmpBuilder()
-			.src(std::make_shared<SineWaveTable>(114, std::make_shared <DoubleArray>(new double[10]{
+			.src(std::make_shared<SineWaveTable>(114, DoubleArray({
 			114, 0.3, 215, 1, 306, 0.1, 383, 0.5, 412, 0.5
-		}, 10)))
+		})))
 			.arctanDistortion(1, 1.5, 1)
 			.drum(125, 114, 2, SimpleDrumAmp::MODE_FIXED, Pow(-15))
 			.add(AmpBuilder()
@@ -768,9 +780,9 @@ namespace yzrilyzr_simplesynth{
 
 		add(MIDIFile::DrumSet::SURDO_OPEN,
 			AmpBuilder()
-			.src(std::make_shared<SineWaveTable>(84, std::make_shared <DoubleArray>(new double[6]{
+			.src(std::make_shared<SineWaveTable>(84, DoubleArray({
 			84, 1, 108, 0.1, 143, 0.1
-		}, 6)))
+		})))
 			.drum(90, 84, 2)
 			.arctanDistortion(1, 3, 1)
 			.add(AmpBuilder()

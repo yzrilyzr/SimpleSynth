@@ -13,7 +13,7 @@ using namespace yzrilyzr_lang;
 extern "C" JNIEXPORT jlong JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2_constructor(JNIEnv *, jobject, jint bufferSize){
 	Mixer2 * mixer=new Mixer2(bufferSize);
 	mixer->setSynthMode(Mixer2::MODE_THREAD_POOL, -1);
-	mixer->setInstrumentProvider(std::make_shared<SimpleMIDIInstrument>());
+	mixer->getGlobalConfig().setInstrumentProvider(std::make_shared<SimpleMIDIInstrument>());
 	return reinterpret_cast<jlong>(mixer);
 }
 extern "C" JNIEXPORT void JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2_destructor(JNIEnv *, jobject, jlong paramRegPtr){

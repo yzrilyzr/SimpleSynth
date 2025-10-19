@@ -13,7 +13,7 @@ namespace yzrilyzr_simplesynth{
 		soundboardParameters.eq5=8000;
 		soundboardParameters.c1=12;
 		soundboardParameters.c3=30;
-		GraphInterpolator vol(std::make_shared<DoubleArray>(new double[18]{//
+		GraphInterpolator vol(DoubleArray({//
 			36, 1,//
 				48, 1,//
 				60, 1,//
@@ -23,16 +23,16 @@ namespace yzrilyzr_simplesynth{
 				83, 4,//
 				96, 18,//
 				120, 40//
-		}, 18));
-		GraphInterpolator pos(std::make_shared<DoubleArray>(new double[12]{//
+		}));
+		GraphInterpolator pos(DoubleArray({//
 			36, 0.4,//
 				48, 0.4,//
 				60, 0.3,//
 				72, 0.2,//
 				84, 0.1,//
 				120, 0.05//
-		}, 12));
-		GraphInterpolator weight(std::make_shared<DoubleArray>(new double[20]{//
+		}));
+		GraphInterpolator weight(DoubleArray({//
 			36, 8,//
 				42, 5,//
 				48, 4,//
@@ -43,8 +43,8 @@ namespace yzrilyzr_simplesynth{
 				84, 3,//
 				90, 2,//
 				120, 2//
-		}, 20));
-		GraphInterpolator detune(std::make_shared<DoubleArray>(new double[18]{//
+		}));
+		GraphInterpolator detune(DoubleArray({//
 			0, 0.00015,  // 低音区更小的detune
 				36, 0.00015, // 低音区
 				48, 0.00020, // 低音到中音过渡
@@ -54,7 +54,7 @@ namespace yzrilyzr_simplesynth{
 				96, 0.00180, // 高音区
 				108, 0.00200, // 极高音区
 				128, 0.00250  // 极高音区
-		}, 18));
+		}));
 		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
 			PianoKeyParameters & kp=keyParams[i];
 			kp.noteID=i;

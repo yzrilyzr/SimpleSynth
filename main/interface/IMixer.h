@@ -34,6 +34,9 @@ namespace yzrilyzr_simplesynth{
 		u_time_f processTime=0;
 		ChannelConfig globalChannelConfig;
 		std::optional<std::future<void>> mixFuture;
+		bool enable_MIDI_CC_EFFECT=false;
+		bool enable_MIDI_CC_ADSR=false;
+
 		
 		public:
 		static constexpr const int8_t MODE_SINGLE_THREAD=0;

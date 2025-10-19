@@ -57,6 +57,7 @@ namespace yzrilyzr_simplesynth{
 		cfgSnapshots.resize(bufSize);
 		for(u_index i=0; i < bufSize; ++i){
 			cfgSnapshots[i]=std::make_shared<ChannelConfig>();
+			cfgSnapshots[i]->channel=this;
 		}
 
 		output[0]=std::make_shared<SampleArray>(bufSize);
@@ -66,8 +67,9 @@ namespace yzrilyzr_simplesynth{
 		dspChain[0]=std::make_shared<DSPChain>();
 		dspChain[1]=std::make_shared<DSPChain>();
 		//
-		choruser[0]=std::make_shared<Chorus>(0.027, 30, 0.3, 0);
-		choruser[1]=std::make_shared<Chorus>(0.021, 30, 0.3, 0);
+		Random rand;
+		choruser[0]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.027, rand.nextDouble()), 30, 0.3, 0);
+		choruser[1]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.021, rand.nextDouble()), 30, 0.3, 0);
 		//
 		phaser[0]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
 		phaser[1]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
@@ -78,12 +80,10 @@ namespace yzrilyzr_simplesynth{
 		limiter[0]=std::make_shared<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 300);
 		limiter[1]=std::make_shared<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 300);
 		//
-		Random rand;
 		for(u_index i=0;i < 2;i++){
 			dspChain[i]->add(choruser[i]);
 			dspChain[i]->add(phaser[i]);
 			dspChain[i]->add(reverber[i]);
-			std::static_pointer_cast<Chorus>(choruser[i])->setInitPhase(rand.nextDouble());
 		}
 		setName(groupName + " #" + std::to_string(channelID));
 	}
@@ -96,13 +96,13 @@ namespace yzrilyzr_simplesynth{
 			p->init(sr);
 		}
 	}
-	yzrilyzr_dsp::Chorus & ChannelData::getChorus(u_index ch)const{
+	Chorus & ChannelData::getChorus(u_index ch)const{
 		return *std::dynamic_pointer_cast<Chorus>(choruser[ch]);
 	}
-	yzrilyzr_dsp::Freeverb & ChannelData::getReverb(u_index ch)const{
+	Freeverb & ChannelData::getReverb(u_index ch)const{
 		return *std::dynamic_pointer_cast<Freeverb>(reverber[ch]);
 	}
-	yzrilyzr_dsp::Phaser & ChannelData::getPhaser(u_index ch)const{
+	Phaser & ChannelData::getPhaser(u_index ch)const{
 		return *std::dynamic_pointer_cast<Phaser>(phaser[ch]);
 	}
 	void ChannelData::reset(){}
@@ -117,6 +117,7 @@ namespace yzrilyzr_simplesynth{
 		setSynthMode(MODE_THREAD_POOL, -1);
 		auto defCfg=ChannelConfig::DefaultConfig();
 		getGlobalConfig().set(*defCfg);
+		getGlobalConfig().mixer=this;
 		nonDrumSetLimiter[0]=std::make_shared<Limiter>(5, 5000, 5000, 1.0);
 		nonDrumSetLimiter[1]=std::make_shared<Limiter>(5, 5000, 5000, 1.0);
 		drumSetLimiter[0]=std::make_shared<Limiter>(5, 500, 500, 3.0);
@@ -868,16 +869,16 @@ namespace yzrilyzr_simplesynth{
 			}
 			break;
 			case MIDIFile::CC::EFFECT_REVERB:
-				//if(enable_MIDI_CC_EFFECT)setReverb(cc.value / 127.0f);
+				if(enable_MIDI_CC_EFFECT)data.setReverb(cc.value / 127.0f);
 				break;
 			case MIDIFile::CC::EFFECT_CHORUS:
-				//if(enable_MIDI_CC_EFFECT)setChorus(cc.value / 127.0f);
+				if(enable_MIDI_CC_EFFECT)data.setChorus(cc.value / 127.0f);
 				break;
 			case MIDIFile::CC::EFFECT_DETUNE:
-				//if(enable_MIDI_CC_EFFECT)setDetune(cc.value / 127.0f);
+				if(enable_MIDI_CC_EFFECT)data.setDetune(cc.value / 127.0f);
 				break;
 			case MIDIFile::CC::EFFECT_PHASER:
-				//if(enable_MIDI_CC_EFFECT)setPhaser(cc.value / 127.0f);
+				if(enable_MIDI_CC_EFFECT)data.setPhaser(cc.value / 127.0f);
 				break;
 			case MIDIFile::CC::RPN_MSB:
 				cfg.nrpn.reset();
@@ -1002,6 +1003,12 @@ namespace yzrilyzr_simplesynth{
 		switch(nrpnController){
 			case NRPN::MIXER_LIMITER:
 				setUseLimiter(value >= 64);
+				break;
+			case NRPN::MIXER_ENABLE_MIDI_CC_EFFECT:
+				enable_MIDI_CC_EFFECT=value >= 64;
+				break;
+			case NRPN::MIXER_ENABLE_MIDI_CC_ADSR:
+				enable_MIDI_CC_ADSR=value >= 64;
 				break;
 			case NRPN::CHANNEL_3D_YAW:
 				if(lsb)

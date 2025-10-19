@@ -26,13 +26,19 @@ file(GLOB_RECURSE YZRUTIL_SRC
     "${CMAKE_SOURCE_DIR}/yzrutil/main/*.cpp"
 )
 
+file(GLOB_RECURSE SIMPLEDSP_SRC
+    "${CMAKE_SOURCE_DIR}/SimpleDSP/main/*.h"
+    "${CMAKE_SOURCE_DIR}/SimpleDSP/main/*.hpp"
+    "${CMAKE_SOURCE_DIR}/SimpleDSP/main/*.cpp"
+)
+
 file(GLOB_RECURSE SIMPLESYNTH_SRC
     "${CMAKE_SOURCE_DIR}/SimpleSynth/main/*.h"
     "${CMAKE_SOURCE_DIR}/SimpleSynth/main/*.hpp"
     "${CMAKE_SOURCE_DIR}/SimpleSynth/main/*.cpp"
 )
 
-smtg_add_vst3plugin(${PROJECT_NAME}  ${PLUGIN_SRC} ${YZRUTIL_SRC} ${SIMPLESYNTH_SRC})
+smtg_add_vst3plugin(${PROJECT_NAME}  ${PLUGIN_SRC} ${YZRUTIL_SRC} ${SIMPLEDSP_SRC} ${SIMPLESYNTH_SRC})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     message("USE O3")
@@ -70,8 +76,11 @@ smtg_target_add_plugin_snapshots (${PROJECT_NAME}
 
 smtg_target_configure_version_file(${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/yzrutil/main")
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/SimpleSynth/main")
+target_include_directories(${PROJECT_NAME} PRIVATE
+"${CMAKE_SOURCE_DIR}/yzrutil/main"
+"${CMAKE_SOURCE_DIR}/SimpleDSP/main"
+"${CMAKE_SOURCE_DIR}/SimpleSynth/main"
+)
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
 "${CMAKE_SOURCE_DIR}/yzrutil/main/yzrutil.h" 

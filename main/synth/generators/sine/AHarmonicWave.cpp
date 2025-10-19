@@ -2,7 +2,7 @@
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
 	AHarmonicWave::AHarmonicWave(std::shared_ptr<PhaseSrc> freq): SineHarmonicWave(freq,
-																				  new DoubleArray(new double[12]{
+																				   DoubleArray({
 																						  0.0066f,
 																						  0.1894f,
 																						  0.1407f,
@@ -15,6 +15,6 @@ namespace yzrilyzr_simplesynth{
 																						  0.018f,
 																						  0.0184f,
 																						  0.0121f
-																				  }, 12)){
+																				  })){
 	}
 }

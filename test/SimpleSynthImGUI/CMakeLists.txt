@@ -54,22 +54,26 @@ add_executable (${PROJECT_NAME} "main.cpp"
 find_package(OpenGL REQUIRED)
 #find_package(SDL2 REQUIRED)
 
-target_include_directories(${PROJECT_NAME} PRIVATE "${SDL2_DIR}/include")
-target_include_directories(${PROJECT_NAME} PRIVATE "${JSON_DIR}/include")
-target_include_directories(${PROJECT_NAME} PRIVATE "${IMGUI_DIR}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${IMGUI_FILEDLG_DIR}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${IMGUI_KNOBS_DIR}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${IMPLOT_DIR}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${IMGUI_BACKENDS_DIR}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/yzrutil/main")
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/SimpleSynth/main")
+target_include_directories(${PROJECT_NAME} PRIVATE
+"${SDL2_DIR}/include"
+"${JSON_DIR}/include"
+"${IMGUI_DIR}"
+"${IMGUI_FILEDLG_DIR}"
+"${IMGUI_KNOBS_DIR}"
+"${IMPLOT_DIR}"
+"${IMGUI_BACKENDS_DIR}"
+"${CMAKE_SOURCE_DIR}/yzrutil/main"
+"${CMAKE_SOURCE_DIR}/SimpleDSP/main"
+"${CMAKE_SOURCE_DIR}/SimpleSynth/main"
+)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 target_link_directories(${PROJECT_NAME} PRIVATE "${SDL2_DIR}/lib/x64")
-target_link_libraries(${PROJECT_NAME} PRIVATE yzrutil)
-target_link_libraries(${PROJECT_NAME} PRIVATE SimpleSynth)
-target_link_libraries(${PROJECT_NAME} PRIVATE "${SDL2_DIR}/lib/x64/SDL2.lib")
-target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} PRIVATE yzrutil SimpleDSP SimpleSynth "${SDL2_DIR}/lib/x64/SDL2.lib" OpenGL::GL)
+
+if(WIN32)
+  target_sources(${PROJECT_NAME} PRIVATE win32res.rc)
+endif(WIN32)
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/lang" DESTINATION  "${CMAKE_BINARY_DIR}/bin")

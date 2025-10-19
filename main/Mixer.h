@@ -102,10 +102,6 @@ namespace yzrilyzr_simplesynth{
 		u_normal_11_f getPitchBend() const; // 获取弯音值
 		void setPitchBend(u_normal_11_f pitchBend1); // 设置弯音值
 		u_normal_01_f getDetune() const;  // 获取失谐值
-		void setDetune(u_normal_01_f ccDetune); // 设置失谐值
-		void setPhaser(u_normal_01_f ccPhaser); // 设置相位效果
-		void setChorus(u_normal_01_f chorus); // 设置合唱效果
-		void setReverb(u_normal_01_f reverb); // 设置混响效果
 		void setSostenuto(bool b);        // 设置选择性延音
 		void setPortamento(bool b);       // 设置滑音开关
 		void setPortamentoTime(u_time_f v); // 设置滑音时间

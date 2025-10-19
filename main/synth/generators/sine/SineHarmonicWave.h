@@ -10,13 +10,13 @@ namespace yzrilyzr_simplesynth{
 	*/
 	ECLASS(SineHarmonicWave, public Osc){
 	private:
-	yzrilyzr_array::DoubleArray *aa;
+	yzrilyzr_array::DoubleArray aa;
 	public:
-		~SineHarmonicWave();
-		SineHarmonicWave(yzrilyzr_array::DoubleArray *freqAndAmp);
-		SineHarmonicWave(std::shared_ptr<PhaseSrc> freq, yzrilyzr_array::DoubleArray *freqAndAmp);
-		u_sample getAmp(Note &note) override;
+	~SineHarmonicWave();
+	SineHarmonicWave(const yzrilyzr_array::DoubleArray& freqAndAmp);
+	SineHarmonicWave(std::shared_ptr<PhaseSrc> freq, const yzrilyzr_array::DoubleArray & freqAndAmp);
+	u_sample getAmp(Note & note) override;
 	private:
-		u_sample a(double x);
+	u_sample a(double x);
 	};
 }

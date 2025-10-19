@@ -31,7 +31,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	bool noMoreData(Note & note) override{
-		u_index noteid=(u_index)note.idSynth;
+		u_index noteid=(u_index)note.id;
 		u_index vel=yzrilyzr_util::Util::clamp((int)(note.velocity * 127.0), 0, 127);
 		auto & reg1=buildRegion[noteid * CHANNEL_MAX_NOTE_ID + vel];
 		for(auto & ptr : reg1){
@@ -61,7 +61,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	u_sample getAmp(Note & note) override{
-		u_index noteid=(u_index)note.idSynth;
+		u_index noteid=(u_index)note.id;
 		u_index vel=yzrilyzr_util::Util::clamp((int)(note.velocity * 127.0), 0, 127);
 		u_sample sum=0;
 		auto & reg1=buildRegion[noteid * CHANNEL_MAX_NOTE_ID + vel];

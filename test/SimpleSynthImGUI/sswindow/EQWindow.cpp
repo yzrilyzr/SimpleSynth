@@ -67,9 +67,9 @@ void eqWindow(CurrentProjectContext & ctx){
 	u_sample_rate test_sampleRate=44100;
 	const u_index siz=1 << 16;
 	const u_index fsiz=siz >> 1;
-	static double * input_data=new double[siz];
-	static double * mag_data=new double[fsiz];
-	static double * pha_data=new double[fsiz];
+	static SampleArray input_data(siz);
+	static SampleArray mag_data(siz);
+	static SampleArray pha_data(siz);
 	static double * x_data=new double[fsiz];
 	static FFT fft(siz);
 	static bool changed=true;
@@ -86,7 +86,7 @@ void eqWindow(CurrentProjectContext & ctx){
 			//IIRUtil::designThiranFilter(*s->iir->aCoeff, *s->iir->bCoeff, s->freq, 15);
 			dsp.add(s->iir);
 		}
-		std::fill(input_data, input_data + siz, 0);
+		Arrays::fill(input_data, 1, siz,static_cast<u_sample>(0));
 		input_data[0]=fsiz;
 		for(u_index i=0;i < siz;i++){
 			input_data[i]=dsp.procDsp(input_data[i]);
@@ -94,10 +94,10 @@ void eqWindow(CurrentProjectContext & ctx){
 		for(u_index i=0;i < fsiz;i++){
 			x_data[i]=(double)i * test_sampleRate / fsiz / 2.0;
 		}
-		fft.inputDoubleArray(input_data, siz);
+		fft.input(input_data);
 		fft.fft();
-		fft.outputMagnitudeDoubleArray(mag_data, fsiz);
-		fft.outputPhaseDoubleArray(pha_data, fsiz);
+		fft.outputMagnitude(mag_data);
+		fft.outputPhase(pha_data);
 		for(u_index i=0;i < fsiz;i++){
 			mag_data[i]=20.0 * log10(mag_data[i]);
 			pha_data[i]=pha_data[i] * 180.0 / PI;
@@ -140,7 +140,8 @@ void eqWindow(CurrentProjectContext & ctx){
 		ImPlot::SetupAxisLimits(ImAxis_X1, 1, 21000);
 		ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Log10);
 		ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
-		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.magnitude"), x_data, mag_data, fsiz);
+		auto mag1=Arrays::cast<double>(mag_data);
+		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.magnitude"), x_data, mag1->_array, fsiz);
 		ImPlotPoint point=ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
 		bool is_mouse_in_plot=ImPlot::IsPlotHovered();
 		bool isLeftDown=ImGui::IsMouseDown(ImGuiMouseButton_Left);
@@ -197,13 +198,14 @@ void eqWindow(CurrentProjectContext & ctx){
 		}
 		if(ImPlot::IsPlotHovered()){
 			ImGui::BeginTooltip();
-			double slope=calculateDbPerOctave(x_data, mag_data, point.x, siz);
+			double slope=calculateDbPerOctave(x_data, mag1->_array, point.x, siz);
 			ImGui::Text(ctx.LANG.getf("window.eq.freq_response.hover", point.x, slope).c_str(UTF8));
 			ImGui::EndTooltip();
 		}
 
 		ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
-		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.phase"), x_data, pha_data, fsiz);
+		auto pha1=Arrays::cast<double>(pha_data);
+		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.phase"), x_data, pha1->_array, fsiz);
 		ImPlot::EndPlot();
 	}
 	static double freq_min=5;
