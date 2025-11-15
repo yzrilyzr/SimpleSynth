@@ -21,7 +21,7 @@
 	#endif
 #endif
 #define stringCompanyName		"yzrilyzr"
-#define stringLegalCopyright	"Copyright(c) 2025 yzrilyzr."
+#define stringLegalCopyright	"Copyright(c) 2024-2025 yzrilyzr."
 #define stringLegalTrademarks	"VST is a trademark of Steinberg Media Technologies GmbH"
 
 #ifdef _DEBUG

@@ -5,8 +5,10 @@
 #include "interface/NoteTuning.h"
 #include "interpolator/Interpolator.h"
 #include "util/Util.h"
+
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_lang;
 using namespace yzrilyzr_interpolator;
 namespace yzrilyzr_simplesynth{
 	void NoteUpdater::preUpdateNote(Note & note, const ChannelConfig & cfg){
@@ -19,7 +21,7 @@ namespace yzrilyzr_simplesynth{
 		double modValue=0;
 		if(cfg.Modulation > 0 && note.passedTime > cfg.ModDelay){
 			modValue=(double)cfg.Modulation * (double)cfg.ModDepth
-				* fast_sin((note.passedTime - (double)cfg.ModDelay)* _2PI * (double)cfg.ModRate, cfg.ModRate);
+				* fast_sin((note.passedTime - (double)cfg.ModDelay)*  Math::TAU * (double)cfg.ModRate, cfg.ModRate);
 			finalID+=modValue;
 		}
 

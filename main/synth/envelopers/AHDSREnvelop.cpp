@@ -56,7 +56,7 @@ namespace yzrilyzr_simplesynth{
 		if(n1->releaseTime == -1) return false;
 		u_time time1=note.cfg->currentTime - n1->releaseTime;
 		u_time nmdTime=this->releaseTime;
-		if(note.fclosed(*note.cfg)) nmdTime=std::min(this->releaseTime, this->forceReleaseTime);
+		if(note.fclosed(*note.cfg)) nmdTime=Math::min(this->releaseTime, this->forceReleaseTime);
 		return time1 > nmdTime;
 	}
 	NoteProcPtr AHDSREnvelop::clone(){
@@ -69,7 +69,7 @@ namespace yzrilyzr_simplesynth{
 		if(note.fclosed(*note.cfg)){
 			if(n1.releaseTime == -1) n1.releaseTime=note.cfg->currentTime;
 			u_time time1=note.cfg->currentTime - n1.releaseTime;
-			u_time nmdTime=std::min(this->releaseTime, this->forceReleaseTime);
+			u_time nmdTime=Math::min(this->releaseTime, this->forceReleaseTime);
 			if(nmdTime == 0)return 0;
 			return n1.releaseVolume - n1.releaseVolume * (1 - rCurve->y(Util::clamp01(1 - time1 / nmdTime)));//decayToVolume->0
 		}

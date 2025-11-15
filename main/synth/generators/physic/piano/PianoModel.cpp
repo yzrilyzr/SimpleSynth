@@ -6,8 +6,10 @@
 #include "dsp/IIRUtil.h"
 #include "synth/generators/physic/dwg/DigitalWaveGuide.h"
 #include "util/Util.h"
+#include "lang/Math.h"
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_util;
+using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
 	/**
@@ -47,7 +49,7 @@ namespace yzrilyzr_simplesynth{
 		key.ZBridge=4000.0 * param.mult_impedance_bridge;
 		key.ZHammer=1.0 * param.mult_impedance_hammer;
 		// 计算弦芯半径 (米)
-		u_sample coreRadius=std::min(stringRadius, static_cast<u_sample>(0.0006)) * param.mult_radius_core_string;
+		u_sample coreRadius=Math::min(stringRadius, static_cast<u_sample>(0.0006)) * param.mult_radius_core_string;
 		// 钢的杨氏模量 (Pa)
 		u_sample youngsModulus=2e11 * param.mult_modulus_string;
 		// 锤子击打位置比例
@@ -65,13 +67,13 @@ namespace yzrilyzr_simplesynth{
 		u_sample lossFilterC1=0.25;
 		u_sample lossFilterC3=5.85 * param.mult_loss_filter;
 		// 计算线密度 (kg/m)
-		u_sample linearMassDensity=PI * stringRadius * stringRadius * stringDensity;
+		u_sample linearMassDensity=Math::PI * stringRadius * stringRadius * stringDensity;
 		// 计算弦张力 (N)
 		u_sample stringTension=(2.0 * stringLength * param.frequency) * (2.0 * stringLength * param.frequency) * linearMassDensity;
 		// 计算弦的特征阻抗 (kg/s)
 		key.Z=sqrt(1.0 * stringTension * linearMassDensity);
 		// 计算色散因子 (用于模拟高频衰减)
-		u_sample dispersionFactor=(PI * PI * PI) * youngsModulus * coreRadius * coreRadius * coreRadius * coreRadius / (4.0 * stringLength * stringLength * stringTension);
+		u_sample dispersionFactor=(Math::PI * Math::PI * Math::PI) * youngsModulus * coreRadius * coreRadius * coreRadius * coreRadius / (4.0 * stringLength * stringLength * stringTension);
 		// 创建新的弦数组
 		key.string.clear();
 		// 初始化每根弦的数字波导模型
@@ -111,7 +113,7 @@ namespace yzrilyzr_simplesynth{
 		else dispersionOrder=4;
 		for(u_index m=0;m < dispersionOrder;m++){
 			u_sample targetDelay=IIRUtil::calculateThiranDelay(dispersionFactor, freq, dispersionOrder);
-			targetDelay=std::max(targetDelay, static_cast<u_sample>(1.0));
+			targetDelay=Math::max(targetDelay, static_cast<u_sample>(1.0));
 			dispersionDelay+=targetDelay;
 			std::shared_ptr<BiquadIIR> f=std::make_shared<BiquadIIR>();
 			IIRUtil::designThiranFilter(f->aCoeff, f->bCoeff, targetDelay, 2);

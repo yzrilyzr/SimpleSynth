@@ -1,7 +1,9 @@
 ﻿#include "SineBasePowHarmonicWave.h"
-#include "dsp\FastSin.h"
+#include "dsp/FastSin.h"
+#include "lang/Math.h"
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	SineBasePowHarmonicWave::~SineBasePowHarmonicWave(){
 		
@@ -11,7 +13,7 @@ namespace yzrilyzr_simplesynth{
 		this->aa=freqAndAmp;
 	}
 	u_sample SineBasePowHarmonicWave::getAmp(Note &note){
-		return a(getPhase(note)*_2PI, note.id)*note.velocitySynth;
+		return a(getPhase(note)* Math::TAU, note.id)*note.velocitySynth;
 	}
 	u_sample SineBasePowHarmonicWave::a(double x, int id){
 		u_sample y=0;

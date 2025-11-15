@@ -6,7 +6,7 @@ using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
 	AmpWithCC::~AmpWithCC(){}
-	AmpWithCC::AmpWithCC() :AmpWithCC(nullptr, nullptr){}
+	AmpWithCC::AmpWithCC() :AmpWithCC(nullptr, yzrilyzr_array::IntArray()){}
 	AmpWithCC::AmpWithCC(NoteProcPtr a,const yzrilyzr_array::IntArray& cc) : AmpUnaryComposition(a){
 		this->cc=cc;
 	}

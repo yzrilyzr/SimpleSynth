@@ -8,6 +8,7 @@
 #include "collection/ArrayList.hpp"
 #include "interface/NoteProcessor.h"
 #include "io/InputStream.h"
+#include "lang/Math.h"
 #include "soundbank/dls/DLSInstrument.h"
 #include "soundbank/dls/DLSModulator.h"
 #include "soundbank/dls/DLSRegion.h"
@@ -21,7 +22,7 @@
 #include "synth/envelopers/EnvUtil.h"
 #include "synth/generators/sampler/WaveSampler.h"
 #include "synth/source/AmpBuilder.h"
-#include "synth\source\AmplitudeSources.h"
+#include "synth/source/AmplitudeSources.h"
 #include "util/Util.h"
 #include "yzrutil.h"
 #include <algorithm>
@@ -33,6 +34,7 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_collection;
 using namespace yzrilyzr_io;
 using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_soundbank;
 
@@ -172,26 +174,26 @@ namespace yzrilyzr_simplesynth{
 		else eg1.sustainLevel=0;
 		//builder.biquadEnv(
 		//	AmpBuilder().src(ConstAmp(127)).DAHDSR(
-		//		std::max(0.0, eg2.delayTime),
-		//		std::max(0.0, eg2.attackTime),
-		//		std::max(0.0, eg2.holdTime),
-		//		std::max(0.0, eg2.decayTime),
+		//		Math::max(0.0, eg2.delayTime),
+		//		Math::max(0.0, eg2.attackTime),
+		//		Math::max(0.0, eg2.holdTime),
+		//		Math::max(0.0, eg2.decayTime),
 		//		Util::clamp01(eg2.sustainLevel),
 		//		eg2.canSustain,
-		//		std::max(0.0, eg2.releaseTime),
+		//		Math::max(0.0, eg2.releaseTime),
 		//		100,//forceRelease
 		//		EnvUtil::Line(),
 		//		EnvUtil::Line(),
 		//		EnvUtil::Line()
 		//	).build(), ConstAmp(1), FilterPassType::LOWPASS);
 		builder.DAHDSR(
-			std::max(0.0, eg1.delayTime),
-			std::max(0.0, eg1.attackTime),
-			std::max(0.0, eg1.holdTime),
-			std::max(0.0, eg1.decayTime),
+			Math::max(0.0, eg1.delayTime),
+			Math::max(0.0, eg1.attackTime),
+			Math::max(0.0, eg1.holdTime),
+			Math::max(0.0, eg1.decayTime),
 			Util::clamp01(eg1.sustainLevel),
 			eg1.canSustain,
-			std::max(0.0, eg1.releaseTime),
+			Math::max(0.0, eg1.releaseTime),
 			EnvUtil::Pow(5),  // 攻击曲线
 			EnvUtil::Pow(5),  // 衰减曲线
 			EnvUtil::Pow(5)   // 释放曲线

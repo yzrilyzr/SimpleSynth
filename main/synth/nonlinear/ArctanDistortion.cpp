@@ -4,6 +4,7 @@
 
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
+
 namespace yzrilyzr_simplesynth{
 	ArctanDistortion::ArctanDistortion(NoteProcPtr a, u_sample inputGain, double alpha, u_sample outputGain) : AmpUnaryComposition(a){
 		this->inputGain=abs(inputGain);
@@ -17,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 		registerParamGain("OutputGain", &outputGain);
 	}
 	u_sample ArctanDistortion::getAmp(Note & note){
-		return (2 / PI) * atan(inputGain * a->getAmp(note) * alpha) * outputGain;
+		return (2 / Math::PI) * atan(inputGain * a->getAmp(note) * alpha) * outputGain;
 	}
 	NoteProcPtr ArctanDistortion::clone(){
 		return std::make_shared<ArctanDistortion>(a->clone(), inputGain, alpha, outputGain);

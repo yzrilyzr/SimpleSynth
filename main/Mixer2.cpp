@@ -114,7 +114,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	Mixer2::Mixer2(u_index bufferSize){
 		setBufferSize(bufferSize);
-		setSynthMode(MODE_THREAD_POOL, -1);
+		setSynthMode(MODE_SINGLE_THREAD, -1);
 		auto defCfg=ChannelConfig::DefaultConfig();
 		getGlobalConfig().set(*defCfg);
 		getGlobalConfig().mixer=this;
@@ -134,7 +134,7 @@ namespace yzrilyzr_simplesynth{
 		u_time t=(u_time)System::nanoTime();
 
 		// 0. 全局锁保护整个mix过程
-		std::unique_lock<std::mutex> mLock(mixLock);
+		std::unique_lock<std::shared_mutex> mLock(mixLock);
 
 		// 1. 准备基本参数
 		u_sample_rate sampleRate=getSampleRate();
@@ -193,7 +193,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	void Mixer2::processChannelSnapshots(){
-		std::unique_lock<std::mutex> lock(channelLock);
+		std::unique_lock<std::shared_mutex> lock(channelLock);
 		for(auto & data : allChannelData){
 			ChannelData & dat=*data;
 			setDataSnapshotBaseInfo(dat);
@@ -205,7 +205,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::processInstantEvents(u_time deltaTime, u_index bufSize){
-		std::unique_lock<std::mutex> lock(eventLock);
+		std::unique_lock<std::shared_mutex> lock(eventLock);
 		for(auto it=instantEventQueue.begin(); it != instantEventQueue.end();){
 			ChannelEvent * event=*it;
 			int64_t snapshotIndex=0;
@@ -220,7 +220,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::processScheduledEvents(u_time deltaTime, u_index bufSize){
-		std::unique_lock<std::mutex> lock(eventLock);
+		std::unique_lock<std::shared_mutex> lock(eventLock);
 		for(auto it=postEventQueue.begin(); it != postEventQueue.end();){
 			ChannelEvent * event=*it;
 			u_time ti=event->startAtTime - getCurrentTime();
@@ -239,7 +239,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::synthesizeNotes(){
-		std::unique_lock<std::mutex> lock(channelLock);
+		std::unique_lock<std::shared_mutex> lock(channelLock);
 	#ifdef _DEBUG
 		std::map<std::pair<s_midichannel_id, uint8_t>, std::pair<ChannelData *, Note *>> uniqueMap;
 	#endif
@@ -276,7 +276,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::prepareNoteMixTasks(std::unordered_map<ChannelData *, std::vector<NoteTask *>> & noteMixTasks){
-		std::unique_lock<std::mutex> lock(channelLock);
+		std::unique_lock<std::shared_mutex> lock(channelLock);
 
 		// 清空所有通道的输出缓冲区
 		for(auto & data : allChannelData){
@@ -303,7 +303,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::submitNoteMixTasks(std::unordered_map<ChannelData *, std::vector<NoteTask *>> & noteMixTasks){
-		std::unique_lock<std::mutex> lock(channelLock);
+		std::unique_lock<std::shared_mutex> lock(channelLock);
 
 		for(auto & data : allChannelData){
 			ChannelData & d=*data;
@@ -329,7 +329,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::cleanupFinishedNotes(){
-		std::unique_lock<std::mutex> lock(channelLock);
+		std::unique_lock<std::shared_mutex> lock(channelLock);
 
 		for(auto & data : allChannelData){
 			auto & pool=data->workingNotesPool;
@@ -347,7 +347,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::mixNonDrumChannelsToOutput(u_index chc, u_index bufSize){
-		std::unique_lock<std::mutex> lock(channelLock);
+		std::unique_lock<std::shared_mutex> lock(channelLock);
 
 		for(auto & data : allChannelData){
 			if(data->isDrumSetChannel()) continue;
@@ -366,7 +366,7 @@ namespace yzrilyzr_simplesynth{
 	void Mixer2::processNonDrumLimiters(u_index chc, u_index bufSize){
 		if(!useLimiter) return;
 
-		std::unique_lock<std::mutex> lock(dspLock);
+		std::unique_lock<std::shared_mutex> lock(dspLock);
 		for(u_index ch=0; ch < chc; ch++){
 			nonDrumSetLimiter[ch]->procBlock(output[ch]->_array, bufSize);
 		}
@@ -378,7 +378,7 @@ namespace yzrilyzr_simplesynth{
 			memset(drumOutput[ch]->_array, 0, bufSize * sizeof(u_sample));
 		}
 
-		std::unique_lock<std::mutex> lock(channelLock);
+		std::unique_lock<std::shared_mutex> lock(channelLock);
 
 		for(auto & data : allChannelData){
 			if(!data->isDrumSetChannel()) continue;
@@ -397,7 +397,7 @@ namespace yzrilyzr_simplesynth{
 	void Mixer2::processDrumLimiters(u_index chc, u_index bufSize){
 		if(!useLimiter) return;
 
-		std::unique_lock<std::mutex> lock(dspLock);
+		std::unique_lock<std::shared_mutex> lock(dspLock);
 		for(u_index ch=0; ch < chc; ch++){
 			drumSetLimiter[ch]->procBlock(drumOutput[ch]->_array, bufSize);
 		}
@@ -415,7 +415,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Mixer2::processMasterEffects(u_index chc, u_index bufSize){
-		std::unique_lock<std::mutex> lock(dspLock);
+		std::unique_lock<std::shared_mutex> lock(dspLock);
 
 		if(useEQ){
 			for(u_index ch=0; ch < chc; ch++){
@@ -447,11 +447,11 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	void  Mixer2::reset(){
-		std::unique_lock <std::mutex > lock0(mixLock);
-		std::unique_lock <std::mutex > lock1(channelLock);
-		std::unique_lock <std::mutex > lock2(eventLock);
-		std::unique_lock <std::mutex > lock3(dspLock);
-		mReset();
+		std::unique_lock <std::shared_mutex > lock0(mixLock);
+		std::unique_lock <std::shared_mutex > lock1(channelLock);
+		std::unique_lock <std::shared_mutex > lock2(eventLock);
+		std::unique_lock <std::shared_mutex > lock3(dspLock);
+		mReset();		
 	}
 	void  Mixer2::mReset(){
 		channelData.clear();
@@ -465,7 +465,7 @@ namespace yzrilyzr_simplesynth{
 		return mixerCurrentSampleIndex / (u_time)getSampleRate();
 	}
 	u_index Mixer2::getCurrentProcessingNoteCount(){
-		std::unique_lock <std::mutex > lock(channelLock);
+		std::unique_lock <std::shared_mutex > lock(channelLock);
 		u_index sum=0;
 		for(auto & data : allChannelData){
 			sum+=data->workingNotesPool.size();
@@ -588,15 +588,15 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	void Mixer2::sendInstantEvent(ChannelEvent * event){
-		std::unique_lock <std::mutex > lock(eventLock);
+		std::unique_lock <std::shared_mutex > lock(eventLock);
 		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
 		instantEventQueue.push_back(event);
 	}
 	void Mixer2::postEvent(ChannelEvent * event, u_time startAt){
-		std::unique_lock <std::mutex > lock(eventLock);
-		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
-		event->startAtTime=startAt;
-		postEventQueue.push_back(event);
+		std::unique_lock <std::shared_mutex > lock(eventLock);
+			if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
+			event->startAtTime=startAt;
+			postEventQueue.push_back(event);
 	}
 	void Mixer2::setSampleRate(u_sample_rate sr){
 		IMixer::setSampleRate(sr);
@@ -706,8 +706,7 @@ namespace yzrilyzr_simplesynth{
 			if(data.isDrumSetChannel()){
 				ins=instrp->getDrumSet(cfg.Bank, sampleRate);
 				cfg.Sustain=true;
-			}
-			else{
+			} else{
 				ins=instrp->get(0, 0, sampleRate);
 				cfg.Sustain=false;
 			}
@@ -1053,7 +1052,7 @@ namespace yzrilyzr_simplesynth{
 		return chann;
 	}
 	void Mixer2::resetLimiter(){
-		std::unique_lock <std::mutex > lock(dspLock);
+		std::unique_lock <std::shared_mutex > lock(dspLock);
 		mResetLimiter();
 	}
 	void Mixer2::mResetLimiter(){
@@ -1127,7 +1126,7 @@ namespace yzrilyzr_simplesynth{
 		return finalEQ;
 	}
 	std::shared_ptr<IChannel> Mixer2::getMIDIChannel(const String & group, s_midichannel_id ch){
-		std::unique_lock <std::mutex > lock(channelLock);
+		std::unique_lock <std::shared_mutex > lock(channelLock);
 		return getOrCreateMIDIChannelData(group, ch);
 	}
 	u_sample * Mixer2::getOutput(uint32_t chIndex)const{

@@ -91,7 +91,7 @@ namespace yzrilyzr_simplesynth{
 			u_sample x=luaL_checknumber(L, 1);
 			u_sample minVal=luaL_optnumber(L, 2, -1.0);
 			u_sample maxVal=luaL_optnumber(L, 3, 1.0);
-			u_sample result=std::max(minVal, std::min(maxVal, x));
+			u_sample result=Math::max(minVal, Math::min(maxVal, x));
 			lua_pushnumber(L, result);
 			return 1;
 		});

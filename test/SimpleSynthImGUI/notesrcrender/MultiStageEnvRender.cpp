@@ -42,7 +42,7 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 
 		if(pts.size() > 1){
 			int endX=1000.0*pts[pts.size() - 1].x;
-			endX=std::max(dataSize - 1, endX);
+			endX=Math::max(dataSize - 1, endX);
 			MSEPoint * start=&pts[0];
 			MSEPoint * end=&pts[1];
 			for(u_index i=0;i < endX;i++){

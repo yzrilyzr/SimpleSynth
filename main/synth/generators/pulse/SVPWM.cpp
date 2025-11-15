@@ -29,7 +29,7 @@ namespace yzrilyzr_simplesynth{
 		float carrierFreq=syncModulation?modFreq * syncRatio:asyncCarrierFreq;
 
 		// 计算调制波相位（考虑初始相位）
-		float modPhase=_2PI * (modFreq * t + modulationPhase);
+		float modPhase= Math::TAU * (modFreq * t + modulationPhase);
 
 		// 计算基本调制波
 		float modulationWave=sin(modPhase) * modVoltage;

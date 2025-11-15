@@ -61,7 +61,7 @@ namespace yzrilyzr_simplesynth{
 		data->pTri+=deltaTime * fTri1;
 		data->pSin+=deltaTime * fSin1;
 		double vTri=PWM::pwm(data->pTri, 0, 0.5, 0.5, 0);
-		double phiSin=data->pSin * _2PI;
+		double phiSin=data->pSin *  Math::TAU;
 		double vSinP=vSine * sin(phiSin);
 		double vSinN=vSine * -sin(phiSin);
 		int v1=vSinP > vTri?1:-1;

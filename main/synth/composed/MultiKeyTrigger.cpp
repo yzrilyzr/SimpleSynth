@@ -7,7 +7,7 @@ using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	MultiKeyTrigger::~MultiKeyTrigger(){}
-	MultiKeyTrigger::MultiKeyTrigger() :MultiKeyTrigger(nullptr, nullptr, nullptr){}
+	MultiKeyTrigger::MultiKeyTrigger() :MultiKeyTrigger(nullptr, IntArray(), DoubleArray()){}
 	MultiKeyTrigger::MultiKeyTrigger(NoteProcPtr a, const IntArray & noteShift, const DoubleArray & velocityMul) : AmpUnaryComposition(a){
 		this->notesCount=noteShift.length;
 		this->idShift=noteShift;

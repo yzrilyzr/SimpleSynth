@@ -336,7 +336,7 @@ namespace yzrilyzr_simplesynth{
 						break;
 						case XMFile::EffectType::SET_VOLUME: /* Cxx: Set volume */
 						{
-							float volume=(float)(std::min(s.effect_param, 0x40)) / (float)0x40;
+							float volume=(float)(Math::min(s.effect_param, 0x40)) / (float)0x40;
 							ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::VOLUME, (int)(volume * 127));
 							//mixerSequence->postToSequence(channel, channelEvent, time);
 						}

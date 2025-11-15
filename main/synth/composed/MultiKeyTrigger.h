@@ -21,8 +21,8 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(MultiKeyTrigger, public AmpUnaryComposition, NoteData<MultiKeyTriggerKeyData>){
 	private:
 	u_index notesCount=0;
-	yzrilyzr_array::IntArray idShift=nullptr;
-	yzrilyzr_array::DoubleArray velocityMul=nullptr;
+	yzrilyzr_array::IntArray idShift;
+	yzrilyzr_array::DoubleArray velocityMul;
 	std::atomic<int> uniqueID{0};
 	public:
 	~MultiKeyTrigger();

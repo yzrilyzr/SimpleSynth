@@ -3,7 +3,7 @@
 #include "array/Array.hpp"
 #include "events/ChannelConfig.h"
 #include <memory>
-#include <mutex>
+#include <shared_mutex>
 #include <vector>
 #include <future>
 #include <optional>
@@ -27,10 +27,10 @@ namespace yzrilyzr_simplesynth{
 		bool channelUseDSP=true;
 		int8_t synthMode=0;                       // 合成模式
 		u_index outputChannelCount=2;
-		std::mutex mixLock;
-		std::mutex dspLock;
-		std::mutex eventLock;
-		std::mutex channelLock;
+		std::shared_mutex mixLock;
+		std::shared_mutex dspLock;
+		std::shared_mutex eventLock;
+		std::shared_mutex channelLock;
 		u_time_f processTime=0;
 		ChannelConfig globalChannelConfig;
 		std::optional<std::future<void>> mixFuture;
@@ -91,8 +91,8 @@ namespace yzrilyzr_simplesynth{
 		u_time_f getProcessTime() const;
 		u_time_f getProcessStandardTime() const;
 		virtual yzrilyzr_lang::String toString()const override;
-		std::mutex & getDSPLock();
-		std::mutex & getEventLock();
-		std::mutex & getChannelLock();
+		std::shared_mutex & getDSPLock();
+		std::shared_mutex & getEventLock();
+		std::shared_mutex & getChannelLock();
 	};
 }

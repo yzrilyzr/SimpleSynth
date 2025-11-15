@@ -87,7 +87,7 @@ void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	//ImGui::SameLine();
 	//if(ImGui::Button(ctx.LANG.getc("module.sample.fill.sine"))){
 	//	for(u_index i=0;i < paramRegPtr->length;i++){
-	//		paramRegPtr->array->_array[i]=std::sin(_2PI * i / paramRegPtr->length);
+	//		paramRegPtr->array->_array[i]=std::sin( Math::TAU * i / paramRegPtr->length);
 	//	}
 	//}
 	//ImGui::SameLine();

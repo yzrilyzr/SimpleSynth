@@ -5,6 +5,7 @@
 #include "dsp/FastSin.h"
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	SineWaveTable::~SineWaveTable(){
 		
@@ -16,7 +17,7 @@ namespace yzrilyzr_simplesynth{
 		this->baseFreq=baseFreq;
 	}
 	u_sample SineWaveTable::getAmp(Note &note){
-		return a(getPhase(note)*_2PI, note.cfg->tuning->getFrequencyByID(note.id))*note.velocitySynth;
+		return a(getPhase(note)* Math::TAU, note.cfg->tuning->getFrequencyByID(note.id))*note.velocitySynth;
 	}
 	u_sample SineWaveTable::a(double x, u_freq notef){
 		u_sample y=0;

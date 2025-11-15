@@ -82,8 +82,8 @@ static std::unordered_map<jlong, std::shared_ptr<MixerSequence>> sequenceMap;
 extern "C" JNIEXPORT jlong JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2Sequence_constructor(JNIEnv * env, jobject, jint type, jbyteArray data){
 	jbyte * dataPtr=env->GetByteArrayElements(data, NULL);
 	jsize length=env->GetArrayLength(data);
-	std::shared_ptr<ByteArray> ba=std::make_shared<ByteArray>(length);
-	memcpy(ba->_array, dataPtr, length);
+	ByteArray ba(length);
+	memcpy(ba._array, dataPtr, length);
 	env->ReleaseByteArrayElements(data, dataPtr, 0);
 	std::shared_ptr<MixerSequence> seq=nullptr;
 	ByteArrayInputStream bba(ba);

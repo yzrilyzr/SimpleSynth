@@ -241,9 +241,9 @@ namespace yzrilyzr_simplesynth{
 					   .ADSR(1, 1, 1, true, 100, Line(), Line(), Line())
 					   .add(ConstAmp(70))
 					   .build(), ConstAmp(1), FilterPassType::LOWPASS)
-			.mul(2)
 			.ADSR(100, 10, 1, false, 2000, Pow(-5), Pow(5), Pow(4))
-			.addMul(AmpBuilder().src(SineAmp(490)).ADSR(3, 10, 1, false, 3, Pow(-5), Pow(5), Pow(4)).build(), 0.2)
+			.addMul(AmpBuilder().src(SineAmp(490)).ADSR(3, 10, 1, false, 3, Pow(-5), Pow(5), Pow(4)).build(), 0.5)
+			.mul(2)
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_2,
 			AmpBuilder(std::make_shared<CymbalOsc>(0.9))
@@ -256,9 +256,9 @@ namespace yzrilyzr_simplesynth{
 					   .ADSR(1, 1, 1, true, 100, Line(), Line(), Line())
 					   .add(ConstAmp(70))
 					   .build(), ConstAmp(1), FilterPassType::LOWPASS)
-			.mul(2)
 			.ADSR(100, 10, 1, false, 2000, Pow(-5), Pow(5), Pow(4))
-			.addMul(AmpBuilder().src(SineAmp(420)).ADSR(3, 10, 1, false, 3, Pow(-5), Pow(5), Pow(4)).build(), 0.2)
+			.addMul(AmpBuilder().src(SineAmp(420)).ADSR(3, 10, 1, false, 3, Pow(-5), Pow(5), Pow(4)).build(), 0.5)
+			.mul(2)
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_SPLASH,
 			AmpBuilder(std::make_shared<CymbalOsc>(2.5))
@@ -296,7 +296,7 @@ namespace yzrilyzr_simplesynth{
 		add(MIDIFile::DrumSet::HI_HAT_OPEN,
 			AmpBuilder(std::make_shared<CymbalOsc>(0.8))
 			.IIR(sampleRate, 2, 4000, 18000.0)
-			.mul(2)
+			.mul(1.5)
 			.ADSR(10, 800, 0, false, 100, Pow(5), Pow(5), Pow(5))
 			.build());
 		add(MIDIFile::DrumSet::TAMBOURINE,

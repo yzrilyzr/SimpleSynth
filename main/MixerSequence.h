@@ -22,9 +22,11 @@ namespace yzrilyzr_simplesynth{
 		std::unordered_map<s_midichannel_id, std::vector<EventWrapper>> channelEvents;
 		void postToSequence(s_midichannel_id channel, ChannelEvent * n1, u_time startAt);
 		void sortPosted();
-		void postToMixer(IMixer * mixer, u_time deltaLoadTime)const;
-		void postToMixer(IMixer * mixer, u_time deltaLoadTime, const yzrilyzr_lang::String & groupName)const;
+		void postToMixer(IMixer * mixer, u_time startDelay)const;
+		void postToMixer(IMixer * mixer, u_time startDelay, u_time sequenceOffset, const yzrilyzr_lang::String & groupName)const;
+		void postToMixer(IMixer * mixer, u_time startDelay, const yzrilyzr_lang::String & groupName)const;
 		void setInstrument(std::shared_ptr<InstrumentProvider> midiInstrument);
 		std::shared_ptr<InstrumentProvider> getInstrument()const;
+		u_time getDuration()const;
 	};
 }

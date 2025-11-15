@@ -32,7 +32,7 @@ using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	Mixer::Mixer(u_index bufferSize){
 		setBufferSize(bufferSize);
-		setSynthMode(MODE_THREAD_POOL, -1);
+		setSynthMode(MODE_SINGLE_THREAD, -1);
 		auto defCfg=ChannelConfig::DefaultConfig();
 		getGlobalConfig().set(*defCfg);
 		nonDrumSetLimiter=new Limiter * [2]{new Limiter(5, 5000, 5000, 1), new Limiter(5, 5000, 5000, 1)};

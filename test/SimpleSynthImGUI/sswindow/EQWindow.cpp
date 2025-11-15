@@ -100,13 +100,13 @@ void eqWindow(CurrentProjectContext & ctx){
 		fft.outputPhase(pha_data);
 		for(u_index i=0;i < fsiz;i++){
 			mag_data[i]=20.0 * log10(mag_data[i]);
-			pha_data[i]=pha_data[i] * 180.0 / PI;
+			pha_data[i]=pha_data[i] * 180.0 / Math::PI;
 		}
 		//
 		mixer.setUseEQ(true);
 		std::shared_ptr<DSPChain> * c=mixer.getEQ();
-		std::mutex & dspLock=mixer.getDSPLock();
-		std::unique_lock <std::mutex > lock(dspLock);
+		std::shared_mutex & dspLock=mixer.getDSPLock();
+		std::unique_lock <std::shared_mutex > lock(dspLock);
 		for(u_index ii=0;ii < 2;ii++){
 			std::shared_ptr<DSPChain> cc=c[ii];
 			cc->clear();

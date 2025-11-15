@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 		
 	}
 	SineHarmonicWaveTable::SineHarmonicWaveTable(const Array<DoubleArray> &aa) : SineHarmonicWaveTable(nullptr, aa){}
-	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq,const Array<DoubleArray> &naa) : Osc(freq){
+	SineHarmonicWaveTable::SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq,const Array<DoubleArray> &aa) : Osc(freq){
 		this->aa=aa;
 		this->interpolator=std::make_shared<LineInterpolator>();
 	}
@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 		return ampArr;
 	}
 	u_sample SineHarmonicWaveTable::getAmp(Note & note){
-		return a(note, getPhase(note) * _2PI) * note.velocitySynth;
+		return a(note, getPhase(note) *  Math::TAU) * note.velocitySynth;
 	}
 	u_sample SineHarmonicWaveTable::a(Note & note, double x){
 		u_sample y=0;

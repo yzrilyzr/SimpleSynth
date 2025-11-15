@@ -1,4 +1,5 @@
 ﻿#include "NotificationManager.h"
+#include "lang/Math.h"
 using namespace yzrilyzr_lang;
 void  NotificationManager::AddNotification(const String & message, float duration=3.0f, ImVec4 color=ImVec4(0.0f, 1.0f, 0.0f, 1.0f)){
 	messages.push_back(NotificationMessage{message, ImGui::GetTime() + duration, color});
@@ -14,7 +15,7 @@ void NotificationManager::Draw(){
 		}
 
 		// 计算消息的透明度（淡出效果）
-		double alpha=std::min(1.0, messages[i].showTime - currentTime);
+		double alpha=Math::min(1.0, messages[i].showTime - currentTime);
 
 		// 设置窗口位置（右上角）
 		double windowWidth=300.0;  // 消息窗口宽度

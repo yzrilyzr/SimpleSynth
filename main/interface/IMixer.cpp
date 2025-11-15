@@ -55,13 +55,13 @@ namespace yzrilyzr_simplesynth{
 	String IMixer::toString()const{
 		return "IMixer";
 	}
-	std::mutex & IMixer::getDSPLock(){
+	std::shared_mutex & IMixer::getDSPLock(){
 		return dspLock;
 	}
-	std::mutex & IMixer::getEventLock(){
+	std::shared_mutex & IMixer::getEventLock(){
 		return eventLock;
 	}
-	std::mutex & IMixer::getChannelLock(){
+	std::shared_mutex & IMixer::getChannelLock(){
 		return channelLock;
 	}
 	void IMixer::asyncMix(){

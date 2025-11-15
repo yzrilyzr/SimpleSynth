@@ -31,12 +31,15 @@ namespace yzrilyzr_simplesynth{
 			std::sort(ch.begin(), ch.end(), compareMixerEvents);
 		}
 	}
-	void MixerSequence::postToMixer(IMixer * mixer, u_time deltaLoadTime)const{
-		postToMixer(mixer, deltaLoadTime, Mixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME);
+	void MixerSequence::postToMixer(IMixer * mixer, u_time startDelay)const{
+		postToMixer(mixer, startDelay, Mixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME);
 	}
-	void MixerSequence::postToMixer(IMixer * mixer, u_time deltaLoadTime, const String & groupName)const{
+	void MixerSequence::postToMixer(IMixer * mixer, u_time startDelay, const String & groupName)const{
+		postToMixer(mixer, startDelay, 0, Mixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME);
+	}
+	void MixerSequence::postToMixer(IMixer * mixer, u_time startDelay, u_time sequenceOffset, const yzrilyzr_lang::String & groupName)const{
 		if(instrument != nullptr) mixer->getGlobalConfig().setInstrumentProvider(instrument);
-		u_time t1=mixer->getCurrentTime() + deltaLoadTime;
+		u_time t1=mixer->getCurrentTime() + startDelay;
 		if(auto m1=dynamic_cast<Mixer *>(mixer)){
 			for(auto & entry : channelEvents){
 				s_midichannel_id index=entry.first;
@@ -61,14 +64,37 @@ namespace yzrilyzr_simplesynth{
 			}
 			std::sort(eventsv.begin(), eventsv.end(), compareMixerEvents);
 			for(auto & entry : eventsv){
-				m2->postEvent(entry.event, entry.event->startAtTime + t1);
+				auto ev=entry.event;
+				if(ev->startAtTime < sequenceOffset){
+					auto et=ev->getType();
+					switch(et){
+						case EventType::NOTE_ON:
+						case EventType::NOTE_OFF:
+						case EventType::NOTE_PRESSURE:
+						case EventType::NOTE_PITCH_BEND:
+							continue;						
+					}
+				}
+				m2->postEvent(ev, ev->startAtTime + t1 - sequenceOffset);
 			}
 		}
 	}
+
 	void MixerSequence::setInstrument(std::shared_ptr<InstrumentProvider> midiInstrument){
 		this->instrument=midiInstrument;
 	}
 	std::shared_ptr<InstrumentProvider> MixerSequence::getInstrument()const{
 		return this->instrument;
+	}
+	u_time MixerSequence::getDuration()const{
+		u_time maxTime=0;
+		for(auto & entry : channelEvents){
+			s_midichannel_id index=entry.first;
+			auto & events=entry.second;
+			for(auto & eventw : events){
+				maxTime=Math::max(eventw.event->startAtTime, maxTime);
+			}
+		}
+		return maxTime;
 	}
 }
