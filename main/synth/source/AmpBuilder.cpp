@@ -25,6 +25,7 @@
 #include "synth/nonlinear/ArctanDistortion.h"
 #include "synth/nonlinear/ClampAmp.h"
 #include "synth/nonlinear/ClampWithVelocityAmp.h"
+#include "synth/envelopers/EnvUtil.h"
 
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_interpolator;
@@ -217,6 +218,16 @@ namespace yzrilyzr_simplesynth{
 		AmpBuilder::ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, std::shared_ptr<Interpolator> aCurve, std::shared_ptr<Interpolator> dCurve,
 						 std::shared_ptr<Interpolator> rCurve){
 		return DAHDSR(0, attackTime, 1, decayTime, decayToVolume, canSustain, releaseTime, 100, aCurve, dCurve, rCurve);
+	}
+	AmpBuilder &
+		AmpBuilder::AR(u_time_ms attackTime, u_time_ms releaseTime, std::shared_ptr<Interpolator> aCurve,
+						 std::shared_ptr<Interpolator> rCurve){
+		return DAHDSR(0, attackTime, 0.1, 0.1, 1, false, releaseTime, 100, aCurve, Line(), rCurve);
+	}
+	AmpBuilder &
+		AmpBuilder::AR(u_time_ms attackTime, u_time_ms releaseTime,u_time_ms forceReleaseTime, std::shared_ptr<Interpolator> aCurve,
+						 std::shared_ptr<Interpolator> rCurve){
+		return DAHDSR(0, attackTime, 0.1, 0.1, 1, false, releaseTime, forceReleaseTime, aCurve, Line(), rCurve);
 	}
 	AmpBuilder & AmpBuilder::ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime, std::shared_ptr<Interpolator> aCurve,
 								  std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){

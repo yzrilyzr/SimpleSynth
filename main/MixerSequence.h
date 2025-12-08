@@ -1,8 +1,5 @@
 ﻿#pragma once
 #include "events/ChannelEvent.h"
-#include "collection/HashMap.hpp"
-#include "collection/LinkedList.hpp"
-#include "lang/Boxing.h"
 #include "interface/InstrumentProvider.h"
 
 namespace yzrilyzr_simplesynth{

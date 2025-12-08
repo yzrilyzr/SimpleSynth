@@ -1,5 +1,6 @@
 ﻿#include "SimpleSynth.h"
 #include "TR808DrumSet.h"
+#include "interpolator/GraphInterpolator.h"
 #include "interface/NoteProcessor.h"
 #include "synth/envelopers/EnvUtil.h"
 #include "synth/generators/noise/NoiseSrc.h"
@@ -12,6 +13,7 @@
 #include "synth/source/AmplitudeSources.h"
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_util;
+using namespace yzrilyzr_interpolator;
 namespace yzrilyzr_simplesynth{
 	void TR808DrumSet::init(ChannelConfig & cfg){
 		u_sample_rate sampleRate=cfg.sampleRate;
@@ -71,16 +73,25 @@ namespace yzrilyzr_simplesynth{
 			.build()
 		);
 		add(MIDIFile::DrumSet::HAND_CLAP, AmpBuilder()
-			.src(AmpBuilder()
-				 .src(std::make_shared<NoiseSrc>())
-				 .biquad(sampleRate, FilterPassType::BANDPASS, 1000, 0.7, 0)
-				 .build())
-			.mul(AmpBuilder()
-				 .src(ConstAmp(1))
-				 .addMul(std::make_shared<Pulse>(ConstPhase(100), 0, 0.05, 0.95, 0), 0.3)
-				 .build()
-			)
-			.ADSR(2, 0, 1, false, 190, Line(), Line(), Pow(1))
+			.src(std::make_shared<NoiseSrc>())
+			.biquad(sampleRate, FilterPassType::LOWPASS, 10000, 0.7, 0)
+			.biquad(sampleRate, FilterPassType::HIGHPASS, 500, 0.7, 0)
+			.ADSR(2, 0, 1, false, 190, Line(), Line(), std::make_shared<GraphInterpolator>(std::initializer_list<double>{
+			0, 0,
+				0.15, 0.00001,
+				0.35, 0.001,
+				0.65, 0.01,
+				0.75, 0.1,
+				0.85, 0.3,
+				0.964, 1,
+				0.965, 0,
+				0.974, 1,
+				0.975, 0,
+				0.984, 1,
+				0.985, 0,
+				0.994, 1,
+				0.995, 0,
+				1, 1}))
 			.build()
 		);
 		add(MIDIFile::DrumSet::MARACAS, AmpBuilder()

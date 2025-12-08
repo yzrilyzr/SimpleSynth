@@ -1,10 +1,12 @@
 #include "events/ChannelConfig.h"
-#include "interface/IMixer.h"
 #include "events/ChannelEvent.h"
-#include "tuning/EqualTemperament.h"
-#include "interpolator/PowInterpolator.h"
 #include "instrument/SimpleMIDIInstrument.h"
+#include "interface/IMixer.h"
+#include "interpolator/PowInterpolator.h"
+#include "tuning/EqualTemperament.h"
+
 using namespace yzrilyzr_interpolator;
+
 namespace yzrilyzr_simplesynth{
 	ChannelConfig::~ChannelConfig(){}
 	void ChannelConfig::postInstantEvent(ChannelEvent * event){

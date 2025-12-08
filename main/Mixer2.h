@@ -1,25 +1,20 @@
 #pragma once
 #include "SimpleSynth.h"
-#include "array/Array.hpp"
-#include "collection/LinkedList.hpp"
 #include "dsp/DSP.h"
 #include "events/ChannelEvent.h"
 #include "events/Note.h"
 #include "interface/IChannel.h"
 #include "interface/IMixer.h"
-#include "interface/NoteTuning.h"
 #include "util/FixedThreadPool.h"
 #include "util/Flag.h"
 #include "util/Pool2.hpp"
 #include "yzrutil.h"
 #include <cstdint>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <unordered_map>
-#include <set>
-#include <vector>
 #include <deque>
+#include <memory>
+#include <set>
+#include <unordered_map>
+#include <vector>
 
 namespace yzrilyzr_dsp{
 	class DSPChain;
@@ -34,8 +29,8 @@ namespace yzrilyzr_simplesynth{
 	EBCLASS(NoteTask){
 		public:
 		Note note;
-		std::shared_ptr<yzrilyzr_array::SampleArray> output=nullptr;
-		ChannelData * data;
+		yzrilyzr_array::SampleArray output;
+		ChannelData * data; 
 		NoteTask(uint8_t uniqueID);
 	};
 	ECLASS(NoteTaskPool, public yzrilyzr_util::Pool2<NoteTask, CHANNEL_MAX_VOICE>){
@@ -50,8 +45,8 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(ChannelData, public IChannel){
 		public:
 		std::vector<std::shared_ptr<ChannelConfig>> cfgSnapshots;
-		std::shared_ptr<yzrilyzr_array::SampleArray> output[2];
-		std::shared_ptr<yzrilyzr_array::SampleArray> noteOutput;
+		yzrilyzr_array::SampleArray output[2];
+		yzrilyzr_array::SampleArray noteOutput;
 		std::shared_ptr<yzrilyzr_dsp::DSPChain> dspChain[2]; // DSP处理链
 		std::shared_ptr<yzrilyzr_dsp::DSP> choruser[2];     // 合唱效果器
 		std::shared_ptr<yzrilyzr_dsp::DSP> phaser[2];     // 合唱效果器
@@ -94,8 +89,8 @@ namespace yzrilyzr_simplesynth{
 		bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)override;
 		private:
 		static constexpr int const FLAG_RESET=0b1;
-		std::shared_ptr<yzrilyzr_array::SampleArray> output[2]; // 输出缓冲区指针数组
-		std::shared_ptr<yzrilyzr_array::SampleArray> drumOutput[2]; // 输出缓冲区指针数组
+		yzrilyzr_array::SampleArray output[2]; // 输出缓冲区指针数组
+		yzrilyzr_array::SampleArray drumOutput[2]; // 输出缓冲区指针数组
 		std::deque<ChannelEvent *> instantEventQueue; // 即时事件队列
 		std::deque<ChannelEvent *> postEventQueue; // 即时事件队列
 		yzrilyzr_util::FixedThreadPool * threadPool=nullptr;

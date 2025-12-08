@@ -39,6 +39,12 @@ namespace yzrilyzr_simplesynth{
 	AmpBuilder & velMix(u_normal_01 mix); // 混合原始力度和指定力度
 
 	// 包络控制
+	AmpBuilder & AR(u_time_ms attackTime, u_time_ms releaseTime,
+					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
+					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // AR包络
+	AmpBuilder & AR(u_time_ms attackTime, u_time_ms releaseTime, u_time_ms forceReleaseTime,
+					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
+					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // AR包络
 	AmpBuilder & ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume,
 					  bool canSustain, u_time_ms releaseTime,
 					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
@@ -99,7 +105,7 @@ namespace yzrilyzr_simplesynth{
 	AmpBuilder & biquadEnvVel(s_note_id idMin, s_note_id idMax, double q, yzrilyzr_dsp::FilterPassType type); // 根据音符力度的双二阶滤波
 	AmpBuilder & noteDSP(yzrilyzr_dsp::DSPPtr dsp); // 每个音符的DSP
 	AmpBuilder & postDSP(yzrilyzr_dsp::DSPPtr dsp); // 音符合并混音后的DSP(通道DSP)
-	AmpBuilder & biquadEnvGroup(int type, std::vector<BiquadEnvFilterGroupConfig> filters);
+	AmpBuilder & biquadEnvGroup(int type, std::vector<BiquadEnvFilterGroupConfig> filters);//包络滤波器组
 
 	// 失真效果
 	AmpBuilder & clamp(u_sample clamp); // 硬截幅失真

@@ -22,7 +22,12 @@ namespace yzrilyzr_simplesynth{
 			Note tmp(note.uniqueID);
 			tmp.set(note);
 			tmp.velocitySynth=1;
-			tmp.phaseSynth=(passedTime - modDelay) * (double)modRate;
+			u_freq minRate=modRate-3;
+			u_freq maxRate=modRate+3;
+			s_note_id_i idMin=0, idMax=127;
+			u_freq rate=Util::linearMap(idMin, idMax, minRate, maxRate, Util::clamp(note.id, idMin, idMax));
+			rate=Util::clamp(rate, 1.0, 15.0);
+			tmp.phaseSynth=(passedTime - modDelay) *rate;
 			mod=modShape->getAmp(tmp);
 			isMod=true;
 		} else mod=0;

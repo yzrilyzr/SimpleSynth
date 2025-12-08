@@ -31,7 +31,7 @@ void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 		}
 		data["Points"]=paramRegPtr->xys;
 	}*/
-	if(!paramRegPtr->xys)return;
+	if(paramRegPtr->xys.empty())return;
 	if(ImPlot::BeginPlot(ctx.LANG.getc("module.interpolator.graph.plot.title"), ImVec2(500, 500))){
 		ImPlot::SetupAxis(ImAxis_Y1, "Y", ImPlotAxisFlags_NoLabel);
 		ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 1.0, ImPlotCond_Always);

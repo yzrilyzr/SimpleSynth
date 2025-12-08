@@ -54,7 +54,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer::setBufferSize(u_index bs){
 		for(int32_t i=0;i < getOutputChannelCount();i++){
-			output[i]=std::make_shared<SampleArray>(bs);
+			output[i]=SampleArray(bs);
 		}
 	}
 	void Mixer::setSynthMode(int8_t mode, int32_t cores){
@@ -143,10 +143,10 @@ namespace yzrilyzr_simplesynth{
 			}
 		}
 		for(u_index ch=0;ch < chCount;ch++){
-			u_sample * thisOutput=output[ch]->_array;
+			u_sample * thisOutput=output[ch]._array;
 			memset(thisOutput, 0, blen * sizeof(u_sample));
 			for(auto & c : channels){
-				u_sample * channelOutput=c->output[ch]->_array;
+				u_sample * channelOutput=c->output[ch]._array;
 				bool isDrumSet=c->isDrumSetChannel();
 				if(isDrumSet)continue;
 				for(u_index sample=0;sample < blen;sample++){
@@ -155,7 +155,7 @@ namespace yzrilyzr_simplesynth{
 			}
 			if(tUseLimiter) tLimiter[ch]->procBlock(thisOutput, blen);
 			for(auto & c : channels){
-				u_sample * channelOutput=c->output[ch]->_array;
+				u_sample * channelOutput=c->output[ch]._array;
 				bool isDrumSet=c->isDrumSetChannel();
 				if(!isDrumSet)continue;
 				for(u_index sample=0;sample < blen;sample++){
@@ -183,7 +183,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		if(flags.hasAndRemove(FLAG_RESET_BUFFER)){
 			for(u_index i=0;i < chCount;i++){
-				SampleArray & outputBuf=*output[i];
+				SampleArray & outputBuf=output[i];
 				memset(outputBuf._array, 0, sizeof(u_sample) * outputBuf.length);
 			}
 		}
@@ -237,7 +237,7 @@ namespace yzrilyzr_simplesynth{
 		setMIDIChannel(DEFAULT_MIDI_CHANNEL_GROUP_NAME, id, channel);
 	}
 	u_index Mixer::getBufferSize()const{
-		return output[0]->length;
+		return output[0].length;
 	}
 	void Mixer::setMIDIChannel(const String & name, s_midichannel_id id, std::shared_ptr<Channel>channel){
 		channel->setBufferSize(getBufferSize());
@@ -315,7 +315,7 @@ namespace yzrilyzr_simplesynth{
 		this->skipSample=skip;
 	}
 	u_sample * Mixer::getOutput(uint32_t chIndex)const{
-		return output[chIndex]->_array;
+		return output[chIndex]._array;
 	}
 	void Mixer::sendInstantEvent(ChannelEvent * event){
 		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
@@ -372,7 +372,7 @@ namespace yzrilyzr_simplesynth{
 		postEventQueue.clear();
 		instantEventQueue.clear();
 		for(u_index i=0;i < channelCount;i++){
-			SampleArray & outputBuf=*output[i];
+			SampleArray & outputBuf=output[i];
 			memset(outputBuf._array, 0, sizeof(u_sample) * outputBuf.length);
 		}
 		for(u_index ch=0;ch < channelCount;ch++){
@@ -390,11 +390,11 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Channel::setBufferSize(u_index bs){
 		for(u_index i=0;i < channelCount;i++){
-			output[i]=std::make_shared<SampleArray>(bs);
+			output[i]=SampleArray(bs);
 		}
 	}
 	u_index Channel::getBufferSize()const{
-		return output[0]->length;
+		return output[0].length;
 	}
 	Channel::~Channel(){
 	}
@@ -443,8 +443,8 @@ namespace yzrilyzr_simplesynth{
 		int blen=getBufferSize();
 		int chCount=channelCount;
 		int channelCurrentSampleIndex=0;
-		u_sample * s_outputL=output[0]->_array;
-		u_sample * s_outputR=output[1]->_array;
+		u_sample * s_outputL=output[0]._array;
+		u_sample * s_outputR=output[1]._array;
 		for(u_index sample=0;sample < blen;sample++){
 			channelConfig.currentTime=(u_time)(mixerCurrentSampleIndex + channelCurrentSampleIndex) * invSampleRate;
 			s_eventTimeSum+=(u_time_f)s_currentDeltaTime;
@@ -1096,7 +1096,7 @@ namespace yzrilyzr_simplesynth{
 		closeNotSustainNotes();
 	}
 	u_sample * Channel::getOutput(uint32_t chIndex)const{
-		return output[chIndex]->_array;
+		return output[chIndex]._array;
 	}
 	ChannelConfig & Channel::getConfig(){
 		return channelConfig;

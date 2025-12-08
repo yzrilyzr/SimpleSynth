@@ -12,10 +12,10 @@
 #include <vector>
 namespace yzrilyzr_simplesynth{
 	struct BiquadEnvFilterGroupConfig{
-		yzrilyzr_dsp::FilterPassType type;
-		NoteProcPtr freqEnv;
-		NoteProcPtr qEnv;
-		NoteProcPtr gainEnv;
+		yzrilyzr_dsp::FilterPassType type;//类型
+		NoteProcPtr freqEnv;//频率包络
+		NoteProcPtr qEnv;//Q包络
+		NoteProcPtr gainEnv;//增益包络
 		BiquadEnvFilterGroupConfig(yzrilyzr_dsp::FilterPassType t, NoteProcPtr freq, NoteProcPtr q, NoteProcPtr gain)
 			: type(t), freqEnv(std::move(freq)), qEnv(std::move(q)), gainEnv(std::move(gain)){}
 

@@ -35,6 +35,7 @@
 #endif
 #include "MixerSequence.h"
 #include "io/FileInputStream.h"
+#include "io/ByteArrayOutputStream.h"
 #include "util/WAVWriter.h"
 
 #pragma comment(lib,"winmm.lib")
@@ -368,14 +369,11 @@ int main(int argc, char * argv[]){
 	SDL_PauseAudio(0);
 	openMIDIDevice();
 	mixer2->setUseLimiter(true);
-	std::string a;
 	while(true){
-		std::getline(std::cin, a);
-		String str=a;
+		String str=Util::readLine(System::in);
 		try{
 			if(str.length() > 0 && str.startsWith("\"") && str.endsWith("\"")){
 				str=str.substring(1, str.length() - 1);
-				a=str.tostring();
 			}
 			if(str.endsWith(".xm")){
 				std::shared_ptr<MixerSequence> seq=SynthUtil::parseXM(FileInputStream(str));
@@ -410,28 +408,28 @@ int main(int argc, char * argv[]){
 				rin->setDrumSet(std::make_shared<TR808DrumSet>());
 			} else if(str == "export"){
 				exportMode=!exportMode;
-				std::cout << "ExportMode: " << exportMode << std::endl;
+				System::out.println(String("ExportMode: ") + exportMode);
 			} else if(str == "exporttrack"){
 				exportTrackMode=!exportTrackMode;
-				std::cout << "ExportTrack: " << exportTrackMode << std::endl;
+				System::out.println(String("ExportTrack: ") + exportTrackMode);
 			} else if(str == "exportsamplerate"){
-				std::cout << "Input new sample rate" << std::endl;
-				std::getline(std::cin, a);
-				exportSampleRate=parseInt(a);
-				std::cout << "ExportSampleRate: " << (int)exportSampleRate << std::endl;
+				System::out.println("Input new sample rate");
+				str=Util::readLine(System::in);
+				exportSampleRate=parseInt(str);
+				System::out.println(String("ExportSampleRate: ") + (int)exportSampleRate);
 			} else if(str == "limiter"){
 				exportLimiter=!exportLimiter;
-				std::cout << "ExportLimiter:" << exportLimiter << std::endl;
+				System::out.println(String("ExportLimiter:") + exportLimiter);
 			} else if(str == "channeldsp"){
 				exportChannelDSP=!exportChannelDSP;
-				std::cout << "ExportChannelDSP:" << exportChannelDSP << std::endl;
+				System::out.println(String("ExportChannelDSP:") + exportChannelDSP);
 			} else if(str == "exit"){
 				break;
 			} else if(str == "exportinfo"){
-				std::cout << "ExportMode: " << exportMode << std::endl;
-				std::cout << "ExportTrack: " << exportTrackMode << std::endl;
-				std::cout << "ExportLimiter:" << exportLimiter << std::endl;
-				std::cout << "ExportSampleRate: " << (int)exportSampleRate << std::endl;
+				System::out.println(String("ExportMode: ") + exportMode);
+				System::out.println(String("ExportTrack: ") + exportTrackMode);
+				System::out.println(String("ExportLimiter:") + exportLimiter);
+				System::out.println(String("ExportSampleRate: ") + (int)exportSampleRate);
 			} else if(str.startsWith("midi ")){
 				auto & split=str.split(" ");
 				uint8_t ty=parseInt(split[1].tostring(), 16);
@@ -440,7 +438,7 @@ int main(int argc, char * argv[]){
 				SynthUtil::sendMIDIBytes(mixer2.get(), ty, data1, data2);
 			}
 		} catch(Exception e){
-			std::cout << "Error: " << e.what() << std::endl;
+			std::cerr << "Error: " << e.what() << std::endl;
 		}
 	}
 	closeAndExit();

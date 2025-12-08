@@ -82,7 +82,7 @@ void eqWindow(CurrentProjectContext & ctx){
 				s->iir=std::make_shared<IIR>(2, 3);
 			}
 			//s->iir=IIRUtil::newButterworthIIRFilter(test_sampleRate, FilterPassType::LOWPASS, 16, s->freq, 0);
-			IIRUtil::biquad(*s->iir->aCoeff, *s->iir->bCoeff, s->freq, test_sampleRate, s->q, s->type, s->gain);
+			IIRUtil::biquad(s->iir->aCoeff, s->iir->bCoeff, s->freq, test_sampleRate, s->q, s->type, s->gain);
 			//IIRUtil::designThiranFilter(*s->iir->aCoeff, *s->iir->bCoeff, s->freq, 15);
 			dsp.add(s->iir);
 		}

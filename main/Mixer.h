@@ -44,7 +44,7 @@ namespace yzrilyzr_simplesynth{
 		public:
 			// ==================== 公共成员变量 ====================
 		uint8_t channelCount=2;          // 声道数(默认立体声)
-		std::shared_ptr<yzrilyzr_array::SampleArray> output[2]; // 输出缓冲区指针数组
+		yzrilyzr_array::SampleArray output[2]; // 输出缓冲区指针数组
 		u_time_stamp lastActiveTime=0;         // 最后活跃时间
 		bool alwaysActive=false;        // 是否始终保持活跃状态
 		NotePool workingNotesPool; // 工作音符池
@@ -247,7 +247,7 @@ namespace yzrilyzr_simplesynth{
 
 		private:
 			// ==================== 私有成员变量 ====================
-		std::shared_ptr<yzrilyzr_array::SampleArray> output[2]; // 输出缓冲区指针数组
+		yzrilyzr_array::SampleArray output[2]; // 输出缓冲区指针数组
 		std::unordered_map<std::pair<yzrilyzr_lang::String, s_midichannel_id>, std::shared_ptr<Channel>> midiChannelMap; // MIDI通道映射表
 		yzrilyzr_collection::ArrayList<std::shared_ptr<Channel>> channels;                // 全部通道列表
 		yzrilyzr_dsp::Limiter ** nonDrumSetLimiter=nullptr;      // 非鼓组限制器

@@ -183,7 +183,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder()
 					.src(std::make_shared<SineBasePowHarmonicWave>(DoubleArray({
 					0.9, 0.9, 1.0, 0.7, 0.6
-				})))
+																			   })))
 					.detune(2, 0.1)
 					.biquad(sampleRate, HIGHSHELF, 2000.0, 0.5, -12.0)
 					.mul(0.4)
@@ -331,7 +331,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::GUITAR_OVERDRIVEN_GUITAR:
 				return AmpBuilder()
 					.ks(0.85)
-					.arctanDistortion(1, 5, 1)
+					.arctanDistortion(1, 3, 1)
 					.biquad(sampleRate, FilterPassType::BELL, 200, 0.6, 4)
 					.biquad(sampleRate, FilterPassType::LOWPASS, 4000, 1, 1)
 					.clampV(0.9, 0.9)
@@ -343,11 +343,11 @@ namespace yzrilyzr_simplesynth{
 					.ks(0.85)
 					.biquad(sampleRate, FilterPassType::BELL, 200, 0.6, 5)
 					.clampV(100, 0.9)
-					.arctanDistortion(1, 50, 1)
+					.arctanDistortion(1, 25, 1)
 					.clampV(0.8, 0.8)
 					.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
-							 .biquad(sampleRate, FilterPassType::BELL, 5000, 0.6, 4)
-							 .biquad(sampleRate, FilterPassType::LOWPASS, 5000, 1, 0)
+							 .biquad(sampleRate, FilterPassType::BELL, 500, 0.6, 4)
+							 .biquad(sampleRate, FilterPassType::LOWPASS, 3000, 0.5, 0)
 							 .biquad(sampleRate, FilterPassType::HIGHPASS, 10, 1, 0)
 							 .build())
 					.mul(0.8)
@@ -416,7 +416,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::BASS_SLAP_BASS_2:
 				return AmpBuilder().src(std::make_shared<Pulse>(0.3, 0.4, 0.3, 0))
 					.ks(0.9)
-					.biquad(sampleRate,HIGHPASS,10,0.7,0)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.mul(1.2)
 					.ADSR(10, 1000, 0.3, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -446,10 +446,49 @@ namespace yzrilyzr_simplesynth{
 					.autoMod(0.2, 0.3, 5.5, 0.75)
 					.ADSR(50, 100, 0.7, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
-			case MIDIFile::Instruments::PIPE_PICCOLO + 3:
-			case MIDIFile::Instruments::PIPE_PICCOLO + 4:
-			case MIDIFile::Instruments::PIPE_PICCOLO + 5:
-			case MIDIFile::Instruments::PIPE_PICCOLO + 7:
+			case MIDIFile::Instruments::PIPE_PAN_FLUTE:
+				return SakuraBuilder()
+					.exciter(AmpBuilder().src(std::make_shared<Pulse>(0.3, 0.2, 0.2, 0)).add(std::make_shared<NoiseSrc>()).build())
+					.exciterHiCut(0.93, 1)
+					.exciterHiCutEnv(97.2222, 0, 0, 0.791667)
+					.exciterLowCut(0.11, 1)
+					.string1(1, 0.015, 0.466)
+					.string2(2, -0.015, 0.477)
+					.stringMix(0.015)
+					.stringEnv(0, 0, 62.5, true, 0.875, 100)
+					.stringLevel(0.022)
+					.comb(1, 1, -1, 0)
+					.resonatorLevel(1)
+					.build();
+			case MIDIFile::Instruments::PIPE_BOTTLE_BLOW:
+				return SakuraBuilder()
+					.exciter(AmpBuilder().src(std::make_shared<Pulse>(0.3, 0.2, 0.2, 0)).add(std::make_shared<NoiseSrc>()).build())
+					.exciterHiCut(0.76, 1)
+					.exciterHiCutEnv(97.2222, 0, 0, 0.791667)
+					.exciterLowCut(0.11, 1)
+					.string1(1, 0.015, 0.789)
+					.string2(2, -0.09, 0.808)
+					.stringMix(0.015)
+					.stringEnv(0, 0, 62.5, true, 0.875, 100)
+					.stringLevel(0.022)
+					.comb(1, 1, -1, 0)
+					.resonatorLevel(1)
+					.build();
+			case MIDIFile::Instruments::PIPE_SHAKUHACHI:
+				return SakuraBuilder()
+					.exciter(AmpBuilder().src(std::make_shared<Pulse>(0.3, 0.2, 0.2, 0)).add(std::make_shared<NoiseSrc>()).build())
+					.exciterHiCut(0.91, 1)
+					.exciterHiCutEnv(256.944, 0, 0, 0.909722)
+					.exciterLowCut(0.04, 1)
+					.string1(1, 0.015, 0.789)
+					.string2(2, -0.09, 0.808)
+					.stringMix(0.015)
+					.stringEnv(0, 0, 62.5, true, 0.875, 100)
+					.stringLevel(0.015)
+					.comb(0.508, 1, -1, 0)
+					.resonatorLevel(1)
+					.build();
+			case MIDIFile::Instruments::PIPE_OCARINA:
 				return AmpBuilder().src(std::make_shared<SineWave>())
 					.pm(std::make_shared<SineWave>(), 0.2, 2)
 					.autoMod(0.2, 0.3, 5.3, 0.75)
@@ -462,11 +501,18 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::BRASS_TRUMPET:
 				return
-					AmpBuilder().src(std::make_shared<Pulse>(0.0, 0.04, 0.1, 0.46))
-					.biquad(sampleRate, BANDPASS, 3000, 0.20, 0)
-					.autoMod(0.6, 0.3, 5.0, 0.0,
+					AmpBuilder().src(std::make_shared<Pulse>(0.0, 0.04, 0.03, 0.0))
+					.biquadEnvGroup(DSPGroupBuilder::TYPE_CHAIN, {
+						{FilterPassType::BELL, NoteFreqAmp, 0.7, 10},
+						{FilterPassType::LOWPASS, NoteFreqAmp*40, 0.5, 0}
+						}
+					)
+					.biquad(sampleRate, LOWPASS, 15000, 0.20, 0)
+					.biquad(sampleRate, HIGHPASS, 250, 0.20, 0)
+					.autoMod(0.7, 0.5, 5.0, 0.1,
 							 AmpBuilder().src(
-								 std::make_shared<Pulse>(0.3, 0.2, 0.5, 0))
+								 std::make_shared<Pulse>(0.31, 0.2, 0.25, 0))
+							 .add(ConstAmp(-0.4))
 							 .DAHDSR(100, 200, 10, 1, 1, true, 100, 100, Line(), Line(), Line()).build())
 					.mul(1.5)
 					.ADSR(30, 108, 0.9, true, 100, Pow(5), Pow(5), Pow(5))
@@ -662,12 +708,12 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder()
 					.src(std::make_shared<SineWaveTable>(269.53125, DoubleArray({
 					269.53125, 1.0,
-						525, 0.005,
-						784, 0.01,
-						1051, 0.01,
-						1308, 0.005,
-						3122, 0.01
-				})))
+					525, 0.005,
+					784, 0.01,
+					1051, 0.01,
+					1308, 0.005,
+					3122, 0.01
+																				})))
 					.autoMod(0.1, 0.3, 5, 0.8)
 					.addMul(
 						AmpBuilder(std::make_shared<NoiseSrc>())
@@ -1061,7 +1107,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder()
 					.src(std::make_shared<SineWaveTable>(269.53125, DoubleArray({
 					269.53125, 1.0, 363.28125, 0.07235363857701663, 398.4375, 0.12799743578985023, 433.59375, 0.08737175770435823, 515.625, 0.6206402594994691, 539.0625, 0.3597885911495093, 597.65625, 0.08264700342927812, 656.25, 0.7188440200746729, 785.15625, 0.3795586131241527, 855.46875, 0.011978267525183701, 914.0625, 0.07184674145688824, 1054.6875, 0.22712185759377435, 1171.875, 0.051998250533269966, 1312.5, 0.030940107100424292, 4464.84375, 0.012544763401347499
-				})))
+																				})))
 					.biquadEnv(AmpBuilder().src(ConstAmp(60))
 							   .ADSR(30, 1, 1, true, 100, Line(), Line(), Line())
 							   .add(ConstAmp(60))
