@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 		return sum;
 	}
 	NoteProcPtr MultiKeyTrigger::clone(){
-		return std::make_shared<MultiKeyTrigger>(a, idShift, velocityMul);
+		return mksp<MultiKeyTrigger>(a, idShift, velocityMul);
 	}
 	MultiKeyTriggerKeyData * MultiKeyTrigger::init(MultiKeyTriggerKeyData * data, Note & note){
 		if(data == nullptr){

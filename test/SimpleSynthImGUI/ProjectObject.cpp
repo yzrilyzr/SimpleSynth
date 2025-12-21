@@ -68,7 +68,7 @@ void ProjectObject::paramToJSON(json & a, const ParamRegister & paramReg){
 			}
 			break;
 			default:
-				std::shared_ptr<void> * paramRegPtr=reinterpret_cast<std::shared_ptr<void>*>(p.value);
+				u_sp<void> * paramRegPtr=reinterpret_cast<u_sp<void>*>(p.value);
 				void * rawPtr=paramRegPtr->get();
 				a[p.name.c_str()]=reinterpret_cast<uint64_t>(rawPtr);
 				break;
@@ -194,26 +194,26 @@ void ProjectObject::from_json(const json & j){
 					auto data=value["data"];
 					auto type=value["type"];
 					if(type == "SampleArray"){
-						auto arrPtr=std::make_shared<SampleArray>(data.size());
+						auto arrPtr=mksp<SampleArray>(data.size());
 						for(u_index i=0;i < data.size();i++){
 							(*arrPtr)[i]=data[i].get<u_sample>();
 						}
 						storeData[key]=arrPtr;
 					} else if(type == "DoubleArray"){
-						auto arrPtr=std::make_shared<DoubleArray>(data.size());
+						auto arrPtr=mksp<DoubleArray>(data.size());
 						for(u_index i=0;i < data.size();i++){
 							(*arrPtr)[i]=data[i].get<double>();
 						}
 						storeData[key]=arrPtr;
 					}
 				} else if(value.is_number_integer()){
-					auto intPtr=std::make_shared<Integer>(value.get<int32_t>());
+					auto intPtr=mksp<Integer>(value.get<int32_t>());
 					storeData[key]=intPtr;
 				} else if(value.is_number_unsigned()){
-					auto longPtr=std::make_shared<Long>(value.get<int64_t>());
+					auto longPtr=mksp<Long>(value.get<int64_t>());
 					storeData[key]=longPtr;
 				} else if(value.is_number_float()){
-					auto doublePtr=std::make_shared<Double>(value.get<double>());
+					auto doublePtr=mksp<Double>(value.get<double>());
 					storeData[key]=doublePtr;
 				}
 			}

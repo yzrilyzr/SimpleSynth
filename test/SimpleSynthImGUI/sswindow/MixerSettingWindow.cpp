@@ -48,15 +48,15 @@ void mixerSettingWindow(CurrentProjectContext & ctx){
 	}
 	if(ImGui::Combo(ctx.LANG.getc("window.mixer.tuning"), &tuningType, tuningNames.data(), tuningNames.size())){
 		//std::unique_lock<std::shared_mutex> lock(ctx.mixerLock);
-		std::shared_ptr<NoteTuning> t=nullptr;
-		if(tuningType == 0)t=std::make_shared<EqualTemperament>();
-		else if(tuningType == 1)t=std::make_shared<JustIntonation>();
-		else if(tuningType == 2)t=std::make_shared<Pythagorean>();
-		else if(tuningType == 3)t=std::make_shared<Meantone>();
-		else if(tuningType == 4)t=std::make_shared<Werckmeister>();
-		else if(tuningType == 5)t=std::make_shared<Kirnberger>();
-		else if(tuningType == 6)t=std::make_shared<Vallotti>();
-		else if(tuningType == 7)t=std::make_shared<Young>();
+		u_sp<NoteTuning> t=nullptr;
+		if(tuningType == 0)t=mksp<EqualTemperament>();
+		else if(tuningType == 1)t=mksp<JustIntonation>();
+		else if(tuningType == 2)t=mksp<Pythagorean>();
+		else if(tuningType == 3)t=mksp<Meantone>();
+		else if(tuningType == 4)t=mksp<Werckmeister>();
+		else if(tuningType == 5)t=mksp<Kirnberger>();
+		else if(tuningType == 6)t=mksp<Vallotti>();
+		else if(tuningType == 7)t=mksp<Young>();
 		mixer.getGlobalConfig().setNoteTuning(t);
 		for(auto channel : mixer.getAllChannels()){
 			TuningChange * event=new TuningChange();

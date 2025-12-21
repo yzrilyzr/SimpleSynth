@@ -14,9 +14,9 @@ namespace yzrilyzr_simplesynth{
 		registerParamInterpolator("Interpolator", &syncInterp);
 	}
 
-	SoftSync::SoftSync(NoteProcPtr slave, float ratio, std::shared_ptr<Interpolator> interp=nullptr)
+	SoftSync::SoftSync(NoteProcPtr slave, float ratio, u_sp<Interpolator> interp=nullptr)
 		: AmpUnaryComposition(slave), slaveFreqRatio(ratio){
-		syncInterp=interp?interp:std::make_shared<LineInterpolator>();
+		syncInterp=interp?interp:mksp<LineInterpolator>();
 	}
 
 	u_sample SoftSync::getAmp(Note & note){
@@ -53,12 +53,12 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	// 设置同步插值器（如Bezier、Pow等）
-	void SoftSync::setSyncInterpolator(std::shared_ptr<Interpolator> interp){
+	void SoftSync::setSyncInterpolator(u_sp<Interpolator> interp){
 		syncInterp=interp;
 	}
 
 	NoteProcPtr SoftSync::clone(){
-		return std::make_shared<SoftSync>(a->clone(), slaveFreqRatio, syncInterp);
+		return mksp<SoftSync>(a->clone(), slaveFreqRatio, syncInterp);
 	}
 
 	SoftSyncKeyData * SoftSync::init(SoftSyncKeyData * data, Note & note){

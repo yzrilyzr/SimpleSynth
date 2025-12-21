@@ -9,7 +9,7 @@ using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
-bool renderMatrix(std::shared_ptr<Matrix6x6Modulation> paramRegPtr, int type){
+bool renderMatrix(u_sp<Matrix6x6Modulation> paramRegPtr, int type){
 	bool change=false;
 	const u_index MTX_SIZE=Matrix6x6Modulation::MATRIX_SIZE;
 	u_index cols=MTX_SIZE + 2;
@@ -76,14 +76,14 @@ bool renderMatrix(std::shared_ptr<Matrix6x6Modulation> paramRegPtr, int type){
 	return change;
 }
 void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	std::shared_ptr<Matrix6x6Modulation> paramRegPtr=std::dynamic_pointer_cast<Matrix6x6Modulation, ParamRegister>(obj.paramRegPtr);
+	u_sp<Matrix6x6Modulation> paramRegPtr=std::dynamic_pointer_cast<Matrix6x6Modulation, ParamRegister>(obj.paramRegPtr);
 	u_index MTX_SIZE=Matrix6x6Modulation::MATRIX_SIZE;
 	auto & data=obj.storeData;
 	if(obj.loadStoredData){
 		obj.loadStoredData=false;
 		auto it=data.find("FM_Matrix");
 		if(it != data.end()){
-			std::shared_ptr<SampleArray> arr=std::dynamic_pointer_cast<SampleArray>(it->second);
+			u_sp<SampleArray> arr=std::dynamic_pointer_cast<SampleArray>(it->second);
 			u_index k=0;
 			for(u_index x=0;x < MTX_SIZE;x++){
 				for(u_index y=0;y < MTX_SIZE;y++){
@@ -93,7 +93,7 @@ void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & 
 		}
 		it=data.find("RM_Matrix");
 		if(it != data.end()){
-			std::shared_ptr<SampleArray> arr=std::dynamic_pointer_cast<SampleArray>(it->second);
+			u_sp<SampleArray> arr=std::dynamic_pointer_cast<SampleArray>(it->second);
 			u_index k=0;
 			for(u_index x=0;x < MTX_SIZE;x++){
 				for(u_index y=0;y < MTX_SIZE;y++){
@@ -127,14 +127,14 @@ void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & 
 		ImGui::EndTabBar();
 	}
 	if(change){
-		std::shared_ptr<SampleArray> fmArr=std::make_shared<SampleArray>(MTX_SIZE * MTX_SIZE);
+		u_sp<SampleArray> fmArr=mksp<SampleArray>(MTX_SIZE * MTX_SIZE);
 		u_index k=0;
 		for(u_index x=0;x < MTX_SIZE;x++){
 			for(u_index y=0;y < MTX_SIZE;y++){
 				(*fmArr)[k++]=paramRegPtr->fmMatrix[x][y];
 			}
 		}
-		std::shared_ptr<SampleArray> rmArr=std::make_shared<SampleArray>(MTX_SIZE * MTX_SIZE);
+		u_sp<SampleArray> rmArr=mksp<SampleArray>(MTX_SIZE * MTX_SIZE);
 		k=0;
 		for(u_index x=0;x < MTX_SIZE;x++){
 			for(u_index y=0;y < MTX_SIZE;y++){

@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 		return a->getAmp(note);
 	}
 	NoteProcPtr AmpWithCC::clone(){
-		return std::make_shared<AmpWithCC>(a, cc);
+		return mksp<AmpWithCC>(a, cc);
 	}
 	void AmpWithCC::init(ChannelConfig & cfg){
 		AmpUnaryComposition::init(cfg);

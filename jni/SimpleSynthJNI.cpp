@@ -13,7 +13,7 @@ using namespace yzrilyzr_lang;
 extern "C" JNIEXPORT jlong JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2_constructor(JNIEnv *, jobject, jint bufferSize){
 	Mixer2 * mixer=new Mixer2(bufferSize);
 	mixer->setSynthMode(Mixer2::MODE_THREAD_POOL, -1);
-	mixer->getGlobalConfig().setInstrumentProvider(std::make_shared<SimpleMIDIInstrument>());
+	mixer->getGlobalConfig().setInstrumentProvider(mksp<SimpleMIDIInstrument>());
 	return reinterpret_cast<jlong>(mixer);
 }
 extern "C" JNIEXPORT void JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2_destructor(JNIEnv *, jobject, jlong paramRegPtr){
@@ -77,7 +77,7 @@ extern "C" JNIEXPORT void JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2_nGetBuffe
 	env->ReleasePrimitiveArrayCritical(ch2, nativeArray2, 0);
 }
 
-static std::unordered_map<jlong, std::shared_ptr<MixerSequence>> sequenceMap;
+static std::unordered_map<jlong, u_sp<MixerSequence>> sequenceMap;
 
 extern "C" JNIEXPORT jlong JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2Sequence_constructor(JNIEnv * env, jobject, jint type, jbyteArray data){
 	jbyte * dataPtr=env->GetByteArrayElements(data, NULL);
@@ -85,7 +85,7 @@ extern "C" JNIEXPORT jlong JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2Sequence_
 	ByteArray ba(length);
 	memcpy(ba._array, dataPtr, length);
 	env->ReleaseByteArrayElements(data, dataPtr, 0);
-	std::shared_ptr<MixerSequence> seq=nullptr;
+	u_sp<MixerSequence> seq=nullptr;
 	ByteArrayInputStream bba(ba);
 	if(type == 0)seq=SynthUtil::parseMIDI(bba);
 	else if(type == 1)seq=SynthUtil::parseXM(bba);
@@ -101,7 +101,7 @@ extern "C" JNIEXPORT void JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2Sequence_d
 }
 
 extern "C" JNIEXPORT void JNICALL Java_yzrilyzr_simplesynth_ntv_Mixer2Sequence_nPost(JNIEnv *, jobject, jlong paramRegPtr, jlong mixerPtr){
-	std::shared_ptr<MixerSequence> seq=sequenceMap[paramRegPtr];
+	u_sp<MixerSequence> seq=sequenceMap[paramRegPtr];
 	Mixer2 * mixer=reinterpret_cast<Mixer2 *>(mixerPtr);
 	seq->postToMixer(mixer, 0);
 }

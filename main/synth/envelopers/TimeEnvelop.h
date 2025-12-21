@@ -8,7 +8,7 @@
 namespace yzrilyzr_simplesynth{
 	ECLASS(TimeEnvelop, public NoteProcessor), public Enveloper{
 	private:
-		std::shared_ptr<yzrilyzr_interpolator::Interpolator> curve;
+		u_sp<yzrilyzr_interpolator::Interpolator> curve;
 		u_time duration;
 		bool inv;
 		/**
@@ -19,8 +19,8 @@ namespace yzrilyzr_simplesynth{
 		TimeEnvelop() : TimeEnvelop(0,nullptr,false){
 			registerParamTimeMs("Time(ms)", &duration);
 		}
-		TimeEnvelop(u_time_ms duration,std::shared_ptr<yzrilyzr_interpolator::Interpolator> curve) : TimeEnvelop(duration,curve,false){}
-		TimeEnvelop(u_time_ms duration,std::shared_ptr<yzrilyzr_interpolator::Interpolator> curve,bool inv){
+		TimeEnvelop(u_time_ms duration,u_sp<yzrilyzr_interpolator::Interpolator> curve) : TimeEnvelop(duration,curve,false){}
+		TimeEnvelop(u_time_ms duration,u_sp<yzrilyzr_interpolator::Interpolator> curve,bool inv){
 			this->curve=curve;
 			this->duration=duration/1000.0;
 			this->inv=inv;

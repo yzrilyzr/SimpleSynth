@@ -65,7 +65,7 @@ namespace yzrilyzr_simplesynth{
 
 		lua_pushcfunction(L, [](lua_State * L) -> int{
 			u_sample phase=luaL_checknumber(L, 1);
-			u_sample result=std::sin(phase);
+			u_sample result=Math::sin(phase);
 			lua_pushnumber(L, result);
 			return 1;
 		});
@@ -272,7 +272,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	NoteProcPtr LuaNoteProcessor::clone(){
-		return std::make_shared<LuaNoteProcessor>(script_);
+		return mksp<LuaNoteProcessor>(script_);
 	}
 
 	// Lua绑定辅助方法实现

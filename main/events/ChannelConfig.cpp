@@ -104,32 +104,32 @@ namespace yzrilyzr_simplesynth{
 		this->mixer=mixer;
 		this->channel=channel;
 	}
-	void ChannelConfig::setNoteTuning(std::shared_ptr<NoteTuning> val){
+	void ChannelConfig::setNoteTuning(u_sp<NoteTuning> val){
 		sp_tuning=val;
 		tuning=val.get();
 	}
-	void ChannelConfig::setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val){
+	void ChannelConfig::setNoteVelocityMap(u_sp<yzrilyzr_interpolator::Interpolator> val){
 		sp_velocityMap=val;
 		velocityMap=val.get();
 	}
-	void ChannelConfig::setInstrumentProvider(std::shared_ptr<InstrumentProvider> instr){
+	void ChannelConfig::setInstrumentProvider(u_sp<InstrumentProvider> instr){
 		sp_instrument=instr;
 		instrument=instr.get();
 	}
-	/*std::shared_ptr<InstrumentProvider> ChannelConfig::getInstrumentProvider()const{
+	/*u_sp<InstrumentProvider> ChannelConfig::getInstrumentProvider()const{
 		return sp_instrument;
 	}
-	std::shared_ptr<NoteTuning> ChannelConfig::getNoteTuning()const{
+	u_sp<NoteTuning> ChannelConfig::getNoteTuning()const{
 		return sp_tuning;
 	}
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> ChannelConfig::getNoteVelocityMap()const{
+	u_sp<yzrilyzr_interpolator::Interpolator> ChannelConfig::getNoteVelocityMap()const{
 		return sp_velocityMap;
 	}*/
-	void ChannelConfig::set3DEffect(std::shared_ptr<yzrilyzr_dsp::DSP3D> dsp3d){
+	void ChannelConfig::set3DEffect(u_sp<yzrilyzr_dsp::DSP3D> dsp3d){
 		this->sp_dsp3d=dsp3d;
 		this->dsp3d=dsp3d.get();
 	}
-	/*std::shared_ptr<yzrilyzr_dsp::DSP3D> ChannelConfig::get3DEffect(){
+	/*u_sp<yzrilyzr_dsp::DSP3D> ChannelConfig::get3DEffect(){
 		return sp_dsp3d;
 	}*/
 	void ChannelConfig::set(const ChannelConfig & other){
@@ -142,11 +142,11 @@ namespace yzrilyzr_simplesynth{
 		if(mixer == nullptr)mixer=other.mixer;
 		if(channel == nullptr)channel=other.channel;
 	}
-	std::shared_ptr<ChannelConfig> ChannelConfig::DefaultConfig(){
-		std::shared_ptr<ChannelConfig> p=std::make_shared< ChannelConfig>();
-		p->setNoteTuning(std::make_shared<EqualTemperament>());
-		p->setInstrumentProvider(std::make_shared<SimpleMIDIInstrument>());
-		p->setNoteVelocityMap(std::make_shared<PowInterpolator>(2));
+	u_sp<ChannelConfig> ChannelConfig::DefaultConfig(){
+		u_sp<ChannelConfig> p=mksp< ChannelConfig>();
+		p->setNoteTuning(mksp<EqualTemperament>());
+		p->setInstrumentProvider(mksp<SimpleMIDIInstrument>());
+		p->setNoteVelocityMap(mksp<PowInterpolator>(2));
 		return p;
 	}
 }

@@ -16,7 +16,7 @@ namespace yzrilyzr_simplesynth{
 	void Sitar::init(ChannelConfig & cfg){
 		resonanceStrings=new RingBufferSample[resonanceStringsCount];
 		resonanceStringDelays=new RingBufferSample[resonanceStringsCount];
-		resonanceStringFreq=std::make_shared<DoubleArray>(resonanceStringsCount);
+		resonanceStringFreq=mksp<DoubleArray>(resonanceStringsCount);
 		Osc::init(cfg);
 		int initI=Note::C4;
 		int * ids=new int[14]{initI, initI + 2, initI + 4, initI + 5, initI + 7, initI + 9, initI + 11, initI + 12, initI + 14, initI + 16, initI + 17, initI + 19, initI + 21, initI + 23};
@@ -49,7 +49,7 @@ namespace yzrilyzr_simplesynth{
 		return out;
 	}
 	NoteProcPtr Sitar::clone(){
-		return std::make_shared<Sitar>();
+		return mksp<Sitar>();
 	}
 	u_sample Sitar::getAmp(Note & note){
 		RingBufferSample & buffer=*getData(note);

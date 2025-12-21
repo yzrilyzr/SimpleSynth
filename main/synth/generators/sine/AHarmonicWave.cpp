@@ -1,7 +1,7 @@
 ﻿#include "AHarmonicWave.h"
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
-	AHarmonicWave::AHarmonicWave(std::shared_ptr<PhaseSrc> freq): SineHarmonicWave(freq,
+	AHarmonicWave::AHarmonicWave(u_sp<PhaseSrc> freq): SineHarmonicWave(freq,
 																				   DoubleArray({
 																						  0.0066f,
 																						  0.1894f,

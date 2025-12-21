@@ -9,13 +9,13 @@
 namespace yzrilyzr_simplesynth{
 	ECLASS(Osc, public NoteProcessor){
 	private:
-	std::shared_ptr<PhaseSrc> _freq;
+	u_sp<PhaseSrc> _freq;
 	NoteProcPtr _pm;
 	NoteProcPtr _lpm;
 	double pmAmp=0;
 	double lpmAmp=0;
 	public:
-	Osc(std::shared_ptr<PhaseSrc> freq);
+	Osc(u_sp<PhaseSrc> freq);
 	Osc();
 	s_phase getPhase(Note & note){
 		s_phase t=_freq->getPhase(note);
@@ -28,8 +28,8 @@ namespace yzrilyzr_simplesynth{
 		return t;
 	}
 	void init(ChannelConfig & cfg)override;
-	std::shared_ptr<PhaseSrc> getPhaseSource()const;
-	void setPhaseSource(std::shared_ptr<PhaseSrc> freq);
+	u_sp<PhaseSrc> getPhaseSource()const;
+	void setPhaseSource(u_sp<PhaseSrc> freq);
 	/**
 	 * pm调制
 	 *
@@ -37,7 +37,7 @@ namespace yzrilyzr_simplesynth{
 	 * @param pmAmp     载波相位改变量
 	 * @param noteRatio pm调制波频率与载波（音符）频率之比
 	 */
-	void pm(std::shared_ptr<Osc> pmSrc, double pmAmp, double noteRatio);
+	void pm(u_sp<Osc> pmSrc, double pmAmp, double noteRatio);
 	void pm(NoteProcPtr pmSrc,double pmAmp);
 	/**
 	 * lpm 低频相位调制
@@ -46,7 +46,7 @@ namespace yzrilyzr_simplesynth{
 	 * @param lpmAmp 载波相位改变量
 	 * @param lpmHz  调制波频率
 	 */
-	void lpm(std::shared_ptr<Osc> lpmSrc, double lpmAmp, u_freq lpmHz);
+	void lpm(u_sp<Osc> lpmSrc, double lpmAmp, u_freq lpmHz);
 	void lpm(NoteProcPtr lpmSrc, double lpmAmp);
 	yzrilyzr_lang::String toString() const override;
 	};

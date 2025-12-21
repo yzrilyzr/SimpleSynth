@@ -21,7 +21,7 @@ namespace yzrilyzr_simplesynth{
 		return (2 / Math::PI) * atan(inputGain * a->getAmp(note) * alpha) * outputGain;
 	}
 	NoteProcPtr ArctanDistortion::clone(){
-		return std::make_shared<ArctanDistortion>(a->clone(), inputGain, alpha, outputGain);
+		return mksp<ArctanDistortion>(a->clone(), inputGain, alpha, outputGain);
 	}
 	String ArctanDistortion::toString() const{
 		return StringFormat::object2string("ArctanDistortion", a, inputGain, alpha, outputGain);

@@ -12,11 +12,11 @@ namespace yzrilyzr_simplesynth{
 	public:
 	u_sample weight=0;
 	int loadState=0;
-	std::vector<std::shared_ptr<PianoDwgs>> string;
+	std::vector<u_sp<PianoDwgs>> string;
 	u_sample Z=0;
 	u_sample ZBridge=0;
 	u_sample ZHammer=0;
-	std::unique_ptr<Hammer> hammer=nullptr;
+	u_sp<Hammer> hammer=nullptr;
 	u_sample onTimePassed=0;
 	u_sample offTimePassed=0;
 	};

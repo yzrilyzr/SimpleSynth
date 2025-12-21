@@ -7,16 +7,16 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(XMNoteProcessor, public NoteProcessor){
 	private:
 	yzrilyzr_util::XMFile::Instrument * xmInstrument;
-	std::vector<std::shared_ptr<WaveSampler>> samples;
+	std::vector<u_sp<WaveSampler>> samples;
 	NoteProcPtr volEnvelop=nullptr;
 	NoteProcPtr panEnvelop=nullptr;
 	int index;
-	std::shared_ptr<yzrilyzr_util::XMFile::Module> mod;
+	u_sp<yzrilyzr_util::XMFile::Module> mod;
 	double portamentoSpeed=0;
 	public:
 	XMNoteProcessor()=default;
 	~XMNoteProcessor()=default;
-	XMNoteProcessor(std::shared_ptr<yzrilyzr_util::XMFile::Module> mod, yzrilyzr_util::XMFile::Instrument * instrument, int ii);
+	XMNoteProcessor(u_sp<yzrilyzr_util::XMFile::Module> mod, yzrilyzr_util::XMFile::Instrument * instrument, int ii);
 	private:
 	int getLoopType(yzrilyzr_util::XMFile::Loop loop_type);
 	double calculateDecayRate(int fadeout);

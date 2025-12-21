@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 		return Util::clamp(inputGain * a->getAmp(note), -clamp, clamp) * outputGain;
 	}
 	NoteProcPtr ClampAmp::clone(){
-		return std::make_shared<ClampAmp>(a->clone(), inputGain, clamp, outputGain);
+		return mksp<ClampAmp>(a->clone(), inputGain, clamp, outputGain);
 	}
 	String ClampAmp::toString() const{
 		return StringFormat::object2string("ClampAmp", a, inputGain, clamp, outputGain);

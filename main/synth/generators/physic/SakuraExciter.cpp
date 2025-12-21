@@ -23,7 +23,7 @@ namespace yzrilyzr_simplesynth{
 		
 	}
 	NoteProcPtr SakuraExciter::clone(){
-		return std::make_shared<SakuraExciter>();
+		return mksp<SakuraExciter>();
 	}
 	u_sample SakuraExciter::getAmp(Note & note){
 		SakuraExciterKeyData * data=getData(note);

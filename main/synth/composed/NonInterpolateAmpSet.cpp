@@ -28,6 +28,6 @@ namespace yzrilyzr_simplesynth{
 		return src->noMoreData(note);
 	}
 	NoteProcPtr NonInterpolateAmpSet::clone(){
-		return std::shared_ptr<NonInterpolateAmpSet>(this);
+		return u_sp<NonInterpolateAmpSet>(this);
 	}
 }

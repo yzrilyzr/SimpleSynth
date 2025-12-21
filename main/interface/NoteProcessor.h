@@ -25,7 +25,7 @@ namespace yzrilyzr_simplesynth{
 	class Osc;
 	class NoteProcessor;
 	class ChannelConfig;
-	typedef std::shared_ptr<NoteProcessor> NoteProcPtr;
+	typedef u_sp<NoteProcessor> NoteProcPtr;
 	ECLASS(NoteProcessor, public yzrilyzr_util::ParamRegister){
 		public:
 		virtual ~NoteProcessor()=default;
@@ -43,11 +43,11 @@ namespace yzrilyzr_simplesynth{
 		virtual NoteProcPtr clone(){
 			return NoteProcPtr(this);
 		}
-		void registerParamPhaseSrc(const yzrilyzr_lang::String & name, std::shared_ptr<PhaseSrc> *value);
+		void registerParamPhaseSrc(const yzrilyzr_lang::String & name, u_sp<PhaseSrc> *value);
 		void registerParamSrc(const yzrilyzr_lang::String & name, NoteProcPtr * value);
-		void registerParamOscSrc(const yzrilyzr_lang::String & name, std::shared_ptr<Osc> *value);
-		void registerParamDSP(const yzrilyzr_lang::String & name, std::shared_ptr<yzrilyzr_dsp::DSP> *value);
-		void registerParamSample(const yzrilyzr_lang::String & name, std::shared_ptr<yzrilyzr_array::SampleProvider> *value);
+		void registerParamOscSrc(const yzrilyzr_lang::String & name, u_sp<Osc> *value);
+		void registerParamDSP(const yzrilyzr_lang::String & name, u_sp<yzrilyzr_dsp::DSP> *value);
+		void registerParamSample(const yzrilyzr_lang::String & name, u_sp<yzrilyzr_array::SampleProvider> *value);
 		yzrilyzr_lang::String toString() const override;
 	};
 }

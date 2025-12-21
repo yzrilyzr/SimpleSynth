@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 		return y;
 	}
 	NoteProcPtr NoteShift::clone(){
-		return std::make_shared<NoteShift>(a, shift);
+		return mksp<NoteShift>(a, shift);
 	}
 	NoteShiftKeyData * NoteShift::init(NoteShiftKeyData * data, Note & note){
 		if(data == nullptr) data=new NoteShiftKeyData();

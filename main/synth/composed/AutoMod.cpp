@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 		modShape(modShape){}
 	u_sample AutoMod::getAmp(Note & note){
 		if(modShape == nullptr){
-			modShape=std::make_shared<SineWave>();
+			modShape=mksp<SineWave>();
 		}
 		u_time passedTime=note.passedTime;
 		u_sample mod=0;
@@ -22,8 +22,8 @@ namespace yzrilyzr_simplesynth{
 			Note tmp(note.uniqueID);
 			tmp.set(note);
 			tmp.velocitySynth=1;
-			u_freq minRate=modRate-3;
-			u_freq maxRate=modRate+3;
+			u_freq minRate=modRate-1;
+			u_freq maxRate=modRate+1;
 			s_note_id_i idMin=0, idMax=127;
 			u_freq rate=Util::linearMap(idMin, idMax, minRate, maxRate, Util::clamp(note.id, idMin, idMax));
 			rate=Util::clamp(rate, 1.0, 15.0);
@@ -36,7 +36,7 @@ namespace yzrilyzr_simplesynth{
 		return a->getAmp(note);
 	}
 	NoteProcPtr AutoMod::clone(){
-		return std::make_shared<AutoMod>(a->clone(), modFreqDepth, modAmpDepth, modRate, modDelay, modShape->clone());
+		return mksp<AutoMod>(a->clone(), modFreqDepth, modAmpDepth, modRate, modDelay, modShape->clone());
 	}
 	bool AutoMod::noMoreData(Note & note){
 		bool nmd=a->noMoreData(note);

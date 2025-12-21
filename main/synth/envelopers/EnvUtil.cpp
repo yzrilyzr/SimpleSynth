@@ -4,16 +4,16 @@
 #include "interpolator/LineInterpolator.h"
 using namespace yzrilyzr_interpolator;
 namespace yzrilyzr_simplesynth{
-	std::shared_ptr<Interpolator> EnvUtil::Pow(float p){
-		return std::make_shared<PowInterpolator>(p);
+	u_sp<Interpolator> EnvUtil::Pow(float p){
+		return mksp<PowInterpolator>(p);
 	}
-	std::shared_ptr<Interpolator> EnvUtil::Line(){
-		return std::make_shared<LineInterpolator>();
+	u_sp<Interpolator> EnvUtil::Line(){
+		return mksp<LineInterpolator>();
 	}
-	std::shared_ptr<Interpolator> Line(){
-		return std::make_shared<LineInterpolator>();
+	u_sp<Interpolator> Line(){
+		return mksp<LineInterpolator>();
 	}
-	std::shared_ptr<Interpolator> Pow(float p){
-		return std::make_shared<PowInterpolator>(p);
+	u_sp<Interpolator> Pow(float p){
+		return mksp<PowInterpolator>(p);
 	}
 }

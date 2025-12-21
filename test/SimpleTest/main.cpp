@@ -13,7 +13,7 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_io;
 
 int floatBufferLen=256;
-std::shared_ptr<Mixer2> mixer2=nullptr;
+u_sp<Mixer2> mixer2=nullptr;
 
 void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
 	mixer2->awaitMix();
@@ -21,7 +21,7 @@ void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
 		for(u_index ch=0; ch < chc; ch++){
 			double f1=mixer2->getOutput(ch)[sample];
 			f1=Util::clamp(f1, -1.0, 1.0);
-			int32_t c1=(int32_t)(f1 * 0x7fffffff);
+			int32_t c1=(int32_t)(f1 * Integer_MAX_VALUE);
 			stream[j++]=(Uint8)(c1 & 0xff);
 			stream[j++]=(Uint8)((c1 >> 8) & 0xff);
 			stream[j++]=(Uint8)((c1 >> 16) & 0xff);
@@ -53,11 +53,11 @@ int main(int argc, char * argv[]){
 		fprintf(stderr, "Could not initialize SDL - %s\n", SDL_GetError());
 		return -1;
 	}
-	mixer2=std::make_shared<Mixer2>(floatBufferLen);
+	mixer2=mksp<Mixer2>(floatBufferLen);
 	mixer2->setSynthMode(IMixer::MODE_THREAD_POOL, -1);
 	mixer2->setSampleRate(48000);
 	mixer2->setUseLimiter(true);
-	std::shared_ptr<SimpleMIDIInstrument> simple=std::make_shared<SimpleMIDIInstrument>();
+	u_sp<SimpleMIDIInstrument> simple=mksp<SimpleMIDIInstrument>();
 	mixer2->getGlobalConfig().setInstrumentProvider(simple);
 	SDL_AudioSpec spec;
 	spec.freq=48000;

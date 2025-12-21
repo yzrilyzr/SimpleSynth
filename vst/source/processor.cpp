@@ -28,7 +28,7 @@ namespace yzrilyzr_simplesynth_vst{
 	SimpleSynthProcessor::SimpleSynthProcessor(){
 		//--- set the wanted controller for our processor
 		setControllerClass(kSimpleSynthControllerUID);
-		mixer=std::make_shared<Mixer2>(256); // 初始化合成器
+		mixer=mksp<Mixer2>(256); // 初始化合成器
 		mixer->setSampleRate(48000);
 	}
 

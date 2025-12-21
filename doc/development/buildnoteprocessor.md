@@ -1,5 +1,3 @@
-# 搭建SimpleSynth音符处理器的方法
-
 SimpleSynth提供了强大的音符处理器（NoteProcessor）接口，允许开发者创建自定义的声音合成算法。本文将详细介绍如何从零开始，创建一个属于你自己的音符处理器。
 
 ## 核心概念：NoteProcessor
@@ -16,7 +14,7 @@ SimpleSynth提供了强大的音符处理器（NoteProcessor）接口，允许�
 
 ---
 
-## 步骤一：创建处理器类
+## 创建处理器类
 
 首先，你需要创建一个新的C++类，并让它继承自 `yzrilyzr_simplesynth::NoteProcessor`。
 
@@ -64,7 +62,7 @@ namespace yzrilyzr_simplesynth{
 
 ---
 
-## 步骤二：实现核心方法 `getAmp`
+## 实现核心方法 `getAmp`
 
 `getAmp` 方法是整个处理器的灵魂。它接收一个 `Note` 对象作为参数，并返回一个 `u_sample` 类型的振幅值（通常在 -1.0 到 1.0 之间）。
 
@@ -113,7 +111,7 @@ namespace yzrilyzr_simplesynth{
 
 ---
 
-## 步骤三：实现克隆方法 `clone`
+## 实现克隆方法 `clone`
 
 `clone` 方法至关重要，因为合成器在多线程环境下工作时，可能会为每个音符或每个声道复制一个处理器实例，以避免状态冲突。
 
@@ -132,7 +130,7 @@ NoteProcPtr MyCustomProcessor::clone(){
 
 ---
 
-## 步骤四：实现初始化方法 `init` (可选)
+## 实现初始化方法 `init` (可选)
 
 `init` 方法在处理器被分配给一个声道（Channel）时调用。这是设置与采样率（sample rate）相关参数或初始化DSP效果器的理想位置。
 
@@ -161,7 +159,7 @@ void MyCustomProcessor::init(ChannelConfig & cfg){
 
 ---
 
-## 步骤五：实现后处理方法 `postProcess` (可选)
+## 实现后处理方法 `postProcess` (可选)
 
 `postProcess` 方法用于对音符的最终输出进行效果处理。它会在 **当前采样点或缓冲块下** 所有 `Note` 的 `getAmp` 调用完成并混音之后被调用（即所有 `Note` 的输出之和）。这非常适合实现混响、延迟、均衡器、物理建模的箱体等全局效果。
 
@@ -180,7 +178,7 @@ u_sample MyCustomProcessor::postProcess(u_sample output){
 
 ---
 
-## 步骤六：实现生命周期管理 `noMoreData` (可选)
+## 实现生命周期管理 `noMoreData` (可选)
 
 `noMoreData` 方法告诉合成器一个音符是否已经“没有更多数据”可以产生了。当一个音符被释放（NoteOff）后，它可能还会在释放（Release）阶段持续发声一段时间。当声音完全消失后，`noMoreData` 应该返回 `true`，这样合成器就可以归还这个音符实例到对象池，节省资源。
 
@@ -199,7 +197,7 @@ bool MyCustomProcessor::noMoreData(Note & note){
 }
 ```
 
-## 附加：NoteProcessor 生命周期
+## NoteProcessor 生命周期
 当 `NoteProcessor` 附加到 `Channel` 时，调用 `NoteProcessor` 的 `init(ChannelConfig & cfg)` 方法。
 
 合成流程：
@@ -208,35 +206,6 @@ bool MyCustomProcessor::noMoreData(Note & note){
 3. 框架内部调用：NoteUpdater::postUpdateNote(note, cfg);
 4. 调用 `noMoreData`，传入当前通道的每个音符，返回该音符是否还有数据
 5. 所有当前通道的音符混音后，调用`postProcess`，传入混音结果，返回后处理结果
-
-## 附加：向音符存储自定义信息
-对于需要向音符存储自定义数据的复杂处理器：
-
-### 定义音符数据类
-```cpp
-EBCLASS(MyKeyData){
-public:
-    yzrilyzr_dsp::RingBufferSample ringBuffer;
-    std::shared_ptr<yzrilyzr_dsp::IIR> filter = nullptr;
-};
-```
-
-### 继承NoteData模板
-```cpp
-ECLASS(MyProcessor, public Osc, NoteData<MyKeyData>){
-    // 实现init方法初始化音符数据
-    MyKeyData* init(MyKeyData* data, Note& note) override{
-        if(data == nullptr){
-            data = new MyKeyData();
-            data->filter = std::make_shared<yzrilyzr_dsp::BiquadIIR>();
-        }
-        //在这里可根据note初始化data内部数据
-        yzrilyzr_dsp::IIRUtil::biquad(*data -> filter,1000.0, note.cfg->sampleRate, 0.707, yzrilyzr_dsp::FilterPassType::LOWPASS);
-        return data;
-    }
-};
-```
----
 
 ## 总结与最佳实践
 

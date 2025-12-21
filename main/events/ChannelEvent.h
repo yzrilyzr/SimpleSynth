@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 		static constexpr uint8_t const TUNING_CHANGE=9;
 	}
 
-	typedef std::shared_ptr<NoteProcessor> NoteProcPtr;
+	typedef u_sp<NoteProcessor> NoteProcPtr;
 
 	EBCLASS(ChannelEvent){
 		public:
@@ -161,7 +161,7 @@ namespace yzrilyzr_simplesynth{
 
 	ECLASS(TuningChange, public ChannelEvent){
 		public:
-		std::shared_ptr<NoteTuning> value=nullptr;
+		u_sp<NoteTuning> value=nullptr;
 
 		TuningChange();
 

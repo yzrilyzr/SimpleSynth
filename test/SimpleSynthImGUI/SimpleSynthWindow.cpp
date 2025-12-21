@@ -68,14 +68,14 @@ void fileOpenWindow(CurrentProjectContext & ctx){
 		if(file.exists()){
 			if(fileName.contains(".xm")){
 				try{
-					std::shared_ptr<MixerSequence> seq=SynthUtil::parseXM(FileInputStream(file));
+					u_sp<MixerSequence> seq=SynthUtil::parseXM(FileInputStream(file));
 					seq->postToMixer(&mixer, 0, "IMGUI_XM:" + fileName);
 				} catch(Exception e){
 					std::cout << e.what() << std::endl;
 				}
 			} else if(fileName.contains(".mid")){
 				try{
-					std::shared_ptr<MixerSequence> seq=SynthUtil::parseMIDI(FileInputStream(file));
+					u_sp<MixerSequence> seq=SynthUtil::parseMIDI(FileInputStream(file));
 					seq->postToMixer(&mixer, 0, "IMGUI_MID:" + fileName);
 				} catch(Exception e){
 					std::cout << e.what() << std::endl;
@@ -131,13 +131,13 @@ void instrumentSourceWindow(CurrentProjectContext & ctx){
 				File & f=fileList[i];
 				String n=f.getName();
 				if(n == ctx.LANG.get("window.instrument.default")){
-					mixer.getGlobalConfig().setInstrumentProvider(std::make_shared<SimpleMIDIInstrument>());
+					mixer.getGlobalConfig().setInstrumentProvider(mksp<SimpleMIDIInstrument>());
 				} else if(n == ctx.LANG.get("window.instrument.chip")){
-					mixer.getGlobalConfig().setInstrumentProvider(std::make_shared<ChipInstrument>());
+					mixer.getGlobalConfig().setInstrumentProvider(mksp<ChipInstrument>());
 				} else if(n.endsWith(".sf2")){
-					mixer.getGlobalConfig().setInstrumentProvider(std::make_shared<SF2FormatInstrument>(FileInputStream(f)));
+					mixer.getGlobalConfig().setInstrumentProvider(mksp<SF2FormatInstrument>(FileInputStream(f)));
 				} else if(n.endsWith(".dls")){
-					mixer.getGlobalConfig().setInstrumentProvider(std::make_shared<DLSFormatInstrument>(FileInputStream(f)));
+					mixer.getGlobalConfig().setInstrumentProvider(mksp<DLSFormatInstrument>(FileInputStream(f)));
 				}
 			}
 			i++;

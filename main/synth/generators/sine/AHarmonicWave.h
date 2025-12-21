@@ -7,6 +7,6 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(AHarmonicWave, public SineHarmonicWave){
 	public:
 		AHarmonicWave(): AHarmonicWave(nullptr){}
-		AHarmonicWave(std::shared_ptr<PhaseSrc> freq);
+		AHarmonicWave(u_sp<PhaseSrc> freq);
 	};
 }

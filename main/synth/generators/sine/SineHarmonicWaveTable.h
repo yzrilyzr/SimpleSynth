@@ -16,11 +16,11 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(SineHarmonicWaveTable, public Osc){
 	private:
 	yzrilyzr_array::Array<yzrilyzr_array::DoubleArray> aa;
-	std::shared_ptr < yzrilyzr_interpolator::Interpolator> interpolator;
+	u_sp < yzrilyzr_interpolator::Interpolator> interpolator;
 	public:
 	~SineHarmonicWaveTable();
 	SineHarmonicWaveTable(const yzrilyzr_array::Array<yzrilyzr_array::DoubleArray> &aa);
-	SineHarmonicWaveTable(std::shared_ptr<PhaseSrc> freq, const yzrilyzr_array::Array<yzrilyzr_array::DoubleArray> &aa);
+	SineHarmonicWaveTable(u_sp<PhaseSrc> freq, const yzrilyzr_array::Array<yzrilyzr_array::DoubleArray> &aa);
 	/**
 	 * 分贝转倍数
 	 * line[i]为分贝数（相对于1）

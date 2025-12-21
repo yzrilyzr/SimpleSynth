@@ -13,7 +13,7 @@ using namespace yzrilyzr_lang;
 static int fMulI1=4;
 static int fMulI2=4;
 void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	std::shared_ptr<Sakura> paramRegPtr=std::static_pointer_cast<Sakura, ParamRegister>(obj.paramRegPtr);
+	u_sp<Sakura> paramRegPtr=std::static_pointer_cast<Sakura, ParamRegister>(obj.paramRegPtr);
 	ImGui::Begin("Sakura");
 	ImGuiKnobFlags knobFlags=ImGuiKnobFlags_NoInput | ImGuiKnobFlags_ValueTooltip;
 	ImGuiKnobVariant knobvariant=ImGuiKnobVariant_Tick;//ImGuiKnobFlags_Logarithmic
@@ -117,13 +117,13 @@ int toFMulI(double x){
 	}
 	return 4;
 }
-void SakuraEditWindow(IMixer & mixer, std::shared_ptr<Sakura> & paramRegPtr){
+void SakuraEditWindow(IMixer & mixer, u_sp<Sakura> & paramRegPtr){
 	ImGui::Begin("SakuraEdit");
 	static char text[1024 * 16]="";
 	ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput);
 	if(ImGui::Button("Import")){
 		try{
-			std::shared_ptr<TokenReader> tokens=ASTTokenizer::tokenize(std::string(text));
+			u_sp<TokenReader> tokens=ASTTokenizer::tokenize(std::string(text));
 			bool resOn[8]={false};
 			while(tokens->has()){
 				Token & to=tokens->getToken();

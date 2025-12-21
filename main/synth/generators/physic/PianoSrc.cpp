@@ -126,7 +126,7 @@ namespace yzrilyzr_simplesynth{
 		return pianoKey.onTimePassed > 5 || pianoKey.offTimePassed >= 0.1 || note.fclosed(*note.cfg);
 	}
 	NoteProcPtr PianoSrc::clone(){
-		return std::make_shared<PianoSrc>();
+		return mksp<PianoSrc>();
 	}
 	void PianoSrc::cc(ChannelConfig & cfg, ChannelControl & cc){}
 	PianoKey * PianoSrc::init(PianoKey * data, Note & note){

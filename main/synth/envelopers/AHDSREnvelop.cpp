@@ -20,7 +20,7 @@ using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
 	AHDSREnvelop::AHDSREnvelop(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 sustainVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime,
-							   std::shared_ptr<Interpolator> aCurve, std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){
+							   u_sp<Interpolator> aCurve, u_sp<Interpolator> dCurve, u_sp<Interpolator> rCurve){
 		this->delayTime=delayTime / 1000.0;
 		this->attackTime=attackTime / 1000.0;
 		this->holdTime=holdTime / 1000.0;
@@ -60,7 +60,7 @@ namespace yzrilyzr_simplesynth{
 		return time1 > nmdTime;
 	}
 	NoteProcPtr AHDSREnvelop::clone(){
-		return std::make_shared<AHDSREnvelop>(delayTime * 1000.0, attackTime * 1000.0, holdTime * 1000.0, decayTime * 1000.0, sustainVolume, canSustain, releaseTime * 1000.0, forceReleaseTime * 1000.0, aCurve, dCurve, rCurve);
+		return mksp<AHDSREnvelop>(delayTime * 1000.0, attackTime * 1000.0, holdTime * 1000.0, decayTime * 1000.0, sustainVolume, canSustain, releaseTime * 1000.0, forceReleaseTime * 1000.0, aCurve, dCurve, rCurve);
 	}
 	u_sample AHDSREnvelop::getAmp(Note & note){
 		u_time time=note.passedTime;

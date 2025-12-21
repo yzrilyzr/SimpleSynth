@@ -121,7 +121,7 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 	//输出窗口
 	ImGui::Begin(LANG.getc("window.notesrc_output.title"));
 	static int sendToChannel=20;
-	static std::shared_ptr<ParamRegister> params=std::make_shared<ParamRegister>();
+	static u_sp<ParamRegister> params=mksp<ParamRegister>();
 	static bool unregistered=true;
 	if(unregistered){
 		params->registerParam("Output", ParamType::NoteSrc, &finalProcessor, 0, 0);
@@ -214,7 +214,7 @@ void CurrentProjectContext::buildConnectLines(ProjectObject & obj, ParamRegister
 			break;
 			default:
 			{
-				std::shared_ptr<void> * paramRegPtr=reinterpret_cast<std::shared_ptr<void>*>(param.value);
+				u_sp<void> * paramRegPtr=reinterpret_cast<u_sp<void>*>(param.value);
 				void * value=paramRegPtr->get();
 				for(ProjectObject * obj2 : objects){
 					if(obj2 == &obj)continue;

@@ -9,7 +9,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	CymbalOsc::CymbalOsc(double mul) : CymbalOsc(nullptr, ConstAmp(mul)){}
 	CymbalOsc::CymbalOsc(NoteProcPtr mul) : CymbalOsc(nullptr, mul){}
-	CymbalOsc::CymbalOsc(std::shared_ptr<PhaseSrc> freqSrc, NoteProcPtr mul) : Osc(freqSrc){
+	CymbalOsc::CymbalOsc(u_sp<PhaseSrc> freqSrc, NoteProcPtr mul) : Osc(freqSrc){
 		this->mul=mul;
 	}
 	u_sample CymbalOsc::getAmp(Note & note){
@@ -24,7 +24,7 @@ namespace yzrilyzr_simplesynth{
 		sum+=CymbalOsc::square(824 * mul1, time);
 		sum+=CymbalOsc::square(630 * mul1, time);
 		static thread_local u_index randomIndex=0;
-		sum+=random.next(&randomIndex)*0.7;
+		sum+=random.next(&randomIndex)*0.5;
 		return sum * note.velocitySynth * 0.15;
 	}
 	u_sample CymbalOsc::square(u_freq Hz, u_time time){
@@ -33,7 +33,7 @@ namespace yzrilyzr_simplesynth{
 		return ft > 0.5?1:-1;
 	}
 	NoteProcPtr CymbalOsc::clone(){
-		return std::make_shared<CymbalOsc>(mul);
+		return mksp<CymbalOsc>(mul);
 	}
 	String CymbalOsc::toString()const{
 		return StringFormat::object2string("CymbalOsc", getPhaseSource(), mul);

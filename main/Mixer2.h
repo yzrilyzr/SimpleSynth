@@ -44,14 +44,14 @@ namespace yzrilyzr_simplesynth{
 	};
 	ECLASS(ChannelData, public IChannel){
 		public:
-		std::vector<std::shared_ptr<ChannelConfig>> cfgSnapshots;
+		std::vector<u_sp<ChannelConfig>> cfgSnapshots;
 		yzrilyzr_array::SampleArray output[2];
 		yzrilyzr_array::SampleArray noteOutput;
-		std::shared_ptr<yzrilyzr_dsp::DSPChain> dspChain[2]; // DSP处理链
-		std::shared_ptr<yzrilyzr_dsp::DSP> choruser[2];     // 合唱效果器
-		std::shared_ptr<yzrilyzr_dsp::DSP> phaser[2];     // 合唱效果器
-		std::shared_ptr<yzrilyzr_dsp::DSP> reverber[2];      // 混响效果器
-		std::shared_ptr<yzrilyzr_dsp::DSP> limiter[2];
+		u_sp<yzrilyzr_dsp::DSPChain> dspChain[2]; // DSP处理链
+		u_sp<yzrilyzr_dsp::DSP> choruser[2];     // 合唱效果器
+		u_sp<yzrilyzr_dsp::DSP> phaser[2];     // 合唱效果器
+		u_sp<yzrilyzr_dsp::DSP> reverber[2];      // 混响效果器
+		u_sp<yzrilyzr_dsp::DSP> limiter[2];
 		std::set<NoteProcPtr> programCache;
 		NoteTaskPool workingNotesPool;
 		bool lastSnapshotChange=true;
@@ -83,9 +83,9 @@ namespace yzrilyzr_simplesynth{
 		s_sample_index getCurrentSampleIndex() const override;
 		bool hasData() override;
 		u_sample * getOutput(uint32_t chIndex)const override;
-		std::vector<std::shared_ptr<IChannel>> getAllChannels()const override;
-		std::shared_ptr<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)override;
-		std::shared_ptr<yzrilyzr_dsp::DSPChain> * getEQ()override;
+		std::vector<u_sp<IChannel>> getAllChannels()const override;
+		u_sp<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)override;
+		u_sp<yzrilyzr_dsp::DSPChain> * getEQ()override;
 		bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)override;
 		private:
 		static constexpr int const FLAG_RESET=0b1;
@@ -97,14 +97,14 @@ namespace yzrilyzr_simplesynth{
 		std::vector<std::future<void>> futures;
 		int32_t synthMode=0;
 		uint64_t mixerCurrentSampleIndex=0;
-		std::shared_ptr<yzrilyzr_dsp::Limiter>nonDrumSetLimiter[2];      // 非鼓组限制器
-		std::shared_ptr<yzrilyzr_dsp::Limiter>drumSetLimiter[2];      // 鼓组限制器
-		std::shared_ptr<yzrilyzr_dsp::Limiter>masterLimiter[2];      // 主限制器
-		std::shared_ptr<yzrilyzr_dsp::DSPChain> finalEQ[2];               // 最终均衡器链
-		std::unordered_map<yzrilyzr_lang::String, std::unordered_map<s_midichannel_id, std::shared_ptr<ChannelData>>> channelData;
-		std::vector<std::shared_ptr<ChannelData>> allChannelData;
+		u_sp<yzrilyzr_dsp::Limiter>nonDrumSetLimiter[2];      // 非鼓组限制器
+		u_sp<yzrilyzr_dsp::Limiter>drumSetLimiter[2];      // 鼓组限制器
+		u_sp<yzrilyzr_dsp::Limiter>masterLimiter[2];      // 主限制器
+		u_sp<yzrilyzr_dsp::DSPChain> finalEQ[2];               // 最终均衡器链
+		std::unordered_map<yzrilyzr_lang::String, std::unordered_map<s_midichannel_id, u_sp<ChannelData>>> channelData;
+		std::vector<u_sp<ChannelData>> allChannelData;
 		yzrilyzr_util::Flag flags;
-		std::shared_ptr<ChannelData> getOrCreateMIDIChannelData(const yzrilyzr_lang::String & groupName, s_midichannel_id channelID);
+		u_sp<ChannelData> getOrCreateMIDIChannelData(const yzrilyzr_lang::String & groupName, s_midichannel_id channelID);
 		void mReset();
 		void mResetLimiter();
 		void procEvent(ChannelData & data, ChannelConfig & cfg, ChannelEvent & event);

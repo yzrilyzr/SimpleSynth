@@ -55,12 +55,12 @@ namespace yzrilyzr_simplesynth{
 		u_index getOutputChannelCount()const;
 		virtual u_sample * getOutput(uint32_t chIndex)const=0;
 
-		virtual std::vector<std::shared_ptr<IChannel>> getAllChannels()const=0;
+		virtual std::vector<u_sp<IChannel>> getAllChannels()const=0;
 
 		bool hasMIDIChannel(s_midichannel_id id);
 		virtual bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)=0;
-		std::shared_ptr<IChannel> getMIDIChannel(s_midichannel_id id);
-		virtual std::shared_ptr<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)=0;
+		u_sp<IChannel> getMIDIChannel(s_midichannel_id id);
+		virtual u_sp<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)=0;
 
 		int8_t getSynthMode() const;
 		virtual void setSynthMode(int8_t mode, int32_t cores)=0;
@@ -75,7 +75,7 @@ namespace yzrilyzr_simplesynth{
 
 		virtual void resetLimiter()=0;
 		virtual u_time getCurrentTime()const=0;
-		virtual std::shared_ptr<yzrilyzr_dsp::DSPChain> * getEQ()=0;
+		virtual u_sp<yzrilyzr_dsp::DSPChain> * getEQ()=0;
 		virtual void reset()=0;
 		virtual bool hasData()=0;
 		virtual u_index getCurrentProcessingNoteCount()=0;

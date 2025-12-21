@@ -6,7 +6,7 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(SineWave, public Osc){
 	public:
 	SineWave() : SineWave(nullptr){}
-	SineWave(std::shared_ptr<PhaseSrc> freq) : Osc(freq){}
+	SineWave(u_sp<PhaseSrc> freq) : Osc(freq){}
 	u_sample getAmp(Note & note) override;
 	yzrilyzr_lang::String toString()const override;
 	};

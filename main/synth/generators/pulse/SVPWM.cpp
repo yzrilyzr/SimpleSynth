@@ -32,11 +32,11 @@ namespace yzrilyzr_simplesynth{
 		float modPhase= Math::TAU * (modFreq * t + modulationPhase);
 
 		// 计算基本调制波
-		float modulationWave=sin(modPhase) * modVoltage;
+		float modulationWave=Math::sin(modPhase) * modVoltage;
 
 		// 三次谐波注入
 		if(thirdHarmonicInjection){
-			modulationWave+=sin(3.0f * modPhase) * modVoltage / 6.0f;
+			modulationWave+=Math::sin(3.0f * modPhase) * modVoltage / 6.0f;
 		}
 
 		// 折角调制处理

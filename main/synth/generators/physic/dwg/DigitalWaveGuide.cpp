@@ -155,7 +155,7 @@ namespace yzrilyzr_simplesynth{
 			rightNodeAlphas[k]=2.0 * rightConnectedNodes[k]->impedance / totalImpedance;
 		}
 	}
-	void DigitalWaveGuide::setDispersion(std::vector<std::shared_ptr<DSP>> dispersion, std::shared_ptr<DSP> lowpass, u_sample fracDelay){
+	void DigitalWaveGuide::setDispersion(std::vector<u_sp<DSP>> dispersion, u_sp<DSP> lowpass, u_sample fracDelay){
 		commuteFlag=true;
 		this->dispersion=dispersion;
 		this->lowpass=lowpass;

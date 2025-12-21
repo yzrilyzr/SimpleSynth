@@ -48,7 +48,7 @@ namespace yzrilyzr_simplesynth_vst{
 		Steinberg::tresult PLUGIN_API getState(Steinberg::IBStream * state) SMTG_OVERRIDE;
 	//------------------------------------------------------------------------
 		protected:
-		std::shared_ptr<yzrilyzr_simplesynth::IMixer> mixer;
+		u_sp<yzrilyzr_simplesynth::IMixer> mixer;
 		yzrilyzr_util::MemoryFIFOBuffer<u_sample> fifoBuffer[2];
 		s_midichannel_id chID=0;
 		void processParameter(Steinberg::Vst::ProcessData & data);

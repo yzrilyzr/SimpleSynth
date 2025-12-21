@@ -21,18 +21,18 @@ static const char * supported_extensions[]={"mid", "midi", "rmi", "xm"};
 
 class input_midi : public input_stubs{
 	private:
-	std::shared_ptr<yzrilyzr_simplesynth::Mixer2> m_mixer=nullptr;
-	std::shared_ptr<yzrilyzr_simplesynth::MixerSequence> m_sequence=nullptr;
+	u_sp<yzrilyzr_simplesynth::Mixer2> m_mixer=nullptr;
+	u_sp<yzrilyzr_simplesynth::MixerSequence> m_sequence=nullptr;
 	u_time m_total_length=0;
 	void initMixer(){
 		if(!m_mixer){
 		//初始化合成器
-			m_mixer=std::make_shared<yzrilyzr_simplesynth::Mixer2>(mixer_buffer_size);
+			m_mixer=mksp<yzrilyzr_simplesynth::Mixer2>(mixer_buffer_size);
 			m_mixer->setSampleRate(mixer_sample_rate);
 			m_mixer->setSynthMode(yzrilyzr_simplesynth::IMixer::MODE_THREAD_POOL, -1);
 			m_mixer->setUseLimiter(true);
 			// 设置默认乐器
-			std::shared_ptr<yzrilyzr_simplesynth::SimpleMIDIInstrument> simple=std::make_shared<yzrilyzr_simplesynth::SimpleMIDIInstrument>();
+			u_sp<yzrilyzr_simplesynth::SimpleMIDIInstrument> simple=mksp<yzrilyzr_simplesynth::SimpleMIDIInstrument>();
 			m_mixer->getGlobalConfig().setInstrumentProvider(simple);
 		}
 	}

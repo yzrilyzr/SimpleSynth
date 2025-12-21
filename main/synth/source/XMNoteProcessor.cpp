@@ -10,7 +10,7 @@ using namespace yzrilyzr_array;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	XMNoteProcessor::XMNoteProcessor(std::shared_ptr<XMFile::Module> mod, XMFile::Instrument * instrument, int ii) :mod(mod), xmInstrument(instrument), index(ii){
+	XMNoteProcessor::XMNoteProcessor(u_sp<XMFile::Module> mod, XMFile::Instrument * instrument, int ii) :mod(mod), xmInstrument(instrument), index(ii){
 		samples.reserve(instrument->num_samples);
 		double ticksPerSecond=mod->bpm * 0.4;
 		XMFile::Envelop & volEnv=xmInstrument->volume_envelope;
@@ -21,12 +21,12 @@ namespace yzrilyzr_simplesynth{
 				pts[i * 2]=envelopPoint.frame * 1000.0 / ticksPerSecond;
 				pts[i * 2 + 1]=envelopPoint.value / 64.0;
 			}
-			volEnvelop=std::make_shared<GraphEnvelop>(volEnv.sustain_enabled?volEnv.sustain_point:-1,
+			volEnvelop=mksp<GraphEnvelop>(volEnv.sustain_enabled?volEnv.sustain_point:-1,
 													  volEnv.loop_enabled?volEnv.loop_start_point:-1,
 													  volEnv.loop_enabled?volEnv.loop_end_point:-1,
 													  pts);
 		} else{
-			volEnvelop=std::make_shared<AHDSREnvelop>(0, 1, 1, 1, 1, true, 100, 50, Pow(-5), Pow(5), Pow(5));
+			volEnvelop=mksp<AHDSREnvelop>(0, 1, 1, 1, 1, true, 100, 50, Pow(-5), Pow(5), Pow(5));
 		}
 		XMFile::Envelop & panEnv=xmInstrument->panning_envelope;
 		if(panEnv.enabled){
@@ -36,14 +36,14 @@ namespace yzrilyzr_simplesynth{
 				pts[i * 2]=envelopPoint.frame * 1000.0 / ticksPerSecond;
 				pts[i * 2 + 1]=(envelopPoint.value - 32) / 32.0;
 			}
-			panEnvelop=std::make_shared< GraphEnvelop>(panEnv.sustain_enabled?panEnv.sustain_point:-1,
+			panEnvelop=mksp< GraphEnvelop>(panEnv.sustain_enabled?panEnv.sustain_point:-1,
 													   panEnv.loop_enabled?panEnv.loop_start_point:-1,
 													   panEnv.loop_enabled?panEnv.loop_end_point:-1,
 													   pts);
 		}
 		for(u_index i=0;i < instrument->num_samples;i++){
 			XMFile::SampleData & xsample=xmInstrument->samples[i];
-			/*std::shared_ptr<SampleArray> sData=std::make_shared<SampleArray>(xsample.length);
+			/*u_sp<SampleArray> sData=mksp<SampleArray>(xsample.length);
 			if(xsample.bits == 8){
 				for(u_index j=0;j < sData->length;j++){
 					(*sData)[j]=(*xsample.data8)[j] / 127.0 * xsample.volume;
@@ -140,7 +140,7 @@ namespace yzrilyzr_simplesynth{
 		return std::exp(-k * time);
 	}
 	NoteProcPtr XMNoteProcessor::clone(){
-		std::shared_ptr<XMNoteProcessor> c=std::make_shared<XMNoteProcessor>();
+		u_sp<XMNoteProcessor> c=mksp<XMNoteProcessor>();
 		c->xmInstrument=xmInstrument;
 		c->samples=samples;
 		c->volEnvelop=volEnvelop->clone();

@@ -56,7 +56,7 @@ namespace yzrilyzr_simplesynth{
 		this->channelID=channelID;
 		cfgSnapshots.resize(bufSize);
 		for(u_index i=0; i < bufSize; ++i){
-			cfgSnapshots[i]=std::make_shared<ChannelConfig>();
+			cfgSnapshots[i]=mksp<ChannelConfig>();
 			cfgSnapshots[i]->channel=this;
 		}
 
@@ -64,21 +64,21 @@ namespace yzrilyzr_simplesynth{
 		output[1]=SampleArray(bufSize);
 		noteOutput=SampleArray(bufSize);
 
-		dspChain[0]=std::make_shared<DSPChain>();
-		dspChain[1]=std::make_shared<DSPChain>();
+		dspChain[0]=mksp<DSPChain>();
+		dspChain[1]=mksp<DSPChain>();
 		//
 		Random rand;
-		choruser[0]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.027, rand.nextDouble()), 30, 0.3, 0);
-		choruser[1]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.021, rand.nextDouble()), 30, 0.3, 0);
+		choruser[0]=mksp<Chorus>(mksp<SineOscillator>(0.027, rand.nextDouble()), 30, 0.3, 0);
+		choruser[1]=mksp<Chorus>(mksp<SineOscillator>(0.021, rand.nextDouble()), 30, 0.3, 0);
 		//
-		phaser[0]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
-		phaser[1]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
+		phaser[0]=mksp<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
+		phaser[1]=mksp<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
 		//
-		reverber[0]=std::make_shared<Freeverb>(0.2);
-		reverber[1]=std::make_shared<Freeverb>(0.2);
+		reverber[0]=mksp<Freeverb>(0.2);
+		reverber[1]=mksp<Freeverb>(0.2);
 		//
-		limiter[0]=std::make_shared<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 300);
-		limiter[1]=std::make_shared<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 300);
+		limiter[0]=mksp<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 300);
+		limiter[1]=mksp<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 300);
 		//
 		for(u_index i=0;i < 2;i++){
 			dspChain[i]->add(choruser[i]);
@@ -118,14 +118,14 @@ namespace yzrilyzr_simplesynth{
 		auto defCfg=ChannelConfig::DefaultConfig();
 		getGlobalConfig().set(*defCfg);
 		getGlobalConfig().mixer=this;
-		nonDrumSetLimiter[0]=std::make_shared<Limiter>(5, 5000, 5000, 1.0);
-		nonDrumSetLimiter[1]=std::make_shared<Limiter>(5, 5000, 5000, 1.0);
-		drumSetLimiter[0]=std::make_shared<Limiter>(5, 500, 500, 3.0);
-		drumSetLimiter[1]=std::make_shared<Limiter>(5, 500, 500, 3.0);
-		masterLimiter[0]=std::make_shared<Limiter>(1, 500, 5000, 1.0);
-		masterLimiter[1]=std::make_shared<Limiter>(1, 500, 5000, 1.0);
-		finalEQ[0]=std::make_shared<DSPChain>();
-		finalEQ[1]=std::make_shared<DSPChain>();
+		nonDrumSetLimiter[0]=mksp<Limiter>(5, 5000, 5000, 1.0);
+		nonDrumSetLimiter[1]=mksp<Limiter>(5, 5000, 5000, 1.0);
+		drumSetLimiter[0]=mksp<Limiter>(5, 500, 500, 3.0);
+		drumSetLimiter[1]=mksp<Limiter>(5, 500, 500, 3.0);
+		masterLimiter[0]=mksp<Limiter>(1, 500, 5000, 1.0);
+		masterLimiter[1]=mksp<Limiter>(1, 500, 5000, 1.0);
+		finalEQ[0]=mksp<DSPChain>();
+		finalEQ[1]=mksp<DSPChain>();
 	}
 	Mixer2::~Mixer2(){
 		delete threadPool;
@@ -425,7 +425,7 @@ namespace yzrilyzr_simplesynth{
 	void Mixer2::transferSnapshot(ChannelData & data, int32_t startInc){
 		auto & cfgSnapshots=data.cfgSnapshots;
 		u_index bufSize=cfgSnapshots.size();
-		std::shared_ptr<ChannelConfig> last=cfgSnapshots[startInc == -1?bufSize - 1:startInc];
+		u_sp<ChannelConfig> last=cfgSnapshots[startInc == -1?bufSize - 1:startInc];
 		for(u_index i=startInc + 1;i < bufSize;i++){
 			ChannelConfig & curt=*cfgSnapshots[i];
 			curt.setOnlyChannelConfig(*last);
@@ -601,12 +601,12 @@ namespace yzrilyzr_simplesynth{
 	u_index Mixer2::getBufferSize()const{
 		return output[0].length;
 	}
-	std::shared_ptr<ChannelData> Mixer2::getOrCreateMIDIChannelData(const String & groupName, s_midichannel_id channelID){
+	u_sp<ChannelData> Mixer2::getOrCreateMIDIChannelData(const String & groupName, s_midichannel_id channelID){
 		auto outerIt=channelData.find(groupName);
 		if(outerIt == channelData.end()){
 			outerIt=channelData.emplace(
 				groupName,
-				std::unordered_map<s_midichannel_id, std::shared_ptr<ChannelData>>()
+				std::unordered_map<s_midichannel_id, u_sp<ChannelData>>()
 			).first;
 		}
 
@@ -614,7 +614,7 @@ namespace yzrilyzr_simplesynth{
 		auto innerIt=innerMap.find(channelID);
 		if(innerIt == innerMap.end()){
 			u_index bufSize=getBufferSize();
-			auto newChannelData=std::make_shared<ChannelData>(groupName, channelID, bufSize);
+			auto newChannelData=mksp<ChannelData>(groupName, channelID, bufSize);
 			ChannelData & ref=*newChannelData;
 			ref.getConfig().set(getGlobalConfig());
 			ref.setSampleRate(getSampleRate());
@@ -934,7 +934,7 @@ namespace yzrilyzr_simplesynth{
 				break;
 			case MIDIFile::CC::ATTACK_TIME:
 				/*if(enable_MIDI_CC_ADSR){
-					std::shared_ptr<AHDSREnvelop> a=getAHDSREnv();
+					u_sp<AHDSREnvelop> a=getAHDSREnv();
 					if(a){
 						a->attackTime=pow(10000.0, cc.value / 127.0f) / 1000.0;
 					}
@@ -942,7 +942,7 @@ namespace yzrilyzr_simplesynth{
 				break;
 			case MIDIFile::CC::DECAY_TIME:
 				/*if(enable_MIDI_CC_ADSR){
-					std::shared_ptr<AHDSREnvelop> a=getAHDSREnv();
+					u_sp<AHDSREnvelop> a=getAHDSREnv();
 					if(a){
 						a->decayTime=pow(10000.0, cc.value / 127.0f) / 1000.0;
 					}
@@ -950,7 +950,7 @@ namespace yzrilyzr_simplesynth{
 				break;
 			case MIDIFile::CC::RELEASE_TIME:
 				/*if(enable_MIDI_CC_ADSR){
-					std::shared_ptr<AHDSREnvelop> a=getAHDSREnv();
+					u_sp<AHDSREnvelop> a=getAHDSREnv();
 					if(a){
 						a->releaseTime=pow(10000.0, cc.value / 127.0f) / 1000.0;
 					}
@@ -1029,8 +1029,8 @@ namespace yzrilyzr_simplesynth{
 				break;
 		}
 	}
-	std::vector<std::shared_ptr<IChannel>> Mixer2::getAllChannels()const{
-		std::vector<std::shared_ptr<IChannel>> chann;
+	std::vector<u_sp<IChannel>> Mixer2::getAllChannels()const{
+		std::vector<u_sp<IChannel>> chann;
 		for(auto & i : allChannelData){
 			chann.emplace_back(std::dynamic_pointer_cast<IChannel>(i));
 		}
@@ -1107,10 +1107,10 @@ namespace yzrilyzr_simplesynth{
 			threadPool=new FixedThreadPool(cores);
 		}
 	}
-	std::shared_ptr<yzrilyzr_dsp::DSPChain> * Mixer2::getEQ(){
+	u_sp<yzrilyzr_dsp::DSPChain> * Mixer2::getEQ(){
 		return finalEQ;
 	}
-	std::shared_ptr<IChannel> Mixer2::getMIDIChannel(const String & group, s_midichannel_id ch){
+	u_sp<IChannel> Mixer2::getMIDIChannel(const String & group, s_midichannel_id ch){
 		std::unique_lock <std::shared_mutex > lock(channelLock);
 		return getOrCreateMIDIChannelData(group, ch);
 	}

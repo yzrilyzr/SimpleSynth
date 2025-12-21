@@ -40,7 +40,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	NoteProcPtr SoftClipAmp::clone(){
-		return std::make_shared<SoftClipAmp>(a->clone(), inputGain, threshold, outputGain);
+		return mksp<SoftClipAmp>(a->clone(), inputGain, threshold, outputGain);
 	}
 
 	String SoftClipAmp::toString() const{

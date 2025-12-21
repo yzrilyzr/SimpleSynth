@@ -15,9 +15,9 @@
 namespace yzrilyzr_simplesynth{
 	ECLASS(DLSFormatInstrument, public InstrumentProvider){
 	private:
-	std::shared_ptr<yzrilyzr_soundbank::DLSSoundbank> soundbank;
+	u_sp<yzrilyzr_soundbank::DLSSoundbank> soundbank;
 	std::map<std::pair<s_bank_id, s_program_id>, NoteProcPtr> programMap;
-	std::map<s_bank_id, std::shared_ptr<NonInterpolateAmpSet>> drumSetMap;
+	std::map<s_bank_id, u_sp<NonInterpolateAmpSet>> drumSetMap;
 	EqualTemperament tuning;
 
 	public:
@@ -34,7 +34,7 @@ namespace yzrilyzr_simplesynth{
 
 	static u_time_ms timeCent2Ms(double timeCents);
 	static u_normal_01 scale2Normal01(double scale);
-	static std::shared_ptr<yzrilyzr_array::SampleProvider> convertToSample(yzrilyzr_soundbank::DLSSample & sample);
+	static u_sp<yzrilyzr_array::SampleProvider> convertToSample(yzrilyzr_soundbank::DLSSample & sample);
 	static void procModulators(yzrilyzr_soundbank::DLSRegion & region, yzrilyzr_soundbank::DLSInstrument & instrument, AmpBuilder & builder);
 	static float scaleToFloat(int32_t scale);
 	};

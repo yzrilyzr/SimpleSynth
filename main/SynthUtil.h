@@ -24,10 +24,10 @@ namespace yzrilyzr_simplesynth{
 	EBCLASS(SynthUtil){
 		public:
 		typedef void(*MIDICallback)(const yzrilyzr_lang::String & deviceName, uint64_t ev);
-		static std::shared_ptr<MixerSequence> parseMIDI(yzrilyzr_io::InputStream & is);
-		//static std::shared_ptr<IChannel> getMIDIChannelOrNew(IMixer * mixer, const yzrilyzr_lang::String & groupName, s_midichannel_id channelID);
-		//static std::shared_ptr<IChannel> getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID);
-		static std::shared_ptr<MixerSequence> parseXM(yzrilyzr_io::InputStream & is);
+		static u_sp<MixerSequence> parseMIDI(yzrilyzr_io::InputStream & is);
+		//static u_sp<IChannel> getMIDIChannelOrNew(IMixer * mixer, const yzrilyzr_lang::String & groupName, s_midichannel_id channelID);
+		//static u_sp<IChannel> getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID);
+		static u_sp<MixerSequence> parseXM(yzrilyzr_io::InputStream & is);
 		static NoteProcPtr getDefault();
 		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2);
 		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const yzrilyzr_lang::String & groupName);

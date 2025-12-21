@@ -34,7 +34,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	NoteProcPtr Pulse::clone(){
-		return std::make_shared<Pulse>(getPhaseSource(), width, rise, fall, delay);
+		return mksp<Pulse>(getPhaseSource(), width, rise, fall, delay);
 	}
 	String Pulse::toString()const{
 		return StringFormat::object2string("Pulse", getPhaseSource(), width, rise, fall, delay);

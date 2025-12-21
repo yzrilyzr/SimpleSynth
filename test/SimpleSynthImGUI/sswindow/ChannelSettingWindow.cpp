@@ -23,7 +23,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 	ImGui::InputInt(ctx.LANG.getc("window.channel.send_to_channel"), &sendToChannel);
 	ImGui::InputInt(ctx.LANG.getc("window.channel.note_shift"), &noteShift);
 	if(sendToChannel < 0)sendToChannel=0;
-	static std::shared_ptr<IChannel> ch=nullptr;
+	static u_sp<IChannel> ch=nullptr;
 	ch=mixer.getMIDIChannel("WM_MIDI_Instant", sendToChannel);
 	if(sendToChannel == 20){
 		//ch->setAlwaysActive(true);

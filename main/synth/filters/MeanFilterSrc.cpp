@@ -31,7 +31,7 @@ namespace yzrilyzr_simplesynth{
 		return nmd;
 	}
 	NoteProcPtr MeanFilterSrc::clone(){
-		return std::make_shared<MeanFilterSrc>(src->clone(), env->clone(), envMulti);
+		return mksp<MeanFilterSrc>(src->clone(), env->clone(), envMulti);
 	}
 	MeanFilterSrcKeyData * MeanFilterSrc::init(MeanFilterSrcKeyData * data, Note & note){
 		if(data == nullptr) data=new MeanFilterSrcKeyData();

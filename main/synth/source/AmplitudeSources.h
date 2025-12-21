@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 	};
 	ECLASS(_MulPhase, public PhaseSrc){
 	private:
-	std::shared_ptr<PhaseSrc> src;
+	u_sp<PhaseSrc> src;
 	u_sample r;
 	public:
 	_MulPhase() : src(nullptr), r(0){
@@ -30,7 +30,7 @@ namespace yzrilyzr_simplesynth{
 		registerParamPhaseSrc("Src", &src);
 		registerParam("Multiply", yzrilyzr_util::ParamType::Sample, &r, &min, &max);
 	}
-	_MulPhase(std::shared_ptr<PhaseSrc> src, u_sample r) : src(src), r(r){}
+	_MulPhase(u_sp<PhaseSrc> src, u_sample r) : src(src), r(r){}
 	void init()override{
 		if(src == nullptr)throw yzrilyzr_lang::NullPointerException("src == null");
 		src->init();
@@ -44,15 +44,15 @@ namespace yzrilyzr_simplesynth{
 	};
 	ECLASS(_AddPhase, public PhaseSrc){
 	private:
-	std::shared_ptr<PhaseSrc> a=nullptr;
-	std::shared_ptr<PhaseSrc> b=nullptr;
+	u_sp<PhaseSrc> a=nullptr;
+	u_sp<PhaseSrc> b=nullptr;
 	public:
 	_AddPhase(){
 		static u_sample min=-100, max=100;
 		registerParamPhaseSrc("A", &a);
 		registerParamPhaseSrc("B", &b);
 	}
-	_AddPhase(std::shared_ptr<PhaseSrc> a, std::shared_ptr<PhaseSrc> b) : a(a), b(b){}
+	_AddPhase(u_sp<PhaseSrc> a, u_sp<PhaseSrc> b) : a(a), b(b){}
 	void init()override{
 		if(a == nullptr)throw yzrilyzr_lang::NullPointerException("a == null");
 		if(b == nullptr)throw yzrilyzr_lang::NullPointerException("b == null");
@@ -124,63 +124,63 @@ namespace yzrilyzr_simplesynth{
 	}
 	};
 #ifndef NotePhase
-#define NotePhase std::make_shared<_NotePhase>()
+#define NotePhase mksp<_NotePhase>()
 #endif
 #ifndef NoteIDAmp
-#define NoteIDAmp std::make_shared<_NoteIDAmp>()
+#define NoteIDAmp mksp<_NoteIDAmp>()
 #endif
 #ifndef NoteVelAmp
-#define NoteVelAmp std::make_shared<_NoteVelAmp>()
+#define NoteVelAmp mksp<_NoteVelAmp>()
 #endif
 #ifndef NoteFreqAmp
-#define NoteFreqAmp std::make_shared<_NoteFreqAmp>()
+#define NoteFreqAmp mksp<_NoteFreqAmp>()
 #endif
-	static std::shared_ptr<PhaseSrc> MulPhase(std::shared_ptr<PhaseSrc> freq, u_sample r){
-		return std::make_shared<_MulPhase>(freq, r);
+	static u_sp<PhaseSrc> MulPhase(u_sp<PhaseSrc> freq, u_sample r){
+		return mksp<_MulPhase>(freq, r);
 	}
-	static std::shared_ptr<PhaseSrc> AddPhase(std::shared_ptr<PhaseSrc> a, std::shared_ptr<PhaseSrc> b){
-		return std::make_shared<_AddPhase>(a, b);
+	static u_sp<PhaseSrc> AddPhase(u_sp<PhaseSrc> a, u_sp<PhaseSrc> b){
+		return mksp<_AddPhase>(a, b);
 	}
-	static std::shared_ptr<PhaseSrc> ConstPhase(u_freq hz){
-		return std::make_shared<_ConstPhase>(hz);
+	static u_sp<PhaseSrc> ConstPhase(u_freq hz){
+		return mksp<_ConstPhase>(hz);
 	}
 	static NoteProcPtr ConstAmp(u_sample value){
-		return std::make_shared<_ConstAmp>(value);
+		return mksp<_ConstAmp>(value);
 	}
 	static NoteProcPtr SineAmp(u_freq hz){
-		return std::make_shared<SineWave>(ConstPhase(hz));
+		return mksp<SineWave>(ConstPhase(hz));
 	}
 	static NoteProcPtr SineW(){
-		return std::make_shared<SineWave>();
+		return mksp<SineWave>();
 	}
 	static NoteProcPtr SawW(){
-		return std::make_shared<SawWave>();
+		return mksp<SawWave>();
 	}
 	static NoteProcPtr SquareW(){
-		return std::make_shared<SquareWave>();
+		return mksp<SquareWave>();
 	}
 	static NoteProcPtr TriW(){
-		return std::make_shared<TriWave>();
+		return mksp<TriWave>();
 	}
 
 	template<typename T>
-	std::shared_ptr<AmpAdder> operator+(std::shared_ptr<T> a, std::shared_ptr<T> b){
-		return std::make_shared< yzrilyzr_simplesynth::AmpAdder>(a, b);
+	u_sp<AmpAdder> operator+(u_sp<T> a, u_sp<T> b){
+		return mksp< yzrilyzr_simplesynth::AmpAdder>(a, b);
 	}
 	template<typename T>
-	std::shared_ptr<AmpAdder> operator+(std::shared_ptr<T> a, NoteProcPtr b){
-		return std::make_shared< yzrilyzr_simplesynth::AmpAdder>(a, b);
+	u_sp<AmpAdder> operator+(u_sp<T> a, NoteProcPtr b){
+		return mksp< yzrilyzr_simplesynth::AmpAdder>(a, b);
 	}
 	template<typename T>
-	std::shared_ptr<AmpAdder> operator+(std::shared_ptr<T> a, u_sample b){
-		return std::make_shared< yzrilyzr_simplesynth::AmpAdder>(a, ConstAmp(b));
+	u_sp<AmpAdder> operator+(u_sp<T> a, u_sample b){
+		return mksp< yzrilyzr_simplesynth::AmpAdder>(a, ConstAmp(b));
 	}
 	template<typename T>
-	std::shared_ptr<AmpMultiplier> operator*(std::shared_ptr<T> a, std::shared_ptr<T> b){
-		return std::make_shared< yzrilyzr_simplesynth::AmpMultiplier>(a, b);
+	u_sp<AmpMultiplier> operator*(u_sp<T> a, u_sp<T> b){
+		return mksp< yzrilyzr_simplesynth::AmpMultiplier>(a, b);
 	}
 	template<typename T>
-	std::shared_ptr<AmpMultiplier> operator*(std::shared_ptr<T> a, u_sample b){
-		return std::make_shared< yzrilyzr_simplesynth::AmpMultiplier>(a, ConstAmp(b));
+	u_sp<AmpMultiplier> operator*(u_sp<T> a, u_sample b){
+		return mksp< yzrilyzr_simplesynth::AmpMultiplier>(a, ConstAmp(b));
 	}
 }

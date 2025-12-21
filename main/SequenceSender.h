@@ -8,7 +8,7 @@ namespace yzrilyzr_simplesynth{
 		private:
 		struct SequenceData{
 			yzrilyzr_lang::String name;
-			std::shared_ptr<MixerSequence> seq;
+			u_sp<MixerSequence> seq;
 			u_time_ms fadeInCurrentTime;
 			u_time_ms fadeOutCurrentTime;
 		};
@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 		SequenceSender();
 		~SequenceSender();
 		//添加序列
-		void addSequence(const yzrilyzr_lang::String & name, std::shared_ptr<MixerSequence> seq);
+		void addSequence(const yzrilyzr_lang::String & name, u_sp<MixerSequence> seq);
 		//拖动进度条
 		void seek(u_time_ms pos);
 

@@ -10,7 +10,7 @@
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
 void pianoRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	std::shared_ptr<PianoSrc> paramRegPtr=std::static_pointer_cast<PianoSrc, ParamRegister>(obj.paramRegPtr);
+	u_sp<PianoSrc> paramRegPtr=std::static_pointer_cast<PianoSrc, ParamRegister>(obj.paramRegPtr);
 	PianoSoundBoardParameters & sb=paramRegPtr->soundboardParameters;
 	ImGui::Text("Soundboard");
 	static double FREQ_MIN=10, FREQ_MAX=20000;

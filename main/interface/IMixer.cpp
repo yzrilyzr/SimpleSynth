@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 	bool IMixer::hasMIDIChannel(s_midichannel_id id){
 		return hasMIDIChannel(DEFAULT_MIDI_CHANNEL_GROUP_NAME, id);
 	}
-	std::shared_ptr<IChannel> IMixer::getMIDIChannel(s_midichannel_id id){
+	u_sp<IChannel> IMixer::getMIDIChannel(s_midichannel_id id){
 		return getMIDIChannel(DEFAULT_MIDI_CHANNEL_GROUP_NAME, id);
 	}
 	u_sample_rate IMixer::getSampleRate() const{

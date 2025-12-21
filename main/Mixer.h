@@ -80,7 +80,7 @@ namespace yzrilyzr_simplesynth{
 		void setSampleRate(u_sample_rate sr)override; // 设置采样率
 		s_note_id getNoteShift() const;       // 获取音符偏移量
 		void setNoteShift(int8_t noteShift); // 设置音符偏移量
-		std::shared_ptr<AHDSREnvelop> getAHDSREnv()const; // 获取AHDSR包络
+		u_sp<AHDSREnvelop> getAHDSREnv()const; // 获取AHDSR包络
 
 		// ==================== MIDI控制方法 ====================
 		bool isMonoMode() const;           // 检查是否为单音模式
@@ -127,7 +127,7 @@ namespace yzrilyzr_simplesynth{
 		void sendPostEvent(ChannelEvent * n1, u_time startAt); // 发送延时事件
 
 		// ==================== DSP效果处理 ====================
-		void addDSPToChain(std::shared_ptr<yzrilyzr_dsp::DSP> *dsp); // 添加DSP效果到处理链
+		void addDSPToChain(u_sp<yzrilyzr_dsp::DSP> *dsp); // 添加DSP效果到处理链
 		yzrilyzr_dsp::Chorus & getChorus(u_index ch)const override; // 获取合唱效果器
 		yzrilyzr_dsp::Phaser & getPhaser(u_index ch)const override; // 获取相位效果器
 		yzrilyzr_dsp::Freeverb & getReverb(u_index ch)const override; // 获取混响效果器
@@ -143,12 +143,12 @@ namespace yzrilyzr_simplesynth{
 		std::recursive_mutex noteLock;        // 音符操作锁
 		yzrilyzr_collection::LinkedList<ChannelEvent *> postEventQueue; // 延时事件队列
 		yzrilyzr_collection::LinkedList<ChannelEvent *> instantEventQueue; // 即时事件队列
-		std::shared_ptr<yzrilyzr_dsp::DSPChain> dspChain[2]; // DSP处理链
-		std::shared_ptr<yzrilyzr_dsp::DSP> choruser[2];     // 合唱效果器
-		std::shared_ptr<yzrilyzr_dsp::DSP> phaser[2];     // 合唱效果器
-		std::shared_ptr<yzrilyzr_dsp::DSP> reverber[2];      // 混响效果器
-		std::shared_ptr<yzrilyzr_dsp::DSP> panner[2];       // 声像效果器
-		std::shared_ptr<yzrilyzr_dsp::DSP> limiter[2];      // 限制器
+		u_sp<yzrilyzr_dsp::DSPChain> dspChain[2]; // DSP处理链
+		u_sp<yzrilyzr_dsp::DSP> choruser[2];     // 合唱效果器
+		u_sp<yzrilyzr_dsp::DSP> phaser[2];     // 合唱效果器
+		u_sp<yzrilyzr_dsp::DSP> reverber[2];      // 混响效果器
+		u_sp<yzrilyzr_dsp::DSP> panner[2];       // 声像效果器
+		u_sp<yzrilyzr_dsp::DSP> limiter[2];      // 限制器
 		s_midichannel_id channelID=-1;     // 通道ID
 		u_time_f processTime;            // 处理时间统计
 		bool commited=false;           // 提交状态
@@ -202,19 +202,19 @@ namespace yzrilyzr_simplesynth{
 		void resetLimiter()override;            // 重置限制器状态
 
 		void setEQ(int32_t seg, double value); // 设置均衡器参数
-		std::shared_ptr<yzrilyzr_dsp::DSPChain> * getEQ()override;             // 获取均衡器链
+		u_sp<yzrilyzr_dsp::DSPChain> * getEQ()override;             // 获取均衡器链
 		// ==================== MIDI快速消息 ====================
 		void sendInstantEvent(ChannelEvent * event)override;
 		void postEvent(ChannelEvent * event, u_time startAt)override;
 
 		// ==================== 通道管理 ====================
-		void addChannel(std::shared_ptr<Channel>channel);     // 添加通道
-		void removeChannel(std::shared_ptr<Channel> channel);   // 移除指定通道
+		void addChannel(u_sp<Channel>channel);     // 添加通道
+		void removeChannel(u_sp<Channel> channel);   // 移除指定通道
 		void removeAllChannels();              // 移除所有通道
 
-		void setMIDIChannel(s_midichannel_id id, std::shared_ptr<Channel> channel); // 设置通道
-		void setMIDIChannel(const yzrilyzr_lang::String & groupName, s_midichannel_id id, std::shared_ptr<Channel> channel); // 设置通道
-		std::shared_ptr<IChannel> getMIDIChannel(const yzrilyzr_lang::String & groupName, s_midichannel_id id)override; // 获取指定通道
+		void setMIDIChannel(s_midichannel_id id, u_sp<Channel> channel); // 设置通道
+		void setMIDIChannel(const yzrilyzr_lang::String & groupName, s_midichannel_id id, u_sp<Channel> channel); // 设置通道
+		u_sp<IChannel> getMIDIChannel(const yzrilyzr_lang::String & groupName, s_midichannel_id id)override; // 获取指定通道
 		void removeMIDIChannel(s_midichannel_id id);   // 移除指定通道
 		void removeMIDIChannel(const yzrilyzr_lang::String & groupName, s_midichannel_id id);   // 移除指定通道
 
@@ -242,19 +242,19 @@ namespace yzrilyzr_simplesynth{
 		void waitForChannels();
 		void mix()override;
 		u_sample * getOutput(uint32_t chIndex)const override;
-		std::vector<std::shared_ptr<IChannel>> getAllChannels()const override;
+		std::vector<u_sp<IChannel>> getAllChannels()const override;
 		bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)override;
 
 		private:
 			// ==================== 私有成员变量 ====================
 		yzrilyzr_array::SampleArray output[2]; // 输出缓冲区指针数组
-		std::unordered_map<std::pair<yzrilyzr_lang::String, s_midichannel_id>, std::shared_ptr<Channel>> midiChannelMap; // MIDI通道映射表
-		yzrilyzr_collection::ArrayList<std::shared_ptr<Channel>> channels;                // 全部通道列表
+		std::unordered_map<std::pair<yzrilyzr_lang::String, s_midichannel_id>, u_sp<Channel>> midiChannelMap; // MIDI通道映射表
+		yzrilyzr_collection::ArrayList<u_sp<Channel>> channels;                // 全部通道列表
 		yzrilyzr_dsp::Limiter ** nonDrumSetLimiter=nullptr;      // 非鼓组限制器
 		yzrilyzr_dsp::Limiter ** masterLimiter=nullptr;          // 主限制器
 		std::recursive_mutex  channelLock;              // 通道访问锁
 		std::recursive_mutex  midiChannelMapLock;              // 通道访问锁
-		std::shared_ptr<yzrilyzr_dsp::DSPChain> finalEQ[2];               // 最终均衡器链
+		u_sp<yzrilyzr_dsp::DSPChain> finalEQ[2];               // 最终均衡器链
 
 		s_sample_index currentSampleIndex=0;      // 当前采样索引
 		bool _pause=false;                        // 暂停状态

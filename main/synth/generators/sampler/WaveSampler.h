@@ -21,7 +21,7 @@ namespace yzrilyzr_simplesynth{
 	static constexpr int const LOOP_LOOP=2;
 	static constexpr int const LOOP_PING_PONG=3;
 	private:
-	std::shared_ptr<yzrilyzr_array::SampleProvider> sampleData;
+	u_sp<yzrilyzr_array::SampleProvider> sampleData;
 	s_phase phaseMul=1;
 	int32_t startLoopIndex=0;
 	int32_t endLoopIndex=0;
@@ -30,7 +30,7 @@ namespace yzrilyzr_simplesynth{
 	u_index sampleLength=0;
 	public:
 	WaveSampler();
-	WaveSampler(std::shared_ptr<PhaseSrc> freq, s_phase phaseMul, std::shared_ptr<yzrilyzr_array::SampleProvider> sampleData, u_index sampleOffset, u_index sampleLength,
+	WaveSampler(u_sp<PhaseSrc> freq, s_phase phaseMul, u_sp<yzrilyzr_array::SampleProvider> sampleData, u_index sampleOffset, u_index sampleLength,
 				int32_t startLoopIndex, int32_t endLoopIndex, int loopType);
 	u_sample getAmp(Note & note) override;
 	u_sample getSample(yzrilyzr_array::SampleProvider & sample, int32_t index);
@@ -41,9 +41,9 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override;
 	};
 	EBCLASS(WaveSamplerBuilder){
-		std::shared_ptr<PhaseSrc> freq=nullptr;
+		u_sp<PhaseSrc> freq=nullptr;
 		s_phase phaseMul=1;
-		std::shared_ptr<yzrilyzr_array::SampleProvider> sampleData=nullptr;
+		u_sp<yzrilyzr_array::SampleProvider> sampleData=nullptr;
 		u_index sampleOffset=0;
 		u_index sampleLength=0;
 		int32_t startLoopIndex=0;
@@ -51,7 +51,7 @@ namespace yzrilyzr_simplesynth{
 		uint8_t loopType=WaveSampler::LOOP_DISABLE;
 	public:
 	WaveSamplerBuilder(){}
-	WaveSamplerBuilder & freqSrc(std::shared_ptr<PhaseSrc> freq){
+	WaveSamplerBuilder & freqSrc(u_sp<PhaseSrc> freq){
 		this->freq=freq;
 		return *this;
 	}
@@ -78,29 +78,29 @@ namespace yzrilyzr_simplesynth{
 		this->sampleLength=sampleLength;
 		return *this;
 	}
-	WaveSamplerBuilder & sample(std::shared_ptr<yzrilyzr_array::SampleProvider> sampleData){
+	WaveSamplerBuilder & sample(u_sp<yzrilyzr_array::SampleProvider> sampleData){
 		this->sampleData=sampleData;
 		sampleOffsetLength(0, sampleData->length);
 		return *this;
 	}
 	WaveSamplerBuilder & sample(const yzrilyzr_array::DoubleArray &array){
-		sample(std::make_shared < yzrilyzr_array::DoubleArrayProvider>(array));
+		sample(mksp < yzrilyzr_array::DoubleArrayProvider>(array));
 		return *this;
 	}
 	WaveSamplerBuilder & sample(const yzrilyzr_array::FloatArray &array){
-		sample(std::make_shared < yzrilyzr_array::FloatArrayProvider>(array));
+		sample(mksp < yzrilyzr_array::FloatArrayProvider>(array));
 		return *this;
 	}
 	WaveSamplerBuilder & sample(const yzrilyzr_array::ShortArray &array){
-		sample(std::make_shared<yzrilyzr_array::ShortArrayProvider>(array));
+		sample(mksp<yzrilyzr_array::ShortArrayProvider>(array));
 		return *this;
 	}
 	WaveSamplerBuilder & sample(const yzrilyzr_array::ByteArray& array){
-		sample(std::make_shared<yzrilyzr_array::ByteArrayProvider>(array));
+		sample(mksp<yzrilyzr_array::ByteArrayProvider>(array));
 		return *this;
 	}
-	std::shared_ptr<WaveSampler> build(){
-		return std::make_shared<WaveSampler>(freq, phaseMul, sampleData, sampleOffset, sampleLength,
+	u_sp<WaveSampler> build(){
+		return mksp<WaveSampler>(freq, phaseMul, sampleData, sampleOffset, sampleLength,
 											 startLoopIndex, endLoopIndex, loopType);
 	}
 	};

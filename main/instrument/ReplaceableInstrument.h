@@ -7,11 +7,11 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(ReplaceableInstrument, public InstrumentProvider){
 	private:
 	std::map<std::pair<s_bank_id, s_program_id>, NoteProcPtr> map;
-	std::shared_ptr<InstrumentProvider> parent;
+	u_sp<InstrumentProvider> parent;
 	NoteProcPtr drumSet;
 	public:
 	ReplaceableInstrument();
-	ReplaceableInstrument(std::shared_ptr<InstrumentProvider> parent);
+	ReplaceableInstrument(u_sp<InstrumentProvider> parent);
 	NoteProcPtr getDrumSet();
 	void setDrumSet(NoteProcPtr drumSet);
 	void put(s_program_id program, NoteProcPtr src);

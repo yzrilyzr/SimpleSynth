@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 			ChannelEvent * event;
 			u_index index;
 		};
-		std::shared_ptr<InstrumentProvider> instrument=nullptr;
+		u_sp<InstrumentProvider> instrument=nullptr;
 		static bool compareMixerEvents(const EventWrapper & a, const EventWrapper & b);
 		public:
 		
@@ -22,8 +22,8 @@ namespace yzrilyzr_simplesynth{
 		void postToMixer(IMixer * mixer, u_time startDelay)const;
 		void postToMixer(IMixer * mixer, u_time startDelay, u_time sequenceOffset, const yzrilyzr_lang::String & groupName)const;
 		void postToMixer(IMixer * mixer, u_time startDelay, const yzrilyzr_lang::String & groupName)const;
-		void setInstrument(std::shared_ptr<InstrumentProvider> midiInstrument);
-		std::shared_ptr<InstrumentProvider> getInstrument()const;
+		void setInstrument(u_sp<InstrumentProvider> midiInstrument);
+		u_sp<InstrumentProvider> getInstrument()const;
 		u_time getDuration()const;
 	};
 }

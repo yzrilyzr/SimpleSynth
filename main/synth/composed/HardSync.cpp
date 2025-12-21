@@ -36,7 +36,7 @@ namespace yzrilyzr_simplesynth{
 		return output;
 	}
 	NoteProcPtr HardSync::clone(){
-		return std::make_shared<HardSync>(a->clone(), slaveFreqRatio);
+		return mksp<HardSync>(a->clone(), slaveFreqRatio);
 	}
 
 	HardSyncKeyData * HardSync::init(HardSyncKeyData * data, Note & note){

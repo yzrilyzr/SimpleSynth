@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 		return a->noMoreData(note) && b->noMoreData(note);
 	}
 	NoteProcPtr clone() override{
-		return std::make_shared<AmpRatioMixer>(a->clone(), b->clone(), ratio);
+		return mksp<AmpRatioMixer>(a->clone(), b->clone(), ratio);
 	}
 	yzrilyzr_lang::String toString() const override;
 	};

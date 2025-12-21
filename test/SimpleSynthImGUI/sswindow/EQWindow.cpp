@@ -56,7 +56,7 @@ void eqWindow(CurrentProjectContext & ctx){
 	IMixer & mixer=*ctx.mixer;
 	ImGui::Begin(ctx.LANG.getc("window.eq.title"));
 	struct StructEQ{
-		std::shared_ptr<IIR> iir=nullptr;
+		u_sp<IIR> iir=nullptr;
 		double q=0;
 		double freq=0;
 		double gain=0;
@@ -79,7 +79,7 @@ void eqWindow(CurrentProjectContext & ctx){
 		DSPChain dsp;
 		for(StructEQ * s : eqs){
 			if(s->iir == nullptr){
-				s->iir=std::make_shared<IIR>(2, 3);
+				s->iir=mksp<IIR>(2, 3);
 			}
 			//s->iir=IIRUtil::newButterworthIIRFilter(test_sampleRate, FilterPassType::LOWPASS, 16, s->freq, 0);
 			IIRUtil::biquad(s->iir->aCoeff, s->iir->bCoeff, s->freq, test_sampleRate, s->q, s->type, s->gain);
@@ -100,18 +100,18 @@ void eqWindow(CurrentProjectContext & ctx){
 		fft.outputPhase(pha_data);
 		for(u_index i=0;i < fsiz;i++){
 			mag_data[i]=20.0 * log10(mag_data[i]);
-			pha_data[i]=pha_data[i] * 180.0 / Math::PI;
+			pha_data[i]=pha_data[i] * Math::RADIANS_TO_DEGREES;
 		}
 		//
 		mixer.setUseEQ(true);
-		std::shared_ptr<DSPChain> * c=mixer.getEQ();
+		u_sp<DSPChain> * c=mixer.getEQ();
 		std::shared_mutex & dspLock=mixer.getDSPLock();
 		std::unique_lock <std::shared_mutex > lock(dspLock);
 		for(u_index ii=0;ii < 2;ii++){
-			std::shared_ptr<DSPChain> cc=c[ii];
+			u_sp<DSPChain> cc=c[ii];
 			cc->clear();
 			for(StructEQ * s : eqs){
-				std::shared_ptr<IIR> b=std::make_shared<IIR>();
+				u_sp<IIR> b=mksp<IIR>();
 				b->cloneParam(s->iir.get());
 				cc->add(b);
 			}
@@ -128,7 +128,10 @@ void eqWindow(CurrentProjectContext & ctx){
 			"filter.type.lowshelf",
 			"filter.type.highshelf",
 			"filter.type.bell",
-			"filter.type.allpass"
+			"filter.type.allpass"//,
+			//"filter.type.peak",
+			//"filter.type.tiltshelf",
+			//"filter.type.bandshelf",
 						});
 	}
 	if(ImPlot::BeginPlot(ctx.LANG.getc("window.eq.freq_response"), ImVec2(1200, 700))){
@@ -199,7 +202,7 @@ void eqWindow(CurrentProjectContext & ctx){
 		if(ImPlot::IsPlotHovered()){
 			ImGui::BeginTooltip();
 			double slope=calculateDbPerOctave(x_data, mag1->_array, point.x, siz);
-			ImGui::Text(ctx.LANG.getf("window.eq.freq_response.hover", point.x, slope).c_str(UTF8));
+			ImGui::Text(ctx.LANG.getf("window.eq.freq_response.hover", point.x, point.y, slope).c_str(UTF8));
 			ImGui::EndTooltip();
 		}
 

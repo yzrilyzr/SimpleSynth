@@ -56,7 +56,7 @@ void json2obj(json & j, ArrayList<ProjectObject *> & objects){
 						json & j1=obj1->fromJSON;
 						uint64_t obj1id=j1.value("id", static_cast<uint64_t>(0));
 						if(id == obj1id){
-							*static_cast<std::shared_ptr<void> *>(param.value)=obj1->paramRegPtr;
+							*static_cast<u_sp<void> *>(param.value)=obj1->paramRegPtr;
 							break;
 						}
 					}

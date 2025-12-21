@@ -6,7 +6,7 @@
 
 
 void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj);
-void SakuraExciterWindow(std::shared_ptr<yzrilyzr_simplesynth::Sakura> & paramRegPtr);
-void SakuraStringWindow(std::shared_ptr<yzrilyzr_simplesynth::Sakura> & paramRegPtr);
-void SakuraResonatorWindow(std::shared_ptr<yzrilyzr_simplesynth::Sakura> & paramRegPtr);
-void SakuraEditWindow(yzrilyzr_simplesynth::IMixer & mixer, std::shared_ptr<yzrilyzr_simplesynth::Sakura> & paramRegPtr);
+void SakuraExciterWindow(u_sp<yzrilyzr_simplesynth::Sakura> & paramRegPtr);
+void SakuraStringWindow(u_sp<yzrilyzr_simplesynth::Sakura> & paramRegPtr);
+void SakuraResonatorWindow(u_sp<yzrilyzr_simplesynth::Sakura> & paramRegPtr);
+void SakuraEditWindow(yzrilyzr_simplesynth::IMixer & mixer, u_sp<yzrilyzr_simplesynth::Sakura> & paramRegPtr);

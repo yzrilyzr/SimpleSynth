@@ -30,7 +30,7 @@ namespace yzrilyzr_simplesynth{
 		registerParam("LoopType", ParamType::Enum, &loopType, enumNames, &names);
 	}
 
-	WaveSampler::WaveSampler(std::shared_ptr<PhaseSrc> freq, s_phase phaseMul, std::shared_ptr<SampleProvider> sampleData, u_index sampleOffset, u_index sampleLength,
+	WaveSampler::WaveSampler(u_sp<PhaseSrc> freq, s_phase phaseMul, u_sp<SampleProvider> sampleData, u_index sampleOffset, u_index sampleLength,
 							 int32_t startLoopIndex, int32_t endLoopIndex, int loopType) :
 		Osc(freq),
 		sampleData(sampleData),

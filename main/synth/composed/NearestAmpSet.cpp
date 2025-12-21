@@ -6,7 +6,7 @@ namespace yzrilyzr_simplesynth{
 	NearestAmpSet::~NearestAmpSet(){
 		//delete notes;
 	}
-	NearestAmpSet::NearestAmpSet(std::shared_ptr<PhaseSrc> freq) : Osc(freq){}
+	NearestAmpSet::NearestAmpSet(u_sp<PhaseSrc> freq) : Osc(freq){}
 	NearestAmpSet::NearestAmpSet() : NearestAmpSet(nullptr){}
 
 	String NearestAmpSet::toString()const{
@@ -19,7 +19,7 @@ namespace yzrilyzr_simplesynth{
 		return processor->noMoreData(note);
 	}
 	NearestAmpSetBuilder::NearestAmpSetBuilder(){
-		objptr=std::make_shared<NearestAmpSet>();
+		objptr=mksp<NearestAmpSet>();
 	}
 	NearestAmpSetBuilder & NearestAmpSetBuilder::add(int note, NoteProcPtr noteProcessor){
 		objptr->notes[note]=noteProcessor;

@@ -20,7 +20,7 @@ namespace yzrilyzr_simplesynth{
 		return src;
 	}
 	NoteProcPtr clone() override{
-		return std::make_shared<AmpQuantization>(a, quantization);
+		return mksp<AmpQuantization>(a, quantization);
 	}
 	yzrilyzr_lang::String toString() const override;
 	};

@@ -47,7 +47,7 @@ namespace yzrilyzr_simplesynth{
 		double level=scale / 65536.0 / 1000.0;  // 0.1% → % → 0~1
 		return static_cast<u_normal_01>(Util::clamp01(level));
 	}
-	std::shared_ptr<SampleProvider> DLSFormatInstrument::convertToSample(DLSSample & sample){
+	u_sp<SampleProvider> DLSFormatInstrument::convertToSample(DLSSample & sample){
 		ByteArray * byteArr=sample.getDataBuffer()->array();
 		switch(sample.format){
 			case DLSSampleFormat::SIGNED:
@@ -59,11 +59,11 @@ namespace yzrilyzr_simplesynth{
 						val|=((*byteArr)[bi++] & 0xff) << 8;
 						arr[si++]=val;
 					}
-					return std::make_shared<ShortArrayProvider>(arr);
+					return mksp<ShortArrayProvider>(arr);
 				} else if(sample.bits == 8){
 					ByteArray arr(byteArr->length);
 					memcpy(arr._array, byteArr->_array, byteArr->length);
-					return std::make_shared<ByteArrayProvider>(arr);
+					return mksp<ByteArrayProvider>(arr);
 				}
 				break;
 
@@ -71,7 +71,7 @@ namespace yzrilyzr_simplesynth{
 				if(sample.bits == 8){
 					ByteArray arr(byteArr->length);
 					memcpy(arr._array, byteArr->_array, byteArr->length);
-					return std::make_shared<ByteArrayProvider>(arr);
+					return mksp<ByteArrayProvider>(arr);
 				}
 				break;
 
@@ -87,7 +87,7 @@ namespace yzrilyzr_simplesynth{
 						uint32_t * valp=&val;
 						arr[si++]=*((float *)valp);
 					}
-					return std::make_shared<FloatArrayProvider>(arr);
+					return mksp<FloatArrayProvider>(arr);
 				}
 				break;
 		}
@@ -105,7 +105,7 @@ namespace yzrilyzr_simplesynth{
 			bool canSustain=false;
 		};
 		Env eg1, eg2;
-		HashMap<int32_t, std::shared_ptr<DLSModulator>> currentDstModulators;
+		HashMap<int32_t, u_sp<DLSModulator>> currentDstModulators;
 		for(auto & modulatorPtr : instrument.getModulators()){
 			int32_t destination=modulatorPtr->getDestination();
 			currentDstModulators.put(destination, modulatorPtr);
@@ -208,7 +208,7 @@ namespace yzrilyzr_simplesynth{
 		return static_cast<float>(intPart) + (fracPart / 65536.0f);
 	}
 	DLSFormatInstrument::DLSFormatInstrument(InputStream & inputStream){
-		soundbank=std::make_shared<DLSSoundbank>(inputStream);
+		soundbank=mksp<DLSSoundbank>(inputStream);
 		buildInstruments();
 		soundbank=nullptr;
 	}
@@ -256,7 +256,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void DLSFormatInstrument::buildMelodicInstrument(DLSInstrument & instrument){
-		auto noteSrc=std::make_shared<RegionAmp>();
+		auto noteSrc=mksp<RegionAmp>();
 
 		for(auto & region : instrument.getRegions()){
 			AmpBuilder builder;
@@ -276,9 +276,9 @@ namespace yzrilyzr_simplesynth{
 
 	void DLSFormatInstrument::buildDrumInstrument(DLSInstrument & instrument){
 		s_bank_id bank=instrument.getBank();
-		std::shared_ptr<NonInterpolateAmpSet> drumSet=std::dynamic_pointer_cast<NonInterpolateAmpSet>(getDrumSet(bank, 0));
+		u_sp<NonInterpolateAmpSet> drumSet=std::dynamic_pointer_cast<NonInterpolateAmpSet>(getDrumSet(bank, 0));
 		if(drumSet == nullptr){
-			drumSet=std::make_shared<NonInterpolateAmpSet>();
+			drumSet=mksp<NonInterpolateAmpSet>();
 			drumSetMap[bank]=drumSet;
 		}
 		for(auto & region : instrument.getRegions()){

@@ -11,7 +11,7 @@ namespace yzrilyzr_simplesynth{
 	public:
 	~SineWaveTable();
 	SineWaveTable(double baseFreq,const yzrilyzr_array::DoubleArray &freqAndAmp);
-	SineWaveTable(std::shared_ptr<PhaseSrc> freq, double baseFreq, const yzrilyzr_array::DoubleArray & freqAndAmp);
+	SineWaveTable(u_sp<PhaseSrc> freq, double baseFreq, const yzrilyzr_array::DoubleArray & freqAndAmp);
 	u_sample getAmp(Note & note) override;
 	private:
 	u_sample a(double x, u_freq notef);

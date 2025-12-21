@@ -24,15 +24,15 @@ namespace yzrilyzr_simplesynth{
 	u_freq startFreq;
 	u_freq endFreq;
 	u_time duration;
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> curve;
+	u_sp<yzrilyzr_interpolator::Interpolator> curve;
 	NoteProcPtr src;
 	int key=-1;
 	int mode=MODE_FIXED;
 	public:
 	SimpleDrumAmp(u_freq startFreq, u_freq endFreq, u_time duration);
 	SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration);
-	SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, int mode, std::shared_ptr<yzrilyzr_interpolator::Interpolator> curve);
-	SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, std::shared_ptr<yzrilyzr_interpolator::Interpolator> curve);
+	SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, int mode, u_sp<yzrilyzr_interpolator::Interpolator> curve);
+	SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, u_sp<yzrilyzr_interpolator::Interpolator> curve);
 	SimpleDrumAmp();
 	u_sample getAmp(Note & note) override;
 	void init(ChannelConfig & cfg) override;

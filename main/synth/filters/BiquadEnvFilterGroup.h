@@ -32,7 +32,7 @@ namespace yzrilyzr_simplesynth{
 	};
 	EBCLASS(BiquadEnvFilterGroupKeyData){
 		public:
-		std::shared_ptr<yzrilyzr_dsp::DSPGroup> filters;
+		u_sp<yzrilyzr_dsp::DSPGroup> filters;
 		std::vector< BiquadEnvFilterChange> changes;
 	};
 	ECLASS(BiquadEnvFilterGroup, public AmpUnaryComposition, NoteData<BiquadEnvFilterGroupKeyData>){

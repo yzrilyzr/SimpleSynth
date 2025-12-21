@@ -19,10 +19,10 @@ namespace yzrilyzr_simplesynth{
 	private:
 	static constexpr int NOT_FOUND=48964944;
 	std::map<std::pair<s_bank_id, s_program_id>, NoteProcPtr> programMap;
-	std::map<s_bank_id, std::shared_ptr<NonInterpolateAmpSet>> drumSetMap;
-	std::unordered_map<int64_t, std::shared_ptr<yzrilyzr_array::SampleProvider>> sampleMap;
+	std::map<s_bank_id, u_sp<NonInterpolateAmpSet>> drumSetMap;
+	std::unordered_map<int64_t, u_sp<yzrilyzr_array::SampleProvider>> sampleMap;
 	EqualTemperament tuning;
-	std::shared_ptr<yzrilyzr_soundbank::SF2Soundbank> sbx;
+	u_sp<yzrilyzr_soundbank::SF2Soundbank> sbx;
 	public:
 	NoteProcPtr get(s_bank_id bank, s_program_id program, u_sample_rate sampleRate) override;
 	NoteProcPtr getDrumSet(s_bank_id bank, u_sample_rate sampleRate) override;
@@ -33,10 +33,10 @@ namespace yzrilyzr_simplesynth{
 	void putInst(yzrilyzr_soundbank::SF2Instrument & in);
 	void putLayerRegion(RegionAmp & amp, yzrilyzr_soundbank::SF2Instrument & in, yzrilyzr_soundbank::SF2InstrumentRegion & instRegion, yzrilyzr_soundbank::SF2LayerRegion & layerRegion, yzrilyzr_soundbank::SF2Layer & layer);
 	int32_t getGeneratorValue(int32_t id, yzrilyzr_soundbank::SF2LayerRegion & lregion, yzrilyzr_soundbank::SF2InstrumentRegion & instRegion, yzrilyzr_soundbank::SF2Layer & layer, yzrilyzr_soundbank::SF2Instrument & in);
-	int32_t getGeneratorValue(int32_t id, std::shared_ptr<yzrilyzr_collection::HashMap<int32_t, int16_t>> g1);
+	int32_t getGeneratorValue(int32_t id, u_sp<yzrilyzr_collection::HashMap<int32_t, int16_t>> g1);
 	void addSamplerByID(int32_t id, int32_t vel, NoteProcPtr sampler);
 	int32_t getOriginalPitch(yzrilyzr_soundbank::SF2LayerRegion & layerRegion);
-	std::shared_ptr<yzrilyzr_array::SampleProvider> getSampleProvider(yzrilyzr_soundbank::ModelByteBuffer & buf);
+	u_sp<yzrilyzr_array::SampleProvider> getSampleProvider(yzrilyzr_soundbank::ModelByteBuffer & buf);
 	static double time(double in);
 	};
 }

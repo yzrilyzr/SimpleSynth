@@ -50,7 +50,7 @@ namespace yzrilyzr_simplesynth_vst{
 		}
 		CResourceInputStream resInputStream;
 		if(resInputStream.open("lang.properties")){
-			LANG.add(std::make_shared<Properties>(readStreamToString(resInputStream)));
+			LANG.add(mksp<Properties>(readStreamToString(resInputStream)));
 		}		
 		editorDelegate=std::make_unique<SimpleSynthEditorDelegate>(this, LANG);
 		// Here you could register some parameters

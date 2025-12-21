@@ -3,7 +3,7 @@
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	NeighbourMixAmpSet::NeighbourMixAmpSet(std::shared_ptr<PhaseSrc> freq) : Osc(freq){}
+	NeighbourMixAmpSet::NeighbourMixAmpSet(u_sp<PhaseSrc> freq) : Osc(freq){}
 	NeighbourMixAmpSet::NeighbourMixAmpSet() : NeighbourMixAmpSet(nullptr){}
 	NeighbourMixAmpSet * NeighbourMixAmpSet::add(int note, NoteProcPtr noteProcessor){
 		notes[note][0]=noteProcessor;

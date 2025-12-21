@@ -3,7 +3,7 @@
 
 namespace yzrilyzr_simplesynth{
 	class NoteProcessor;
-	typedef std::shared_ptr<NoteProcessor> NoteProcPtr;
+	typedef u_sp<NoteProcessor> NoteProcPtr;
 	EBCLASS(InstrumentProvider){
 		public:
 		virtual ~InstrumentProvider()=default;

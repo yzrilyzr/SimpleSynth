@@ -23,7 +23,7 @@ namespace yzrilyzr_simplesynth{
 	AmpBuilder & src(NoteProcPtr src); // 设置音频源为NoteProcPtr类型
 	AmpBuilder & src(double src); // 设置音频源为固定值
 	AmpBuilder & freqSrc(double src); // 设置频率源为固定值
-	AmpBuilder & freqSrc(std::shared_ptr<PhaseSrc> src); // 设置频率源为PhaseSrc对象
+	AmpBuilder & freqSrc(u_sp<PhaseSrc> src); // 设置频率源为PhaseSrc对象
 	AmpBuilder & cc(const yzrilyzr_array::IntArray &cc); // 设置控制变化(CC)数组
 	AmpBuilder & noteShift(int8_t shift); // 音符移调
 	AmpBuilder & multyKey(const yzrilyzr_array::IntArray & noteShift,
@@ -40,54 +40,54 @@ namespace yzrilyzr_simplesynth{
 
 	// 包络控制
 	AmpBuilder & AR(u_time_ms attackTime, u_time_ms releaseTime,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // AR包络
+					  u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+					  u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // AR包络
 	AmpBuilder & AR(u_time_ms attackTime, u_time_ms releaseTime, u_time_ms forceReleaseTime,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // AR包络
+					  u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+					  u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // AR包络
 	AmpBuilder & ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume,
 					  bool canSustain, u_time_ms releaseTime,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // ADSR包络
+					  u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+					  u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
+					  u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // ADSR包络
 	AmpBuilder & ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume,
 					  bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // 带强制释放的ADSR包络
+					  u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+					  u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
+					  u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // 带强制释放的ADSR包络
 	AmpBuilder & AHDSR(u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime,
 					   u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime,
-					   std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-					   std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
-					   std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // AHDSR包络
+					   u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+					   u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
+					   u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // AHDSR包络
 	AmpBuilder & AHDSR(u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime,
 					   u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime,
 					   u_time_ms forceReleaseTime,
-					   std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-					   std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
-					   std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // 带强制释放的AHDSR包络
+					   u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+					   u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
+					   u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // 带强制释放的AHDSR包络
 	AmpBuilder & DAHDSR(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime,
 						u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain,
 						u_time_ms releaseTime,
-						std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-						std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
-						std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // DAHDSR包络
+						u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+						u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
+						u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // DAHDSR包络
 	AmpBuilder & DAHDSR(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime,
 						u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain,
 						u_time_ms releaseTime, u_time_ms forceReleaseTime,
-						std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-						std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
-						std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve); // 带强制释放的DAHDSR包络
+						u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+						u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
+						u_sp<yzrilyzr_interpolator::Interpolator> rCurve); // 带强制释放的DAHDSR包络
 	AmpBuilder & GraphEnv(int32_t sustainPointIndex,const yzrilyzr_array::DoubleArray &pointValues); // 图形包络
 	AmpBuilder & MultiStageEnv(const std::vector<MSEPoint> &points);
 
 
 	// 调制效果
-	AmpBuilder & am(std::shared_ptr<Osc> amSrc, double amp, u_freq Hz); // 振幅调制(AM)
-	AmpBuilder & rm(std::shared_ptr<Osc> amSrc, double amp, u_freq Hz); // 环形调制(RM)
-	AmpBuilder & pm(std::shared_ptr<Osc> pmSrc, double amp, double noteRatio); // 相位调制(PM)
+	AmpBuilder & am(u_sp<Osc> amSrc, double amp, u_freq Hz); // 振幅调制(AM)
+	AmpBuilder & rm(u_sp<Osc> amSrc, double amp, u_freq Hz); // 环形调制(RM)
+	AmpBuilder & pm(u_sp<Osc> pmSrc, double amp, double noteRatio); // 相位调制(PM)
 	AmpBuilder & pm(NoteProcPtr pmSrc, double amp); // 相位调制(PM)
-	AmpBuilder & lpm(std::shared_ptr<Osc> pmSrc, double amp, u_freq lpmHz); // 低频相位调制
+	AmpBuilder & lpm(u_sp<Osc> pmSrc, double amp, u_freq lpmHz); // 低频相位调制
 	AmpBuilder & lpm(NoteProcPtr lpmSrc, double amp); // 相位调制(PM)
 	AmpBuilder & autoMod(u_normal_01 modFreqDepth, u_normal_01 modAmpDepth, u_freq modRate,
 						 u_time modDelay, NoteProcPtr modShape=nullptr); // 自动调制
@@ -119,10 +119,10 @@ namespace yzrilyzr_simplesynth{
 	// 特殊效果
 	AmpBuilder & ks(u_normal_01 alpha); // Karplus-Strong合成器
 	AmpBuilder & ks(u_freq freq, u_normal_01 alpha); // 固定频率的Karplus-Strong合成器
-	AmpBuilder & ks(std::shared_ptr<PhaseSrc> freqSrc, u_normal_01 alpha); // 频率源控制的Karplus-Strong合成器
+	AmpBuilder & ks(u_sp<PhaseSrc> freqSrc, u_normal_01 alpha); // 频率源控制的Karplus-Strong合成器
 	AmpBuilder & drum(u_freq startFreq, u_freq endFreq, u_time duration); // 鼓点合成
 	AmpBuilder & drum(u_freq startFreq, u_freq endFreq, u_time duration, int mode,
-					  std::shared_ptr<yzrilyzr_interpolator::Interpolator> interpolator); // 高级鼓点合成
+					  u_sp<yzrilyzr_interpolator::Interpolator> interpolator); // 高级鼓点合成
 	AmpBuilder & mean(NoteProcPtr pEnv, double pMul); // 均值处理效果
 
 	// 工具方法

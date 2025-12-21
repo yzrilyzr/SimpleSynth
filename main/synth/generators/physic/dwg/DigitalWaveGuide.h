@@ -48,8 +48,8 @@ namespace yzrilyzr_simplesynth{
 		// 交换标志（控制信号处理流程是否交换）
 		bool commuteFlag=false;
 		u_sample damper=1;
-		std::vector<std::shared_ptr<yzrilyzr_dsp::DSP>> dispersion;
-		std::shared_ptr<yzrilyzr_dsp::DSP> lowpass=nullptr;
+		std::vector<u_sp<yzrilyzr_dsp::DSP>> dispersion;
+		u_sp<yzrilyzr_dsp::DSP> lowpass=nullptr;
 		yzrilyzr_dsp::RingBufferSample fracDelay;
 		u_sample fracDelayLen;
 		~DigitalWaveGuide();
@@ -81,6 +81,6 @@ namespace yzrilyzr_simplesynth{
 		void processDelay();
 		void updateSignals();
 		void initAlphaCoefficients();
-		void setDispersion(std::vector<std::shared_ptr<yzrilyzr_dsp::DSP>> dispersion, std::shared_ptr<yzrilyzr_dsp::DSP> lowpass, u_sample fracDelay);
+		void setDispersion(std::vector<u_sp<yzrilyzr_dsp::DSP>> dispersion, u_sp<yzrilyzr_dsp::DSP> lowpass, u_sample fracDelay);
 	};
 }

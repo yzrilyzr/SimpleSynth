@@ -36,7 +36,7 @@ namespace yzrilyzr_simplesynth{
 		return y;
 	}
 	NoteProcPtr BiquadEnvFilterGroup::clone(){
-		return std::make_shared< BiquadEnvFilterGroup>(a, type, filtersCfg);
+		return mksp< BiquadEnvFilterGroup>(a, type, filtersCfg);
 	}
 	void BiquadEnvFilterGroup::init(ChannelConfig & cfg){
 		for(BiquadEnvFilterGroupConfig & bcfg : filtersCfg){
@@ -52,7 +52,7 @@ namespace yzrilyzr_simplesynth{
 			builder.begin(type);
 			data->changes.clear();
 			for(auto & cf : filtersCfg){
-				builder.add(std::make_shared<BiquadIIR>());
+				builder.add(mksp<BiquadIIR>());
 				data->changes.emplace_back(BiquadEnvFilterChange());
 			}
 			data->filters=builder.build();

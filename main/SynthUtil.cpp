@@ -22,9 +22,9 @@ namespace yzrilyzr_simplesynth{
 	String TickChange::toString() const{
 		return StringFormat::format("[TickChange:%.2fms Start:%d]", tick * 1000.0f, startAtTick);
 	}
-	std::shared_ptr<MixerSequence> SynthUtil::parseMIDI(InputStream & is){
+	u_sp<MixerSequence> SynthUtil::parseMIDI(InputStream & is){
 		try{
-			std::shared_ptr<MixerSequence> mixerSequence=std::make_shared<MixerSequence>();
+			u_sp<MixerSequence> mixerSequence=mksp<MixerSequence>();
 			MIDIFile::MIDISequence * midiSequence=MIDIFile::parse(is);
 			if(midiSequence == nullptr)return nullptr;
 			//Set<String> channelAndTrackName = new HashSet<>();
@@ -111,14 +111,14 @@ namespace yzrilyzr_simplesynth{
 			.ADSR(5, 5000, 0, false, 100, Pow(-5), Pow(8), Pow(5))
 			.build();
 	}
-	//std::shared_ptr<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID){
+	//u_sp<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID){
 	//	return getMIDIChannelOrNew(mixer, IMixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME, channelID);
 	//}
-	//std::shared_ptr<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, const String & groupName, s_midichannel_id channelID){
+	//u_sp<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, const String & groupName, s_midichannel_id channelID){
 	//	if(auto m1=dynamic_cast<Mixer *>(mixer)){
-	//		std::shared_ptr<Channel> channel=std::dynamic_pointer_cast<Channel>(m1->getMIDIChannel(groupName, channelID));
+	//		u_sp<Channel> channel=std::dynamic_pointer_cast<Channel>(m1->getMIDIChannel(groupName, channelID));
 	//		if(channel == nullptr){
-	//			channel=std::make_shared<Channel>();
+	//			channel=mksp<Channel>();
 	//			channel->setName(groupName + " #" + std::to_string(channelID));
 	//			m1->setMIDIChannel(groupName, channelID, channel);
 	//		}
@@ -227,7 +227,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	SampleArray * SynthUtil::noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2){
 		SampleArray * randomData=new SampleArray(length);
-		std::shared_ptr<IIR> iir=IIRUtil::newButterworthIIRFilter(sampleRate, FilterPassType::BANDPASS, 2, f1, f2);
+		u_sp<IIR> iir=IIRUtil::newButterworthIIRFilter(sampleRate, FilterPassType::BANDPASS, 2, f1, f2);
 		iir->init(sampleRate);
 		Random random(5319539547595419742L);
 		for(u_index i=0;i < length;i++){
@@ -238,9 +238,9 @@ namespace yzrilyzr_simplesynth{
 	void SynthUtil::deleteStatic(){
 		delete NOISE;
 	}
-	std::shared_ptr<MixerSequence> SynthUtil::parseXM(InputStream & inputStream){
-		std::shared_ptr<MixerSequence> mixerSequence=std::make_shared<MixerSequence>();
-		std::shared_ptr<XMFile::Module> modulep=XMFile::parse(inputStream);
+	u_sp<MixerSequence> SynthUtil::parseXM(InputStream & inputStream){
+		u_sp<MixerSequence> mixerSequence=mksp<MixerSequence>();
+		u_sp<XMFile::Module> modulep=XMFile::parse(inputStream);
 		if(modulep == nullptr)return nullptr;
 		XMFile::Module & module1=*modulep;
 		double time=0;
@@ -368,7 +368,7 @@ namespace yzrilyzr_simplesynth{
 			ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::ALL_NOTES_OFF, 127);
 			mixerSequence->postToSequence(channel, channelEvent, time);
 		}
-		mixerSequence->setInstrument(std::make_shared<XMInstrument>(modulep));
+		mixerSequence->setInstrument(mksp<XMInstrument>(modulep));
 		mixerSequence->sortPosted();
 		return mixerSequence;
 	}

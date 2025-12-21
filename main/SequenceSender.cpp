@@ -31,7 +31,7 @@
 //		stop();
 //	}
 //
-//	void SequenceSender::addSequence(const yzrilyzr_lang::String & name, std::shared_ptr<MixerSequence> seq){
+//	void SequenceSender::addSequence(const yzrilyzr_lang::String & name, u_sp<MixerSequence> seq){
 //		if(seq){
 //			sequences[name]=seq;
 //		}

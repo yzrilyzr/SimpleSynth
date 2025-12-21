@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 		static int32_t min=0, max=128;
 		registerParam("sync", ParamType::Int, &sync, &min, &max);
 	}
-	VVVF::VVVF(std::shared_ptr<PhaseSrc> freq) :Osc(freq){}
+	VVVF::VVVF(u_sp<PhaseSrc> freq) :Osc(freq){}
 	void VVVF::cc(ChannelConfig & cfg, ChannelControl & cc){
 		PNData & data=cfg.nrpn;
 		if(cc.isMSB()){
@@ -62,8 +62,8 @@ namespace yzrilyzr_simplesynth{
 		data->pSin+=deltaTime * fSin1;
 		double vTri=PWM::pwm(data->pTri, 0, 0.5, 0.5, 0);
 		double phiSin=data->pSin *  Math::TAU;
-		double vSinP=vSine * sin(phiSin);
-		double vSinN=vSine * -sin(phiSin);
+		double vSinP=vSine * Math::sin(phiSin);
+		double vSinN=vSine * -Math::sin(phiSin);
 		int v1=vSinP > vTri?1:-1;
 		int v2=vSinN > vTri?1:-1;
 		return (v1 - v2) * note.velocitySynth;

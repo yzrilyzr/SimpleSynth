@@ -11,10 +11,10 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
 void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	std::shared_ptr<GraphInterpolator> paramRegPtr=std::dynamic_pointer_cast<GraphInterpolator, ParamRegister>(obj.paramRegPtr);
+	u_sp<GraphInterpolator> paramRegPtr=std::dynamic_pointer_cast<GraphInterpolator, ParamRegister>(obj.paramRegPtr);
 	auto & data=obj.storeData;
 	/*if(data.find("PointSize") == data.end()){
-		data["PointSize"]=std::make_shared<Integer>(3);
+		data["PointSize"]=mksp<Integer>(3);
 	}*/
 	// TODO fix
 	/*Integer & PointSize=*std::dynamic_pointer_cast<Integer>(data["PointSize"]);

@@ -37,8 +37,8 @@ namespace yzrilyzr_simplesynth{
 		getGlobalConfig().set(*defCfg);
 		nonDrumSetLimiter=new Limiter * [2]{new Limiter(5, 5000, 5000, 1), new Limiter(5, 5000, 5000, 1)};
 		masterLimiter=new Limiter * [2]{new Limiter(5, 5000, 5000, 1), new Limiter(5, 5000, 5000, 1)};
-		finalEQ[0]=std::make_shared<DSPChain>();
-		finalEQ[1]=std::make_shared<DSPChain>();
+		finalEQ[0]=mksp<DSPChain>();
+		finalEQ[1]=mksp<DSPChain>();
 		//finalEQ[0]->add(IIRUtil::newBiquadIIRFilter(100, 44100, 1.5,5, FilterPassType::LOWSHELF));
 		//finalEQ[1]->add(IIRUtil::newBiquadIIRFilter(100, 44100, 1.5,5, FilterPassType::LOWSHELF));
 	}
@@ -66,7 +66,7 @@ namespace yzrilyzr_simplesynth{
 			threadPool=new FixedThreadPool(cores);
 		}
 	}
-	void fillBuffer1(std::shared_ptr<Channel> c){
+	void fillBuffer1(u_sp<Channel> c){
 		Thread::currentThread()->setPriority(Thread::Priority::HIGH);
 		c->fillBuffer();
 	}
@@ -76,7 +76,7 @@ namespace yzrilyzr_simplesynth{
 			case MODE_SINGLE_THREAD:
 			{
 				std::unique_lock<std::recursive_mutex > lock(channelLock);
-				for(std::shared_ptr<Channel> mix : channels){
+				for(u_sp<Channel> mix : channels){
 					mix->fillBuffer();
 				}
 				break;
@@ -84,7 +84,7 @@ namespace yzrilyzr_simplesynth{
 			case MODE_THREAD_POOL:
 			{
 				std::unique_lock<std::recursive_mutex > lock(channelLock);
-				for(std::shared_ptr<Channel> mix : channels){
+				for(u_sp<Channel> mix : channels){
 					threadPool->commit([mix](){
 						Thread::currentThread()->setPriority(Thread::Priority::HIGH);
 						mix->fillBuffer();
@@ -95,7 +95,7 @@ namespace yzrilyzr_simplesynth{
 			case MODE_FUTURE:
 			{
 				std::unique_lock<std::recursive_mutex > lock(channelLock);
-				for(std::shared_ptr<Channel> mix : channels){
+				for(u_sp<Channel> mix : channels){
 					futures.push_back(std::async(std::launch::async, fillBuffer1, mix));
 				}
 				break;
@@ -133,7 +133,7 @@ namespace yzrilyzr_simplesynth{
 		auto channelItr=channels.iterator();
 		u_time_stamp now=System::currentTimeMillis();
 		while(channelItr->hasNext()){
-			std::shared_ptr<Channel> mix=channelItr->next();
+			u_sp<Channel> mix=channelItr->next();
 			if(mix->hasData()){
 				mix->lastActiveTime=now;
 			}
@@ -196,8 +196,8 @@ namespace yzrilyzr_simplesynth{
 		processTime=(u_time_f)((u_time_f)(System::nanoTime() - t) / 1000000000.0);
 	}
 
-	std::vector<std::shared_ptr<IChannel>> Mixer::getAllChannels()const{
-		std::vector<std::shared_ptr<IChannel>> chann;
+	std::vector<u_sp<IChannel>> Mixer::getAllChannels()const{
+		std::vector<u_sp<IChannel>> chann;
 		for(auto & i : channels){
 			chann.emplace_back(std::dynamic_pointer_cast<IChannel>(i));
 		}
@@ -215,10 +215,10 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	void Mixer::setEQ(int32_t seg, double value){}
-	std::shared_ptr<IChannel> Mixer::getMIDIChannel(const String & name, s_midichannel_id channelID){
+	u_sp<IChannel> Mixer::getMIDIChannel(const String & name, s_midichannel_id channelID){
 		auto res=midiChannelMap.find({name, channelID});
 		if(res == midiChannelMap.end()){
-			auto channel=std::make_shared<Channel>();
+			auto channel=mksp<Channel>();
 			channel->setName(name + " #" + std::to_string(channelID));
 			if(channelID == 9) channel->setSustain(true);
 			setMIDIChannel(name, channelID, channel);
@@ -226,20 +226,20 @@ namespace yzrilyzr_simplesynth{
 		}
 		return std::dynamic_pointer_cast<IChannel>(res->second);
 	}
-	std::shared_ptr<yzrilyzr_dsp::DSPChain> * Mixer::getEQ(){
+	u_sp<yzrilyzr_dsp::DSPChain> * Mixer::getEQ(){
 		return finalEQ;
 	}
-	void Mixer::addChannel(std::shared_ptr<Channel> channel){
+	void Mixer::addChannel(u_sp<Channel> channel){
 		std::unique_lock<std::recursive_mutex > lock(channelLock);
 		channels.add(channel);
 	}
-	void Mixer::setMIDIChannel(s_midichannel_id id, std::shared_ptr<Channel>channel){
+	void Mixer::setMIDIChannel(s_midichannel_id id, u_sp<Channel>channel){
 		setMIDIChannel(DEFAULT_MIDI_CHANNEL_GROUP_NAME, id, channel);
 	}
 	u_index Mixer::getBufferSize()const{
 		return output[0].length;
 	}
-	void Mixer::setMIDIChannel(const String & name, s_midichannel_id id, std::shared_ptr<Channel>channel){
+	void Mixer::setMIDIChannel(const String & name, s_midichannel_id id, u_sp<Channel>channel){
 		channel->setBufferSize(getBufferSize());
 		channel->setSampleRate(getSampleRate());
 		channel->setChannelId(id);
@@ -255,12 +255,12 @@ namespace yzrilyzr_simplesynth{
 		std::unique_lock<std::recursive_mutex > lock(midiChannelMapLock);
 		auto res=midiChannelMap.find({name, channelID});
 		if(res != midiChannelMap.end()){
-			std::shared_ptr<Channel> paramRegPtr=res->second;
+			u_sp<Channel> paramRegPtr=res->second;
 			midiChannelMap.erase({name, channelID});
 			removeChannel(paramRegPtr);
 		}
 	}
-	void Mixer::removeChannel(std::shared_ptr<Channel> channel){
+	void Mixer::removeChannel(u_sp<Channel> channel){
 		std::unique_lock<std::recursive_mutex > lock(channelLock);
 		channels.remove(channel);
 	}
@@ -319,11 +319,11 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer::sendInstantEvent(ChannelEvent * event){
 		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
-		std::shared_ptr<Channel> ch=std::dynamic_pointer_cast<Channel>(getMIDIChannel(event->groupName, event->channelID));
+		u_sp<Channel> ch=std::dynamic_pointer_cast<Channel>(getMIDIChannel(event->groupName, event->channelID));
 		ch->sendInstantEvent(event);
 	}
 	void Mixer::postEvent(ChannelEvent * event, u_time startAt){
-		std::shared_ptr<Channel> ch=std::dynamic_pointer_cast<Channel>(getMIDIChannel(event->groupName, event->channelID));
+		u_sp<Channel> ch=std::dynamic_pointer_cast<Channel>(getMIDIChannel(event->groupName, event->channelID));
 		ch->sendPostEvent(event, startAt);
 	}
 	bool Mixer::hasMIDIChannel(const String & groupName, s_midichannel_id channelID){
@@ -401,24 +401,24 @@ namespace yzrilyzr_simplesynth{
 	Channel::Channel(){
 		channelConfig.channel=this;
 		//
-		dspChain[0]=std::make_shared<DSPChain>();
-		dspChain[1]=std::make_shared<DSPChain>();
+		dspChain[0]=mksp<DSPChain>();
+		dspChain[1]=mksp<DSPChain>();
 		//
-		panner[0]=std::make_shared<AmpMultiply>();
-		panner[1]=std::make_shared<AmpMultiply>();
+		panner[0]=mksp<AmpMultiply>();
+		panner[1]=mksp<AmpMultiply>();
 		//
 		Random rand;
-		choruser[0]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.027, rand.nextDouble()), 30, 0.3, 0);
-		choruser[1]=std::make_shared<Chorus>(std::make_shared<SineOscillator>(0.021, rand.nextDouble()), 30, 0.3, 0);
+		choruser[0]=mksp<Chorus>(mksp<SineOscillator>(0.027, rand.nextDouble()), 30, 0.3, 0);
+		choruser[1]=mksp<Chorus>(mksp<SineOscillator>(0.021, rand.nextDouble()), 30, 0.3, 0);
 		//
-		phaser[0]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
-		phaser[1]=std::make_shared<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
+		phaser[0]=mksp<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
+		phaser[1]=mksp<Phaser>(0.5, 2.0, 0.0, 0.3, 4);
 		//
-		reverber[0]=std::make_shared<Freeverb>(0.0);
-		reverber[1]=std::make_shared<Freeverb>(0.0);
+		reverber[0]=mksp<Freeverb>(0.0);
+		reverber[1]=mksp<Freeverb>(0.0);
 		//
-		limiter[0]=std::make_shared<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 200);
-		limiter[1]=std::make_shared<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 200);
+		limiter[0]=mksp<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 200);
+		limiter[1]=mksp<Limiter>(5, 300, 500, 0.707, EnvelopDetector::RMS, 200);
 		//
 		addDSPToChain(panner);
 		addDSPToChain(choruser);
@@ -828,7 +828,7 @@ namespace yzrilyzr_simplesynth{
 				break;
 			case MIDIFile::CC::ATTACK_TIME:
 				if(ENABLE_MIDI_CC_ADSR){
-					std::shared_ptr<AHDSREnvelop> a=getAHDSREnv();
+					u_sp<AHDSREnvelop> a=getAHDSREnv();
 					if(a){
 						a->attackTime=pow(10000.0, cc.value / 127.0f) / 1000.0;
 					}
@@ -836,7 +836,7 @@ namespace yzrilyzr_simplesynth{
 				break;
 			case MIDIFile::CC::DECAY_TIME:
 				if(ENABLE_MIDI_CC_ADSR){
-					std::shared_ptr<AHDSREnvelop> a=getAHDSREnv();
+					u_sp<AHDSREnvelop> a=getAHDSREnv();
 					if(a){
 						a->decayTime=pow(10000.0, cc.value / 127.0f) / 1000.0;
 					}
@@ -844,7 +844,7 @@ namespace yzrilyzr_simplesynth{
 				break;
 			case MIDIFile::CC::RELEASE_TIME:
 				if(ENABLE_MIDI_CC_ADSR){
-					std::shared_ptr<AHDSREnvelop> a=getAHDSREnv();
+					u_sp<AHDSREnvelop> a=getAHDSREnv();
 					if(a){
 						a->releaseTime=pow(10000.0, cc.value / 127.0f) / 1000.0;
 					}
@@ -877,7 +877,7 @@ namespace yzrilyzr_simplesynth{
 			}
 		}
 	}
-	std::shared_ptr<AHDSREnvelop> Channel::getAHDSREnv()const{
+	u_sp<AHDSREnvelop> Channel::getAHDSREnv()const{
 		auto a=dynamic_cast<EnvelopMultiplier *>(channelConfig.noteProcessor);
 		if(!a)return nullptr;
 		auto b=std::dynamic_pointer_cast<AHDSREnvelop>(a->a);
@@ -965,7 +965,7 @@ namespace yzrilyzr_simplesynth{
 	void Channel::setVolume(u_normal_01_f volume){
 		this->channelConfig.Volume=volume;
 	}
-	void Channel::addDSPToChain(std::shared_ptr<yzrilyzr_dsp::DSP> * dsp){
+	void Channel::addDSPToChain(u_sp<yzrilyzr_dsp::DSP> * dsp){
 		for(u_index i=0;i < 2;i++){
 			dspChain[i]->add(dsp[i]);
 		}
@@ -1003,7 +1003,7 @@ namespace yzrilyzr_simplesynth{
 				channelConfig.mixer->setUseLimiter(value >= 64);
 				break;
 			case NRPN::BUILDER_START:
-				//if(value == 127)setNoteProcessor(std::make_shared<AmpBuilderProcessor>());
+				//if(value == 127)setNoteProcessor(mksp<AmpBuilderProcessor>());
 				break;
 			default:
 				//System.out.println("Unimplemented NRPN:"+nrpnController+" = "+value);

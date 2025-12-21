@@ -6,7 +6,7 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
-	NoteDSP::NoteDSP(NoteProcPtr a, std::shared_ptr<DSP> dsp) : AmpUnaryComposition(a){
+	NoteDSP::NoteDSP(NoteProcPtr a, u_sp<DSP> dsp) : AmpUnaryComposition(a){
 		this->dsp=dsp;
 	}
 	void NoteDSP::init(ChannelConfig & cfg){
@@ -19,7 +19,7 @@ namespace yzrilyzr_simplesynth{
 		return getData(note)->dsp->procDsp(a->getAmp(note));
 	}
 	NoteProcPtr NoteDSP::clone(){
-		return std::make_shared<NoteDSP>(a->clone(), dsp);
+		return mksp<NoteDSP>(a->clone(), dsp);
 	}
 	NoteDSPKeyData * NoteDSP::init(NoteDSPKeyData * data, Note & note){
 		if(data == nullptr){

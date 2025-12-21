@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 		static NoteProcPtr kickBassTrap();
 		static NoteProcPtr tom(u_sample_rate sampleRate, double scale);
 		static NoteProcPtr tom(u_sample_rate sampleRate);
-		static std::shared_ptr<SineWaveTable> risset();
+		static u_sp<SineWaveTable> risset();
 		void setBassDrumType(NoteProcPtr (*bd)()){
 			bassDrum=bd;
 		}

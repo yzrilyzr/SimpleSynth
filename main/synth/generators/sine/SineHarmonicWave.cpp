@@ -9,7 +9,7 @@ namespace yzrilyzr_simplesynth{
 		
 	}
 	SineHarmonicWave::SineHarmonicWave(const DoubleArray & freqAndAmp): SineHarmonicWave(nullptr, freqAndAmp){}
-	SineHarmonicWave::SineHarmonicWave(std::shared_ptr<PhaseSrc> freq, const DoubleArray & freqAndAmp): Osc(freq){
+	SineHarmonicWave::SineHarmonicWave(u_sp<PhaseSrc> freq, const DoubleArray & freqAndAmp): Osc(freq){
 		this->aa=freqAndAmp;
 	}
 	u_sample SineHarmonicWave::getAmp(Note &note){

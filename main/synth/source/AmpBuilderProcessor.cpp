@@ -87,13 +87,13 @@ namespace yzrilyzr_simplesynth{
 		const uint8_t type=readByte();
 		switch(type){
 			case 0://Sine
-				return std::make_shared<SineWave>();
+				return mksp<SineWave>();
 			case 1://Tri
-				return std::make_shared<TriWave>();
+				return mksp<TriWave>();
 			case 2://Saw
-				return std::make_shared<SawWave>();
+				return mksp<SawWave>();
 			case 3://Square
-				return std::make_shared<SquareWave>();
+				return mksp<SquareWave>();
 			default:
 				return nullptr;
 				break;
@@ -111,7 +111,7 @@ namespace yzrilyzr_simplesynth{
 		//	case 2://buildAndSet
 		//	{
 		//		/*int channelID=readByte();
-		//		std::shared_ptr<Channel> channel=mixer->getMIDIChannel(channelID);
+		//		u_sp<Channel> channel=mixer->getMIDIChannel(channelID);
 		//		if(channel == nullptr){
 		//			std::cout << "Target channel == nullptr" << std::endl;
 		//		} else{

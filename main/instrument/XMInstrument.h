@@ -7,9 +7,9 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(XMInstrument, public InstrumentProvider){
 	private:
 	yzrilyzr_collection::ArrayList<NoteProcPtr> insts;
-	std::shared_ptr<yzrilyzr_util::XMFile::Module> mod;
+	u_sp<yzrilyzr_util::XMFile::Module> mod;
 	public:
-	XMInstrument(std::shared_ptr<yzrilyzr_util::XMFile::Module> mod);
+	XMInstrument(u_sp<yzrilyzr_util::XMFile::Module> mod);
 	NoteProcPtr get(s_bank_id bank, s_program_id program, u_sample_rate sampleRate)override{
 		return insts[program]->clone();
 	}

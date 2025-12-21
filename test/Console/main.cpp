@@ -52,7 +52,7 @@ using namespace yzrilyzr_array;
 
 int floatBufferLen=256;
 u_sample_rate exportSampleRate=48000;
-std::shared_ptr<Mixer2> mixer2=nullptr;
+u_sp<Mixer2> mixer2=nullptr;
 bool exportMode=false;
 bool exportTrackMode=false;
 bool exportLimiter=true;
@@ -84,7 +84,7 @@ void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
 		for(u_index ch=0; ch < chc; ch++){
 			double f1=mixer2->getOutput(ch)[sample];
 			f1=Util::clamp(f1, -1.0, 1.0);
-			int32_t c1=(int32_t)(f1 * 0x7fffffff);
+			int32_t c1=(int32_t)(f1 * Integer_MAX_VALUE);
 			stream[j++]=(Uint8)(c1 & 0xff);
 			stream[j++]=(Uint8)((c1 >> 8) & 0xff);
 			stream[j++]=(Uint8)((c1 >> 16) & 0xff);
@@ -190,7 +190,7 @@ int openMIDIDevice(){
 	}
 	return 0;
 }
-std::shared_ptr<DSP> AWeightedFilter(u_sample_rate sr){
+u_sp<DSP> AWeightedFilter(u_sample_rate sr){
 	return DSPGroupBuilder()
 		.begin(DSPGroupBuilder::TYPE_CHAIN)
 		.biquad(sr, HIGHPASS, 20.598996, 0.707, 0)
@@ -221,7 +221,7 @@ void calibrate(int channel, int  program){
 	rmsED.init(sampleRate);
 	peakED.init(sampleRate);
 	awPeakED.init(sampleRate);
-	std::shared_ptr<DSP> awFilter=AWeightedFilter(sampleRate);
+	u_sp<DSP> awFilter=AWeightedFilter(sampleRate);
 	awFilter->init(sampleRate);
 	SampleArray rms(128);
 	SampleArray awRms(128);
@@ -274,7 +274,7 @@ void calibrate(int channel, int  program){
 	std::cout << "PEAK Cali: " << invPeak.toString() << std::endl << std::endl;
 	std::cout << "A-Weighted PEAK Cali: " << invAwPeak.toString() << std::endl << std::endl;
 }
-void exportWAV(const String & fileName, std::shared_ptr<MixerSequence> seq){
+void exportWAV(const String & fileName, u_sp<MixerSequence> seq){
 	if(exportTrackMode){
 		u_index bufLength=65536;
 		Mixer2 mixer1(bufLength);
@@ -294,7 +294,7 @@ void exportWAV(const String & fileName, std::shared_ptr<MixerSequence> seq){
 			mixer1.mix();
 			std::cout << mixer1.getPostedEventCount() << std::endl;
 			for(u_index channelID=0;channelID < 16;channelID++){
-				std::shared_ptr<IChannel> c=mixer1.IMixer::getMIDIChannel(channelID);
+				u_sp<IChannel> c=mixer1.IMixer::getMIDIChannel(channelID);
 				if(c == nullptr)continue;
 				WAVWriter & rafi=*raf[channelID];
 				for(uint32_t sample=0, j=0; sample < bufLength; sample++){
@@ -348,11 +348,11 @@ int main(int argc, char * argv[]){
 		fprintf(stderr, "Could not initialize SDL - %s\n", SDL_GetError());
 		return -1;
 	}
-	mixer2=std::make_shared < Mixer2>(floatBufferLen);
+	mixer2=mksp < Mixer2>(floatBufferLen);
 	mixer2->setSynthMode(IMixer::MODE_THREAD_POOL, -1);
 	mixer2->setSampleRate(48000);
-	std::shared_ptr<SimpleMIDIInstrument> simple=std::make_shared<SimpleMIDIInstrument>();
-	std::shared_ptr <ReplaceableInstrument> rin=std::make_shared<ReplaceableInstrument>(simple);
+	u_sp<SimpleMIDIInstrument> simple=mksp<SimpleMIDIInstrument>();
+	u_sp <ReplaceableInstrument> rin=mksp<ReplaceableInstrument>(simple);
 	mixer2->getGlobalConfig().setInstrumentProvider(rin);
 	SDL_AudioSpec spec;
 	spec.freq=48000;
@@ -376,12 +376,12 @@ int main(int argc, char * argv[]){
 				str=str.substring(1, str.length() - 1);
 			}
 			if(str.endsWith(".xm")){
-				std::shared_ptr<MixerSequence> seq=SynthUtil::parseXM(FileInputStream(str));
+				u_sp<MixerSequence> seq=SynthUtil::parseXM(FileInputStream(str));
 				if(seq == nullptr)throw Exception("File read error");
 				if(exportMode || exportTrackMode)exportWAV(File(str).getName(), seq);
 				else seq->postToMixer(mixer2.get(), 1, "Console_XM");
 			} else if(str.endsWith(".mid")){
-				std::shared_ptr<MixerSequence> seq=SynthUtil::parseMIDI(FileInputStream(str));
+				u_sp<MixerSequence> seq=SynthUtil::parseMIDI(FileInputStream(str));
 				if(seq == nullptr)throw Exception("File read error");
 				static int inc=0;
 				if(exportMode || exportTrackMode)exportWAV(File(str).getName(), seq);
@@ -389,11 +389,11 @@ int main(int argc, char * argv[]){
 			} else if(str.endsWith(".hrir")){
 				mixer2->getGlobalConfig().set3DEffect(HRIR::parseHRIR(FileInputStream(str)));
 			} else if(str == "3d"){
-				mixer2->getGlobalConfig().set3DEffect(std::make_shared<Simple3D>());
+				mixer2->getGlobalConfig().set3DEffect(mksp<Simple3D>());
 			} else if(str.endsWith(".sf2")){
-				mixer2->getGlobalConfig().setInstrumentProvider(std::make_shared<SF2FormatInstrument>(FileInputStream(str)));
+				mixer2->getGlobalConfig().setInstrumentProvider(mksp<SF2FormatInstrument>(FileInputStream(str)));
 			} else if(str.endsWith(".dls")){
-				mixer2->getGlobalConfig().setInstrumentProvider(std::make_shared<DLSFormatInstrument>(FileInputStream(str)));
+				mixer2->getGlobalConfig().setInstrumentProvider(mksp<DLSFormatInstrument>(FileInputStream(str)));
 			} else if(str == ""){
 				mixer2->reset();
 			} else if(str.startsWith("cali")){
@@ -402,10 +402,10 @@ int main(int argc, char * argv[]){
 				uint8_t program=parseInt(split[2].tostring());
 				calibrate(channel, program);
 			} else if(str == "def"){
-				rin->setDrumSet(std::make_shared<SimpleDrumSet>());
+				rin->setDrumSet(mksp<SimpleDrumSet>());
 				mixer2->getGlobalConfig().setInstrumentProvider(rin);
 			} else if(str == "808"){
-				rin->setDrumSet(std::make_shared<TR808DrumSet>());
+				rin->setDrumSet(mksp<TR808DrumSet>());
 			} else if(str == "export"){
 				exportMode=!exportMode;
 				System::out.println(String("ExportMode: ") + exportMode);

@@ -42,8 +42,8 @@ namespace yzrilyzr_simplesynth{
 		shaping5.resetMemory();
 		soundboard.resetMemory();
 	}
-	std::shared_ptr<DSP> PianoSoundBoard::cloneDSP(){
-		return std::make_shared< PianoSoundBoard>(*param);
+	u_sp<DSP> PianoSoundBoard::cloneDSP(){
+		return mksp< PianoSoundBoard>(*param);
 	}
 	void PianoSoundBoard::cloneParam(DSP * obj1){}
 }

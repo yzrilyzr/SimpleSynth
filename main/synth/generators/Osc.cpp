@@ -12,10 +12,10 @@ namespace yzrilyzr_simplesynth{
 		registerParam("PM Amp", ParamType::Double, &pmAmp, &pmMin, &pmMax);
 		registerParam("LPM Amp", ParamType::Double, &lpmAmp, &pmMin, &pmMax);
 	}
-	Osc::Osc(std::shared_ptr<PhaseSrc> freq) :Osc(){
+	Osc::Osc(u_sp<PhaseSrc> freq) :Osc(){
 		setPhaseSource(freq == nullptr?NotePhase:freq);
 	}
-	std::shared_ptr<PhaseSrc> Osc::getPhaseSource()const{
+	u_sp<PhaseSrc> Osc::getPhaseSource()const{
 		return this->_freq;
 	}
 	void Osc::init(ChannelConfig & cfg){
@@ -25,10 +25,10 @@ namespace yzrilyzr_simplesynth{
 		if(_lpm!=nullptr)_lpm->init(cfg);
 	}
 
-	void Osc::setPhaseSource(std::shared_ptr<PhaseSrc> freq){
+	void Osc::setPhaseSource(u_sp<PhaseSrc> freq){
 		this->_freq=freq;
 	}
-	void Osc::pm(std::shared_ptr<Osc> pmSrc, double pmAmp, double noteRatio){
+	void Osc::pm(u_sp<Osc> pmSrc, double pmAmp, double noteRatio){
 		pm(pmSrc, pmAmp);
 		pmSrc->setPhaseSource(MulPhase(this->_freq, noteRatio));
 	}
@@ -36,7 +36,7 @@ namespace yzrilyzr_simplesynth{
 		this->_pm=pmSrc;
 		this->pmAmp=pmAmp;
 	}
-	void Osc::lpm(std::shared_ptr<Osc> lpmSrc, double lpmAmp, u_freq lpmHz){
+	void Osc::lpm(u_sp<Osc> lpmSrc, double lpmAmp, u_freq lpmHz){
 		lpm(lpmSrc, lpmAmp);
 		lpmSrc->setPhaseSource(ConstPhase(lpmHz));
 	}

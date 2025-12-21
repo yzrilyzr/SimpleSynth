@@ -11,6 +11,7 @@
 #include "synth/generators/sine/SineWaveTable.h"
 #include "synth/source/AmpBuilder.h"
 #include "synth/source/AmplitudeSources.h"
+#include "synth/generators/drum/SimpleDrumAmp.h"
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_interpolator;
@@ -33,69 +34,66 @@ namespace yzrilyzr_simplesynth{
 			.build()
 		);
 		add(MIDIFile::DrumSet::BASS_DRUM_1, AmpBuilder()
-			.src(SineAmp(71))
-			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
+			.src(mksp<SimpleDrumAmp>(mksp<SineWave>(), 200, 50, 0.4f, SimpleDrumAmp::MODE_FIXED, Pow(-30)))
+			.AR(2, 400, Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::BASS_DRUM_ACOUSTIC, AmpBuilder()
-			.src(SineAmp(91))
-			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
+			.src(mksp<SimpleDrumAmp>(mksp<SineWave>(), 250, 60, 0.4f, SimpleDrumAmp::MODE_FIXED, Pow(-30)))
+			.AR(2, 400, Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::TOM_LOW, AmpBuilder()
-			.src(std::make_shared<SineWave>())
-			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
+			.src(mksp<SineWave>())
+			.AR(2, 1700, Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::TOM_LOW_FLOOR, AmpBuilder()
-			.src(std::make_shared<SineWave>())
+			.src(mksp<SineWave>())
 			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::TOM_LOW_MID, AmpBuilder()
-			.src(std::make_shared<SineWave>())
+			.src(mksp<SineWave>())
 			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::TOM_HIGH, AmpBuilder()
-			.src(std::make_shared<SineWave>())
+			.src(mksp<SineWave>())
 			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::TOM_HIGH_FLOOR, AmpBuilder()
-			.src(std::make_shared<SineWave>())
+			.src(mksp<SineWave>())
 			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::TOM_HIGH_MID, AmpBuilder()
-			.src(std::make_shared<SineWave>())
+			.src(mksp<SineWave>())
 			.ADSR(2, 0, 1, false, 1700, Line(), Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::HAND_CLAP, AmpBuilder()
-			.src(std::make_shared<NoiseSrc>())
-			.biquad(sampleRate, FilterPassType::LOWPASS, 10000, 0.7, 0)
-			.biquad(sampleRate, FilterPassType::HIGHPASS, 500, 0.7, 0)
-			.ADSR(2, 0, 1, false, 190, Line(), Line(), std::make_shared<GraphInterpolator>(std::initializer_list<double>{
+			.src(mksp<NoiseSrc>())
+			.biquad(sampleRate, FilterPassType::BANDPASS, 1300, 0.5, 0)
+			.mul(2)
+			.ADSR(2, 0, 1, false, 190, Line(), Line(), mksp<GraphInterpolator>(std::initializer_list<double>{
 			0, 0,
-				0.15, 0.00001,
-				0.35, 0.001,
-				0.65, 0.01,
-				0.75, 0.1,
-				0.85, 0.3,
-				0.964, 1,
-				0.965, 0,
-				0.974, 1,
-				0.975, 0,
-				0.984, 1,
-				0.985, 0,
-				0.994, 1,
-				0.995, 0,
+				0.15, 0.01,
+				0.35, 0.05,
+				0.5, 0.1,
+				0.65, 0.2,
+				0.75, 0.4,
+				0.84, 0.8,
+				0.899, 1,
+				0.900, 0,
+				0.949, 1,
+				0.950, 0,
 				1, 1}))
 			.build()
 		);
 		add(MIDIFile::DrumSet::MARACAS, AmpBuilder()
-			.src(std::make_shared<NoiseSrc>())
+			.src(mksp<NoiseSrc>())
 			.biquad(sampleRate, FilterPassType::HIGHPASS, 10000, 0.7, 0)
 			.ADSR(2, 0, 1, false, 50, Line(), Line(), Pow(1))
 			.build()
@@ -104,7 +102,7 @@ namespace yzrilyzr_simplesynth{
 			.src(SineAmp(168))
 			.addMul(SineAmp(327), 0.161)
 			.add(AmpBuilder()
-				 .src(std::make_shared<NoiseSrc>())
+				 .src(mksp<NoiseSrc>())
 				 .biquad(sampleRate, FilterPassType::BANDPASS, 4100, 0.7, 0)
 				 .build())
 			.AHDSR(5, 10, 0, 1, false, 130, Line(), Line(), Pow(4))
@@ -114,86 +112,75 @@ namespace yzrilyzr_simplesynth{
 			.src(SineAmp(168))
 			.addMul(SineAmp(327), 0.161)
 			.add(AmpBuilder()
-				 .src(std::make_shared<NoiseSrc>())
+				 .src(mksp<NoiseSrc>())
 				 .biquad(sampleRate, FilterPassType::BANDPASS, 4100, 0.7, 0)
 				 .build())
 			.AHDSR(5, 10, 0, 1, false, 130, Line(), Line(), Pow(4))
 			.build()
 		);
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_1, AmpBuilder()
-			.src(std::make_shared<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
-			.add(std::make_shared<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
+			.src(mksp<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
+			.add(mksp<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
 			.mul(0.2)
-			.biquad(sampleRate, FilterPassType::HIGHPASS, 3000, 1, 0)
-			.addMul(AmpBuilder()
-					.src(std::make_shared<NoiseSrc>())
-					.biquad(sampleRate, FilterPassType::BANDPASS, 7000, 0.6, 0)
-					.build(), 0.4)
-			.ADSR(24, 0, 1, false, 900, Pow(-5), Line(), Pow(3))
+			.addMul(mksp<NoiseSrc>(), 0.4)
+			.biquad(sampleRate, FilterPassType::HIGHPASS, 4000, 0.8, 0)
+			.biquad(sampleRate, FilterPassType::LOWPASS, 10000, 0.2, 0)
+			.mul(8)
+			.AR(24,  900, Pow(-5),  Pow(3))
 			.build()
 		);
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_2, AmpBuilder()
-			.src(std::make_shared<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
-			.add(std::make_shared<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
+			.src(mksp<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
+			.add(mksp<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
 			.mul(0.2)
-			.biquad(sampleRate, FilterPassType::HIGHPASS, 3000, 1, 0)
-			.addMul(AmpBuilder()
-					.src(std::make_shared<NoiseSrc>())
-					.biquad(sampleRate, FilterPassType::BANDPASS, 7000, 0.6, 0)
-					.build(), 0.4)
-			.ADSR(24, 0, 1, false, 900, Pow(-5), Line(), Pow(3))
+			.addMul(mksp<NoiseSrc>(), 0.4)
+			.biquad(sampleRate, FilterPassType::HIGHPASS, 4000, 0.8, 0)
+			.biquad(sampleRate, FilterPassType::LOWPASS, 10000, 0.2, 0)
+			.mul(8)
+			.AR(24, 900, Pow(-5), Pow(3))
 			.build()
 		);
 		add(MIDIFile::DrumSet::CYMBAL_RIDE_1, AmpBuilder()
-			//.src(std::make_shared<Pulse>(ConstPhase(558),0.45,0.05,0.05,0))//cb
-			//.add(std::make_shared<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
-			//.add(std::make_shared<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
-			.src(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
-			.mul(0.2)
+			//.src(mksp<Pulse>(ConstPhase(558),0.45,0.05,0.05,0))//cb
+			//.add(mksp<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
+			//.add(mksp<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
+			.src(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
+			.mul(0.1)
+			.addMul(mksp<NoiseSrc>(), 0.2)
 			.biquad(sampleRate, FilterPassType::HIGHPASS, 3000, 1, 0)
-			.addMul(AmpBuilder()
-					.src(std::make_shared<NoiseSrc>())
-					.biquad(sampleRate, FilterPassType::BANDPASS, 7000, 0.6, 0)
-					.build(), 0.4)
 			.ADSR(24, 0, 1, false, 900, Pow(-5), Line(), Pow(3))
 			.build()
 		);
 		add(MIDIFile::DrumSet::CYMBAL_RIDE_2, AmpBuilder()
-			//.src(std::make_shared<Pulse>(ConstPhase(558),0.45,0.05,0.05,0))//cb
-			//.add(std::make_shared<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
-			//.add(std::make_shared<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
-			.src(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
-			.mul(0.2)
+			.src(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
+			.mul(0.1)
+			.addMul(mksp<NoiseSrc>(), 0.2)
 			.biquad(sampleRate, FilterPassType::HIGHPASS, 3000, 1, 0)
-			.addMul(AmpBuilder()
-					.src(std::make_shared<NoiseSrc>())
-					.biquad(sampleRate, FilterPassType::BANDPASS, 7000, 0.6, 0)
-					.build(), 0.4)
 			.ADSR(24, 0, 1, false, 900, Pow(-5), Line(), Pow(3))
 			.build()
 		);
 		add(MIDIFile::DrumSet::HI_HAT_OPEN, AmpBuilder()
-			.src(std::make_shared<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
-			.add(std::make_shared<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
+			.src(mksp<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
+			.add(mksp<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
 			.mul(0.15)
 			.addMul(AmpBuilder()
-					.src(std::make_shared<NoiseSrc>())
+					.src(mksp<NoiseSrc>())
 					.biquad(sampleRate, FilterPassType::BANDPASS, 4000, 0.6, 0)
 					.build(), 0.3)
 			.biquad(sampleRate, FilterPassType::HIGHPASS, 8442, 1.5, 0)
@@ -201,15 +188,15 @@ namespace yzrilyzr_simplesynth{
 			.build()
 		);
 		add(MIDIFile::DrumSet::HI_HAT_PEDAL, AmpBuilder()
-			.src(std::make_shared<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
-			.add(std::make_shared<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
+			.src(mksp<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
+			.add(mksp<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
 			.mul(0.15)
 			.addMul(AmpBuilder()
-					.src(std::make_shared<NoiseSrc>())
+					.src(mksp<NoiseSrc>())
 					.biquad(sampleRate, FilterPassType::BANDPASS, 4000, 0.6, 0)
 					.build(), 0.3)
 			.biquad(sampleRate, FilterPassType::HIGHPASS, 8442, 1.5, 0)
@@ -217,15 +204,15 @@ namespace yzrilyzr_simplesynth{
 			.build()
 		);
 		add(MIDIFile::DrumSet::HI_HAT_CLOSED, AmpBuilder()
-			.src(std::make_shared<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
-			.add(std::make_shared<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
-			.add(std::make_shared<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
+			.src(mksp<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(485), 0.45, 0.05, 0.05, 0))//1
+			.add(mksp<Pulse>(ConstPhase(630), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(851), 0.45, 0.05, 0.05, 0))//
+			.add(mksp<Pulse>(ConstPhase(1035), 0.45, 0.05, 0.05, 0))
 			.mul(0.15)
 			.addMul(AmpBuilder()
-					.src(std::make_shared<NoiseSrc>())
+					.src(mksp<NoiseSrc>())
 					.biquad(sampleRate, FilterPassType::BANDPASS, 4000, 0.6, 0)
 					.build(), 0.3)
 			.biquad(sampleRate, FilterPassType::HIGHPASS, 10442, 2, 0)
@@ -233,8 +220,8 @@ namespace yzrilyzr_simplesynth{
 			.build()
 		);
 		add(MIDIFile::DrumSet::COWBELL, AmpBuilder()
-			.src(std::make_shared<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
-			.add(std::make_shared<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
+			.src(mksp<Pulse>(ConstPhase(558), 0.45, 0.05, 0.05, 0))//cb
+			.add(mksp<Pulse>(ConstPhase(824), 0.45, 0.05, 0.05, 0))//cb
 			.biquad(sampleRate, FilterPassType::BANDPASS, 1000, 0.7, 0)
 			.ADSR(4, 0, 1, false, 300, Pow(-5), Line(), Pow(2))
 			.build()

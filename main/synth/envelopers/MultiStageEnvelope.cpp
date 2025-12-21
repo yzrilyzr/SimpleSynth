@@ -68,7 +68,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	NoteProcPtr MultiStageEnvelope::clone(){
-		auto cloned=std::make_shared<MultiStageEnvelope>(points);
+		auto cloned=mksp<MultiStageEnvelope>(points);
 		return cloned;
 	}
 

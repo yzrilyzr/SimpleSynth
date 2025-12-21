@@ -19,16 +19,16 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(SoftSync, public AmpUnaryComposition, public NoteData<SoftSyncKeyData>){
 	private:
 	float slaveFreqRatio=2.0f;
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> syncInterp; // 同步相位插值器
+	u_sp<yzrilyzr_interpolator::Interpolator> syncInterp; // 同步相位插值器
 	public:
 	SoftSync();
-	SoftSync(NoteProcPtr slave, float ratio, std::shared_ptr<yzrilyzr_interpolator::Interpolator> interp);
+	SoftSync(NoteProcPtr slave, float ratio, u_sp<yzrilyzr_interpolator::Interpolator> interp);
 	u_sample getAmp(Note & note) override;
 	static inline s_phase lerpPhase(s_phase start, s_phase end, s_phase t){
 		return start + (end - start) * t; // t∈[0,1]
 	}
 	// 设置同步插值器（如Bezier、Pow等）
-	void setSyncInterpolator(std::shared_ptr<yzrilyzr_interpolator::Interpolator> interp);
+	void setSyncInterpolator(u_sp<yzrilyzr_interpolator::Interpolator> interp);
 	NoteProcPtr clone() override;
 	SoftSyncKeyData * init(SoftSyncKeyData * data, Note & note) override;
 	yzrilyzr_lang::String toString() const override;

@@ -46,12 +46,12 @@ namespace yzrilyzr_simplesynth{
 	};
 	EBCLASS(Matrix6x6ModulationBuilder){
 		private:
-		std::shared_ptr<Matrix6x6Modulation> ptr;
+		u_sp<Matrix6x6Modulation> ptr;
 		public:
 		static constexpr int TYPE_FM=0;
 		static constexpr int TYPE_RM=1;
 		Matrix6x6ModulationBuilder(){
-			ptr=std::make_shared<Matrix6x6Modulation>();
+			ptr=mksp<Matrix6x6Modulation>();
 		}
 		Matrix6x6ModulationBuilder & setOp(u_index index, NoteProcPtr osc,
 									double freqMul=1.0, u_freq freqOff=0.0,

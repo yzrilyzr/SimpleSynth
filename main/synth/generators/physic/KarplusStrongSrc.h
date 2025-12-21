@@ -22,16 +22,16 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(KarplusStrongSrc, public Osc, NoteData<KarplusStrongSrcKeyData>){
 	public:
 	u_normal_01 alpha=0.5;
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> alphaInterpolator;
-	std::shared_ptr<yzrilyzr_array::SampleProvider> burstSampleData;
+	u_sp<yzrilyzr_interpolator::Interpolator> alphaInterpolator;
+	u_sp<yzrilyzr_array::SampleProvider> burstSampleData;
 	NoteProcPtr burst;
 	u_freq constFreq=0;
 	FixedRandom random;
 	KarplusStrongSrc();
-	KarplusStrongSrc(std::shared_ptr<PhaseSrc> freq) :Osc(freq){}
-	KarplusStrongSrc(std::shared_ptr<PhaseSrc> freq, u_normal_01 alpha,
-					 std::shared_ptr<yzrilyzr_interpolator::Interpolator> alphaInterpolator,
-					 std::shared_ptr<yzrilyzr_array::SampleProvider> burstSampleData,
+	KarplusStrongSrc(u_sp<PhaseSrc> freq) :Osc(freq){}
+	KarplusStrongSrc(u_sp<PhaseSrc> freq, u_normal_01 alpha,
+					 u_sp<yzrilyzr_interpolator::Interpolator> alphaInterpolator,
+					 u_sp<yzrilyzr_array::SampleProvider> burstSampleData,
 					 NoteProcPtr burst,
 					 u_freq constFreq) :Osc(freq),
 		alpha(alpha),
@@ -52,20 +52,20 @@ namespace yzrilyzr_simplesynth{
 	};
 	EBCLASS(KarplusStrongBuilder){
 	private:
-	std::shared_ptr<KarplusStrongSrc> ks;
+	u_sp<KarplusStrongSrc> ks;
 	public:
 	KarplusStrongBuilder(){
-		ks=std::make_shared<KarplusStrongSrc>();
+		ks=mksp<KarplusStrongSrc>();
 	}
 	KarplusStrongBuilder & alpha(u_normal_01 alpha){
 		ks->alpha=alpha;
 		return *this;
 	}
-	KarplusStrongBuilder & alpha(std::shared_ptr<yzrilyzr_interpolator::Interpolator> alpha){
+	KarplusStrongBuilder & alpha(u_sp<yzrilyzr_interpolator::Interpolator> alpha){
 		ks->alphaInterpolator=alpha;
 		return *this;
 	}
-	KarplusStrongBuilder & freqSrc(std::shared_ptr<PhaseSrc> freqSrc){
+	KarplusStrongBuilder & freqSrc(u_sp<PhaseSrc> freqSrc){
 		ks->setPhaseSource(freqSrc);
 		return *this;
 	}
@@ -73,7 +73,7 @@ namespace yzrilyzr_simplesynth{
 		ks->burst=burst;
 		return *this;
 	}
-	KarplusStrongBuilder & burst(std::shared_ptr<yzrilyzr_array::SampleProvider> burst){
+	KarplusStrongBuilder & burst(u_sp<yzrilyzr_array::SampleProvider> burst){
 		ks->burstSampleData=burst;
 		return *this;
 	}

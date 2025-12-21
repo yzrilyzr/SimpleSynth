@@ -65,10 +65,10 @@ namespace yzrilyzr_simplesynth{
 	};
 	EBCLASS(SakuraBuilder){
 	private:
-	std::shared_ptr<Sakura> sakura;
+	u_sp<Sakura> sakura;
 	public:
 	SakuraBuilder(){
-		sakura=std::make_shared<Sakura>();
+		sakura=mksp<Sakura>();
 	}
 	SakuraBuilder & exciter(NoteProcPtr paramRegPtr){
 		sakura->exciter=paramRegPtr;

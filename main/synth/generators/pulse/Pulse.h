@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 		registerParamNormal01("Delay", &delay);
 	}
 	Pulse(u_normal_01 width, u_normal_01 rise, u_normal_01 fall, u_normal_01 delay) : Pulse(nullptr, width, rise, fall, delay){}
-	Pulse(std::shared_ptr<PhaseSrc> freqSrc, u_normal_01 width, u_normal_01 rise, u_normal_01 fall, u_normal_01 delay) : Osc(freqSrc){
+	Pulse(u_sp<PhaseSrc> freqSrc, u_normal_01 width, u_normal_01 rise, u_normal_01 fall, u_normal_01 delay) : Osc(freqSrc){
 		this->width=width;
 		this->rise=rise;
 		this->fall=fall;

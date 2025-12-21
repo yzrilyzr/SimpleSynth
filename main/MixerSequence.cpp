@@ -80,10 +80,10 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	void MixerSequence::setInstrument(std::shared_ptr<InstrumentProvider> midiInstrument){
+	void MixerSequence::setInstrument(u_sp<InstrumentProvider> midiInstrument){
 		this->instrument=midiInstrument;
 	}
-	std::shared_ptr<InstrumentProvider> MixerSequence::getInstrument()const{
+	u_sp<InstrumentProvider> MixerSequence::getInstrument()const{
 		return this->instrument;
 	}
 	u_time MixerSequence::getDuration()const{

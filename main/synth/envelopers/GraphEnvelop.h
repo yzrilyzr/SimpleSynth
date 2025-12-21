@@ -40,8 +40,8 @@ namespace yzrilyzr_simplesynth{
 	bool noMoreData(Note & note) override;
 	u_sample getAmp(Note & note) override;
 	GraphEnvelopKeyData * init(GraphEnvelopKeyData * data, Note & note) override;
-	std::shared_ptr <NoteProcessor> clone() override{
-		return std::make_shared<GraphEnvelop>(sustainPointIndex, loopStartPointIndex, loopEndPointIndex, points);
+	u_sp <NoteProcessor> clone() override{
+		return mksp<GraphEnvelop>(sustainPointIndex, loopStartPointIndex, loopEndPointIndex, points);
 	}
 	yzrilyzr_lang::String toString()const override;
 	};

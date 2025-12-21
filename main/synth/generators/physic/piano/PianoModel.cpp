@@ -78,7 +78,7 @@ namespace yzrilyzr_simplesynth{
 		key.string.clear();
 		// 初始化每根弦的数字波导模型
 		for(u_index k=0; k < stringCount; k++){
-			std::shared_ptr<PianoDwgs> pianoDWGs=std::make_shared<PianoDwgs>();
+			u_sp<PianoDwgs> pianoDWGs=mksp<PianoDwgs>();
 			key.string.push_back(pianoDWGs);
 			// 初始化弦的物理模型，应用失谐因子
 			Piano_initString(*pianoDWGs,
@@ -96,17 +96,17 @@ namespace yzrilyzr_simplesynth{
 		switch(param.hammer_type){
 			default:
 			case 1:
-				key.hammer=std::make_unique<StulovHammer>();
+				key.hammer=mksp<StulovHammer>();
 				break;
 			case 2:
-				key.hammer=std::make_unique<BanksHammer>();
+				key.hammer=mksp<BanksHammer>();
 				break;
 		}
 		// 初始化锤子的物理参数
 		key.hammer->init(param.sampleRate, hammerMass, hammerForce, stiffnessExponent, key.Z, hammerHysteresis);
 	}
 	void PianoModel::Piano_initString(PianoDwgs & pianoDWGs, u_sample freq, u_sample sampleRate, u_sample hammerPos, u_sample c1, u_sample c3, u_sample dispersionFactor, u_sample Z, u_sample Zb, u_sample Zh){
-		std::vector<std::shared_ptr<DSP>> dispersion;
+		std::vector<u_sp<DSP>> dispersion;
 		u_sample dispersionDelay=0;
 		int dispersionOrder=0;
 		if(freq > 400)dispersionOrder=1;
@@ -115,11 +115,11 @@ namespace yzrilyzr_simplesynth{
 			u_sample targetDelay=IIRUtil::calculateThiranDelay(dispersionFactor, freq, dispersionOrder);
 			targetDelay=Math::max(targetDelay, static_cast<u_sample>(1.0));
 			dispersionDelay+=targetDelay;
-			std::shared_ptr<BiquadIIR> f=std::make_shared<BiquadIIR>();
+			u_sp<BiquadIIR> f=mksp<BiquadIIR>();
 			IIRUtil::designThiranFilter(f->aCoeff, f->bCoeff, targetDelay, 2);
 			dispersion.push_back(f);
 		}
-		std::shared_ptr<IIR> lowpass=IIRUtil::newC1C3IIRFilter(freq, c1, c3);
+		u_sp<IIR> lowpass=IIRUtil::newC1C3IIRFilter(freq, c1, c3);
 		u_sample lowpassDelay=IIRUtil::groupDelay(*lowpass, freq, sampleRate);
 		u_sample totalDelay=sampleRate / freq;
 		u_sample del1=hammerPos * 0.5 * totalDelay;
@@ -163,7 +163,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sample PianoModel::PianoKeyGo(PianoKey & key){
 		u_sample Zx2=2 * key.Z;
-		std::vector<std::shared_ptr<PianoDwgs>> & keyString=key.string;
+		std::vector<u_sp<PianoDwgs>> & keyString=key.string;
 		u_sample keyStringCount=key.string.size();
 		u_sample facZ=Zx2 / (key.Z * keyStringCount + key.ZBridge);
 		int k;

@@ -33,7 +33,7 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	AmpBuilder & AmpBuilder::am(std::shared_ptr<Osc> amSrc, double amp, u_freq Hz){
+	AmpBuilder & AmpBuilder::am(u_sp<Osc> amSrc, double amp, u_freq Hz){
 		return mul(AmpBuilder(amSrc).freqSrc(Hz).mul(amp).add(1).build());
 	}
 	NoteProcPtr AmpBuilder::build(){
@@ -54,7 +54,7 @@ namespace yzrilyzr_simplesynth{
 		return mul(ConstAmp(mul1));
 	}
 	AmpBuilder & AmpBuilder::velMix(s_note_vel ovrd, u_normal_01 mix){
-		_src= std::make_shared<NoteVelocityMix>(_src, ovrd, mix);
+		_src= mksp<NoteVelocityMix>(_src, ovrd, mix);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::velMix(u_normal_01 mix){
@@ -75,17 +75,17 @@ namespace yzrilyzr_simplesynth{
 	 * 音符时长为 this->_src和mul两者 中的最短
 	 */
 	AmpBuilder & AmpBuilder::mul(NoteProcPtr mul1){
-		if(std::dynamic_pointer_cast<Enveloper>(this->_src)) this->_src=std::make_shared<EnvelopMultiplier>(this->_src, mul1);
-		else if(std::dynamic_pointer_cast<Enveloper>(mul1)) this->_src=std::make_shared<EnvelopMultiplier>(mul1, this->_src);
-		else this->_src=std::make_shared<AmpMultiplier>(this->_src, mul1);
+		if(std::dynamic_pointer_cast<Enveloper>(this->_src)) this->_src=mksp<EnvelopMultiplier>(this->_src, mul1);
+		else if(std::dynamic_pointer_cast<Enveloper>(mul1)) this->_src=mksp<EnvelopMultiplier>(mul1, this->_src);
+		else this->_src=mksp<AmpMultiplier>(this->_src, mul1);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::multyKey(const IntArray& noteShift,const DoubleArray &velocityMul){
-		this->_src=std::make_shared<MultiKeyTrigger>(_src, noteShift, velocityMul);
+		this->_src=mksp<MultiKeyTrigger>(_src, noteShift, velocityMul);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::autoMod(u_normal_01 modFreqDepth, u_normal_01 modAmpDepth, u_freq modRate, u_time modDelay, NoteProcPtr modShape){
-		this->_src=std::make_shared<AutoMod>(this->_src, modFreqDepth, modAmpDepth, modRate, modDelay, modShape);
+		this->_src=mksp<AutoMod>(this->_src, modFreqDepth, modAmpDepth, modRate, modDelay, modShape);
 		return *this;
 	}
 	/**
@@ -97,17 +97,17 @@ namespace yzrilyzr_simplesynth{
 			this->_src=add;
 			return *this;
 		}
-		this->_src=std::make_shared<AmpAdder>(this->_src, add);
+		this->_src=mksp<AmpAdder>(this->_src, add);
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::freqSrc(std::shared_ptr<PhaseSrc> src){
+	AmpBuilder & AmpBuilder::freqSrc(u_sp<PhaseSrc> src){
 		if(!(std::dynamic_pointer_cast<Osc>(this->_src)))
 			throw Exception("this->_src not FreqBasedGenerator");
 		std::dynamic_pointer_cast<Osc>(this->_src)->setPhaseSource(src);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::cc(const yzrilyzr_array::IntArray & cc){
-		this->_src=std::make_shared<AmpWithCC>(this->_src, cc);
+		this->_src=mksp<AmpWithCC>(this->_src, cc);
 		return *this;
 	}
 	NoteProcPtr cali(int samples){
@@ -119,21 +119,21 @@ namespace yzrilyzr_simplesynth{
 	 * 音符时长为 this->_src和mul两者 中的最短
 	 */
 	AmpBuilder & AmpBuilder::addMul(NoteProcPtr src1, double mul){
-		this->_src=std::make_shared<AmpAdder>(this->_src, std::make_shared<AmpMultiplier>(src1, ConstAmp(mul)));
+		this->_src=mksp<AmpAdder>(this->_src, mksp<AmpMultiplier>(src1, ConstAmp(mul)));
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::noteDSP(yzrilyzr_dsp::DSPPtr dsp){
-		this->_src=std::make_shared<NoteDSP>(this->_src, dsp);
+		this->_src=mksp<NoteDSP>(this->_src, dsp);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::postDSP(yzrilyzr_dsp::DSPPtr dsp){
-		this->_src=std::make_shared<PostProcessDSP>(this->_src, dsp);
+		this->_src=mksp<PostProcessDSP>(this->_src, dsp);
 		return *this;
 	}
 	/**
 	 * this *= ( amp * (amSrc.freq=Hz) )
 	 */
-	AmpBuilder & AmpBuilder::rm(std::shared_ptr<Osc> amSrc, double amp, u_freq Hz){
+	AmpBuilder & AmpBuilder::rm(u_sp<Osc> amSrc, double amp, u_freq Hz){
 		return mul(AmpBuilder(amSrc).freqSrc(Hz).mul(amp).build());
 	}
 	AmpBuilder & AmpBuilder::src(double src){
@@ -159,7 +159,7 @@ namespace yzrilyzr_simplesynth{
 		return clamp(inputGain, clamp1, 1);
 	}
 	AmpBuilder & AmpBuilder::clamp(u_sample inputGain, u_sample clamp1, u_sample outputGain){
-		this->_src=std::make_shared<ClampAmp>(_src, inputGain, clamp1, outputGain);
+		this->_src=mksp<ClampAmp>(_src, inputGain, clamp1, outputGain);
 		return *this;
 	}
 	/**
@@ -172,11 +172,11 @@ namespace yzrilyzr_simplesynth{
 		return clampV(inputGain, clamp, 1);
 	}
 	AmpBuilder & AmpBuilder::clampV(u_sample inputGain, u_sample clamp, u_sample outputGain){
-		this->_src=std::make_shared<ClampWithVelocityAmp>(_src, inputGain, clamp, outputGain);
+		this->_src=mksp<ClampWithVelocityAmp>(_src, inputGain, clamp, outputGain);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::arctanDistortion(u_sample inputGain, double alpha, u_sample outputGain){
-		this->_src=std::make_shared<ArctanDistortion>(_src, inputGain, alpha, outputGain);
+		this->_src=mksp<ArctanDistortion>(_src, inputGain, alpha, outputGain);
 		return *this;
 	}
 	/**
@@ -199,15 +199,15 @@ namespace yzrilyzr_simplesynth{
 	 * @param f2 Hz结束（高通低通填0即可）
 	 */
 	AmpBuilder & AmpBuilder::IIR(u_sample_rate sampleRate, FilterPassType type, uint16_t n, u_freq f1, u_freq f2){
-		this->_src=std::make_shared<NoteDSP>(_src, IIRUtil::newButterworthIIRFilter(sampleRate, type, n, IIRUtil::limitFreq(sampleRate, f1), IIRUtil::limitFreq(sampleRate, f2)));
+		this->_src=mksp<NoteDSP>(_src, IIRUtil::newButterworthIIRFilter(sampleRate, type, n, IIRUtil::limitFreq(sampleRate, f1), IIRUtil::limitFreq(sampleRate, f2)));
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::quantization(int32_t q){
-		this->_src=std::make_shared<AmpQuantization>(_src, q);
+		this->_src=mksp<AmpQuantization>(_src, q);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::noteShift(int8_t shift){
-		this->_src=std::make_shared<NoteShift>(this->_src, shift);
+		this->_src=mksp<NoteShift>(this->_src, shift);
 		return *this;
 	}
 	/**
@@ -215,49 +215,49 @@ namespace yzrilyzr_simplesynth{
 	 * 音符时长仅由ADSR参数决定
 	 */
 	AmpBuilder &
-		AmpBuilder::ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, std::shared_ptr<Interpolator> aCurve, std::shared_ptr<Interpolator> dCurve,
-						 std::shared_ptr<Interpolator> rCurve){
+		AmpBuilder::ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_sp<Interpolator> aCurve, u_sp<Interpolator> dCurve,
+						 u_sp<Interpolator> rCurve){
 		return DAHDSR(0, attackTime, 1, decayTime, decayToVolume, canSustain, releaseTime, 100, aCurve, dCurve, rCurve);
 	}
 	AmpBuilder &
-		AmpBuilder::AR(u_time_ms attackTime, u_time_ms releaseTime, std::shared_ptr<Interpolator> aCurve,
-						 std::shared_ptr<Interpolator> rCurve){
+		AmpBuilder::AR(u_time_ms attackTime, u_time_ms releaseTime, u_sp<Interpolator> aCurve,
+						 u_sp<Interpolator> rCurve){
 		return DAHDSR(0, attackTime, 0.1, 0.1, 1, false, releaseTime, 100, aCurve, Line(), rCurve);
 	}
 	AmpBuilder &
-		AmpBuilder::AR(u_time_ms attackTime, u_time_ms releaseTime,u_time_ms forceReleaseTime, std::shared_ptr<Interpolator> aCurve,
-						 std::shared_ptr<Interpolator> rCurve){
+		AmpBuilder::AR(u_time_ms attackTime, u_time_ms releaseTime,u_time_ms forceReleaseTime, u_sp<Interpolator> aCurve,
+						 u_sp<Interpolator> rCurve){
 		return DAHDSR(0, attackTime, 0.1, 0.1, 1, false, releaseTime, forceReleaseTime, aCurve, Line(), rCurve);
 	}
-	AmpBuilder & AmpBuilder::ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime, std::shared_ptr<Interpolator> aCurve,
-								  std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){
+	AmpBuilder & AmpBuilder::ADSR(u_time_ms attackTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime, u_sp<Interpolator> aCurve,
+								  u_sp<Interpolator> dCurve, u_sp<Interpolator> rCurve){
 		return  DAHDSR(0, attackTime, 1, decayTime, decayToVolume, canSustain, releaseTime, forceReleaseTime, aCurve, dCurve, rCurve);
 	}
-	AmpBuilder & AmpBuilder::AHDSR(u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, std::shared_ptr<Interpolator> aCurve,
-								   std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){
+	AmpBuilder & AmpBuilder::AHDSR(u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_sp<Interpolator> aCurve,
+								   u_sp<Interpolator> dCurve, u_sp<Interpolator> rCurve){
 		return DAHDSR(0, attackTime, holdTime, decayTime, decayToVolume, canSustain, releaseTime, 100, aCurve, dCurve, rCurve);
 	}
 	AmpBuilder &
-		AmpBuilder::AHDSR(u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime, std::shared_ptr<Interpolator> aCurve,
-						  std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){
+		AmpBuilder::AHDSR(u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime, u_sp<Interpolator> aCurve,
+						  u_sp<Interpolator> dCurve, u_sp<Interpolator> rCurve){
 		return DAHDSR(0, attackTime, holdTime, decayTime, decayToVolume, canSustain, releaseTime, forceReleaseTime, aCurve, dCurve, rCurve);
 	}
-	AmpBuilder & AmpBuilder::DAHDSR(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, std::shared_ptr<Interpolator> aCurve,
-									std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){
+	AmpBuilder & AmpBuilder::DAHDSR(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_sp<Interpolator> aCurve,
+									u_sp<Interpolator> dCurve, u_sp<Interpolator> rCurve){
 		return DAHDSR(delayTime, attackTime, holdTime, decayTime, decayToVolume, canSustain, releaseTime, 100, aCurve, dCurve, rCurve);
 	}
 	AmpBuilder &
-		AmpBuilder::DAHDSR(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime, std::shared_ptr<Interpolator> aCurve,
-						   std::shared_ptr<Interpolator> dCurve, std::shared_ptr<Interpolator> rCurve){
-		return mul(std::make_shared<AHDSREnvelop>(delayTime, attackTime, holdTime, decayTime, decayToVolume, canSustain, releaseTime, forceReleaseTime, aCurve, dCurve, rCurve));
+		AmpBuilder::DAHDSR(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 decayToVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime, u_sp<Interpolator> aCurve,
+						   u_sp<Interpolator> dCurve, u_sp<Interpolator> rCurve){
+		return mul(mksp<AHDSREnvelop>(delayTime, attackTime, holdTime, decayTime, decayToVolume, canSustain, releaseTime, forceReleaseTime, aCurve, dCurve, rCurve));
 	}
 	AmpBuilder & AmpBuilder::GraphEnv(int32_t sustainPointIndex, const DoubleArray & pointValues){
-		return mul(std::make_shared<GraphEnvelop>(sustainPointIndex, pointValues));
+		return mul(mksp<GraphEnvelop>(sustainPointIndex, pointValues));
 	}
 	AmpBuilder & AmpBuilder::MultiStageEnv(const std::vector<MSEPoint> &points){
-		return mul(std::make_shared<MultiStageEnvelope>(points));
+		return mul(mksp<MultiStageEnvelope>(points));
 	}
-	AmpBuilder & AmpBuilder::pm(std::shared_ptr<Osc> pmSrc, double amp, double noteRatio){
+	AmpBuilder & AmpBuilder::pm(u_sp<Osc> pmSrc, double amp, double noteRatio){
 		std::dynamic_pointer_cast<Osc>(this->_src)->pm(pmSrc, amp, noteRatio);
 		return *this;
 	}
@@ -265,7 +265,7 @@ namespace yzrilyzr_simplesynth{
 		std::dynamic_pointer_cast<Osc>(this->_src)->pm(pmSrc, amp);
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::lpm(std::shared_ptr<Osc> pmSrc, double amp, u_freq lpmHz){
+	AmpBuilder & AmpBuilder::lpm(u_sp<Osc> pmSrc, double amp, u_freq lpmHz){
 		std::dynamic_pointer_cast<Osc>(this->_src)->lpm(pmSrc, amp, lpmHz);
 		return *this;
 	}
@@ -281,20 +281,20 @@ namespace yzrilyzr_simplesynth{
 		this->_src=KarplusStrongBuilder().constFreq(freq).alpha(alpha).burst(_src).build();
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::ks(std::shared_ptr<PhaseSrc> freqSrc, u_normal_01 alpha){
+	AmpBuilder & AmpBuilder::ks(u_sp<PhaseSrc> freqSrc, u_normal_01 alpha){
 		this->_src=KarplusStrongBuilder().freqSrc(freqSrc).alpha(alpha).burst(_src).build();
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::drum(u_freq startFreq, u_freq endFreq, u_time duration){
-		this->_src=std::make_shared<SimpleDrumAmp>(this->_src, startFreq, endFreq, duration);
+		this->_src=mksp<SimpleDrumAmp>(this->_src, startFreq, endFreq, duration);
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::drum(u_freq startFreq, u_freq endFreq, u_time duration, int mode, std::shared_ptr<Interpolator> interpolator){
-		this->_src=std::make_shared<SimpleDrumAmp>(this->_src, startFreq, endFreq, duration, mode, interpolator);
+	AmpBuilder & AmpBuilder::drum(u_freq startFreq, u_freq endFreq, u_time duration, int mode, u_sp<Interpolator> interpolator){
+		this->_src=mksp<SimpleDrumAmp>(this->_src, startFreq, endFreq, duration, mode, interpolator);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::biquadEnv(NoteProcPtr freqEnv, NoteProcPtr qEnv, FilterPassType type){
-		this->_src=std::make_shared<BiquadFilterSrc>(this->_src, freqEnv, qEnv, type);
+		this->_src=mksp<BiquadFilterSrc>(this->_src, freqEnv, qEnv, type);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::biquadEnvID(double idOffset, double q, FilterPassType type){
@@ -304,20 +304,20 @@ namespace yzrilyzr_simplesynth{
 		return biquadEnv(AmpBuilder(ConstAmp(idMax - idMin)).mul(NoteVelAmp).add(ConstAmp(idMin)).build(), ConstAmp(q), type);
 	}
 	AmpBuilder & AmpBuilder::biquad(u_sample_rate sampleRate, FilterPassType type, u_freq f1, double q, double gain){
-		this->_src=std::make_shared<NoteDSP>(_src, IIRUtil::newBiquadIIRFilter(IIRUtil::limitFreq(sampleRate, f1), sampleRate, q, gain, type));
+		this->_src=mksp<NoteDSP>(_src, IIRUtil::newBiquadIIRFilter(IIRUtil::limitFreq(sampleRate, f1), sampleRate, q, gain, type));
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::biquadEnvGroup(int type, std::vector<BiquadEnvFilterGroupConfig> filters){
-		this->_src=std::make_shared<BiquadEnvFilterGroup>(_src, type, filters);
+		this->_src=mksp<BiquadEnvFilterGroup>(_src, type, filters);
 		return *this;
 	}
 
 	AmpBuilder & AmpBuilder::mean(NoteProcPtr pEnv, double pMul){
-		this->_src=std::make_shared<MeanFilterSrc>(this->_src, pEnv, pMul);
+		this->_src=mksp<MeanFilterSrc>(this->_src, pEnv, pMul);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::detune(int32_t count, s_note_id offset){
-		this->_src=std::make_shared<SimpleDetuner>(_src, count, offset);
+		this->_src=mksp<SimpleDetuner>(_src, count, offset);
 		return *this;
 	}
 	NoteProcPtr AmpBuilder::parse(const String & str){

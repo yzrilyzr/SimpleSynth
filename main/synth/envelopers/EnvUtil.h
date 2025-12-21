@@ -5,9 +5,9 @@
 namespace yzrilyzr_simplesynth{
 	EBCLASS(EnvUtil){
 	public:
-	static std::shared_ptr<yzrilyzr_interpolator::Interpolator> Pow(float p);
-	static std::shared_ptr<yzrilyzr_interpolator::Interpolator> Line();
+	static u_sp<yzrilyzr_interpolator::Interpolator> Pow(float p);
+	static u_sp<yzrilyzr_interpolator::Interpolator> Line();
 	};
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> Pow(float p);
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> Line();
+	u_sp<yzrilyzr_interpolator::Interpolator> Pow(float p);
+	u_sp<yzrilyzr_interpolator::Interpolator> Line();
 }

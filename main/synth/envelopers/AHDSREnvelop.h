@@ -23,9 +23,9 @@ namespace yzrilyzr_simplesynth{
 	bool canSustain=false;
 	u_normal_01 sustainVolume=0;
 	u_time releaseTime=0;
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve=nullptr;
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve=nullptr;
-	std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve=nullptr;
+	u_sp<yzrilyzr_interpolator::Interpolator> aCurve=nullptr;
+	u_sp<yzrilyzr_interpolator::Interpolator> dCurve=nullptr;
+	u_sp<yzrilyzr_interpolator::Interpolator> rCurve=nullptr;
 	AHDSREnvelop();
 	/**
 	 * 瞬时乐器：A D(敲击后非人为干预的自由振动) R(手动停止)
@@ -41,9 +41,9 @@ namespace yzrilyzr_simplesynth{
 	AHDSREnvelop(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime,
 				 u_time_ms decayTime, u_normal_01 sustainVolume, bool canSustain,
 				 u_time_ms releaseTime, u_time_ms forceReleaseTime,
-				 std::shared_ptr<yzrilyzr_interpolator::Interpolator> aCurve,
-				 std::shared_ptr<yzrilyzr_interpolator::Interpolator> dCurve,
-				 std::shared_ptr<yzrilyzr_interpolator::Interpolator> rCurve);
+				 u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
+				 u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
+				 u_sp<yzrilyzr_interpolator::Interpolator> rCurve);
 	bool noMoreData(Note & note) override;
 	NoteProcPtr clone() override;
 	void init(ChannelConfig & cfg) override;

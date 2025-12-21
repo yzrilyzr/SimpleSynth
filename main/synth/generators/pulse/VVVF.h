@@ -25,7 +25,7 @@ namespace yzrilyzr_simplesynth{
 	int32_t sync=0;
 	public:
 	VVVF();
-	VVVF(std::shared_ptr<PhaseSrc> freq);
+	VVVF(u_sp<PhaseSrc> freq);
 	u_sample getAmp(Note & note) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	VVVFKeyData * init(VVVFKeyData * data, Note & note) override;

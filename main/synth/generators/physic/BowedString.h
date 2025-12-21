@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 	EBCLASS(BowedStringKeyData){
 	public:
 	yzrilyzr_dsp::RingBufferSample ringBuffer;
-	std::shared_ptr<yzrilyzr_dsp::IIR> filter=nullptr;
+	u_sp<yzrilyzr_dsp::IIR> filter=nullptr;
 	};
 	ECLASS(BowedString, public Osc), NoteData<BowedStringKeyData>{
 	private:

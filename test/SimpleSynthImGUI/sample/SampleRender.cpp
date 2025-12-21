@@ -40,10 +40,10 @@ void gaussianSmooth(SampleArray & data, SampleArray & smoothed, u_sample sigma, 
 }
 void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	// TODO fix
-	//std::shared_ptr<SampleArrayProvider> paramRegPtr=std::dynamic_pointer_cast<SampleArrayProvider, ParamRegister>(obj.paramRegPtr);
+	//u_sp<SampleArrayProvider> paramRegPtr=std::dynamic_pointer_cast<SampleArrayProvider, ParamRegister>(obj.paramRegPtr);
 	//auto & data=obj.storeData;
 	//if(data.find("SampleLength") == data.end()){
-	//	data["SampleLength"]=std::make_shared<Integer>(256);
+	//	data["SampleLength"]=mksp<Integer>(256);
 	//}
 	//Integer & SampleLength=*std::dynamic_pointer_cast<Integer>(data["SampleLength"]);
 	//ImGui::InputInt(ctx.LANG.getc("module.sample.length"), &SampleLength.value);
@@ -53,7 +53,7 @@ void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	//	paramRegPtr->length=paramRegPtr->array.length;
 	//}
 	//if(ImGui::Button(ctx.LANG.getc("module.sample.init"))){
-	//	paramRegPtr->array=std::make_shared<SampleArray>(SampleLength.value);
+	//	paramRegPtr->array=mksp<SampleArray>(SampleLength.value);
 	//	paramRegPtr->length=SampleLength.value;
 	//	data["SampleData"]=paramRegPtr->array;
 	//}
@@ -87,7 +87,7 @@ void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	//ImGui::SameLine();
 	//if(ImGui::Button(ctx.LANG.getc("module.sample.fill.sine"))){
 	//	for(u_index i=0;i < paramRegPtr->length;i++){
-	//		paramRegPtr->array->_array[i]=std::sin( Math::TAU * i / paramRegPtr->length);
+	//		paramRegPtr->array->_array[i]=Math::sin( Math::TAU * i / paramRegPtr->length);
 	//	}
 	//}
 	//ImGui::SameLine();
@@ -123,13 +123,13 @@ void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	//}
 	//ImGui::SameLine();
 	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.light_smooth"))){
-	//	auto sm=std::make_shared<SampleArray>(paramRegPtr->length);
+	//	auto sm=mksp<SampleArray>(paramRegPtr->length);
 	//	gaussianSmooth(*paramRegPtr->array, *sm, 0.5, 3);
 	//	data["SampleData"]=sm;
 	//}
 	//ImGui::SameLine();
 	//if(ImGui::Button(ctx.LANG.getc("module.sample.utils.strong_smooth"))){
-	//	auto sm=std::make_shared<SampleArray>(paramRegPtr->length);
+	//	auto sm=mksp<SampleArray>(paramRegPtr->length);
 	//	gaussianSmooth(*paramRegPtr->array, *sm, 5, 13);
 	//	data["SampleData"]=sm;
 	//}

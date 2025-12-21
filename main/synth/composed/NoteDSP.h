@@ -10,17 +10,17 @@ namespace yzrilyzr_dsp{
 namespace yzrilyzr_simplesynth{
 	EBCLASS(NoteDSPKeyData){
 	public:
-	std::shared_ptr<yzrilyzr_dsp::DSP> dsp=nullptr;
+	u_sp<yzrilyzr_dsp::DSP> dsp=nullptr;
 	};
 	ECLASS(NoteDSP, public AmpUnaryComposition, NoteData<NoteDSPKeyData>){
 	private:
-	std::shared_ptr<yzrilyzr_dsp::DSP> dsp=nullptr;
+	u_sp<yzrilyzr_dsp::DSP> dsp=nullptr;
 	public:
 	~NoteDSP()=default;
 	NoteDSP() :AmpUnaryComposition(nullptr){
 		registerParamDSP("DSP", &dsp);
 	}
-	NoteDSP(NoteProcPtr a, std::shared_ptr<yzrilyzr_dsp::DSP> dsp);
+	NoteDSP(NoteProcPtr a, u_sp<yzrilyzr_dsp::DSP> dsp);
 	void init(ChannelConfig & cfg) override;
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;

@@ -11,7 +11,7 @@ namespace yzrilyzr_simplesynth{
 		NoteProcPtr notes[CHANNEL_MAX_NOTE_ID][2]={nullptr};
 		double notesRatio[CHANNEL_MAX_NOTE_ID][2]={0};
 	public:
-		NeighbourMixAmpSet(std::shared_ptr<PhaseSrc> freq);
+		NeighbourMixAmpSet(u_sp<PhaseSrc> freq);
 		NeighbourMixAmpSet();
 		NeighbourMixAmpSet *add(int note, NoteProcPtr noteProcessor);
 		yzrilyzr_lang::String toString() const override;

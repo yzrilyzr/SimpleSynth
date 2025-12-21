@@ -47,7 +47,7 @@ namespace yzrilyzr_simplesynth{
 		return data;
 	}
 	NoteProcPtr SimpleDetuner::clone(){
-		return std::make_shared<SimpleDetuner>(a->clone(), count, offset);
+		return mksp<SimpleDetuner>(a->clone(), count, offset);
 	}
 	String SimpleDetuner::toString() const{
 		return StringFormat::object2string("SimpleDetuner", a, count, offset);

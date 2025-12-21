@@ -16,7 +16,7 @@ namespace yzrilyzr_simplesynth{
 		registerParam("Output", ParamType::Double, &output, &minOutput, &maxOutput);
 	}
 	void FMOp::init(ChannelConfig & cfg){
-		if(src == nullptr)src=std::make_shared<SineWave>();
+		if(src == nullptr)src=mksp<SineWave>();
 		if(src != nullptr)src->init(cfg);
 	}
 	u_sample FMOp::getAmp(Note & note){

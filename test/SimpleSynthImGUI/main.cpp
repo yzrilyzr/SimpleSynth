@@ -103,7 +103,7 @@ MenuRegister::MenuRegisterObject findObjectAt(const String & category, const Str
 	notfound.name="##/NOT_FOUND/##";
 	return notfound;
 }
-void name2obj(const String & category, const String & name, String * name1, String * category1, String * showName, std::shared_ptr<ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender){
+void name2obj(const String & category, const String & name, String * name1, String * category1, String * showName, u_sp<ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender){
 	auto mobj=findObjectAt(category, name, allNoteProcessor);
 	if(mobj.name == notfound.name)mobj=findObjectAt(category, name, allDSP);
 	if(mobj.name == notfound.name)mobj=findObjectAt(category, name, allInterpolator);
@@ -147,7 +147,7 @@ void fill_audio_pcm(void * userdata, Uint8 * stream, int len){
 		for(uint32_t ch=0; ch < chc; ch++){
 			double f1=mixer->getOutput(ch)[sample];
 			f1=Util::clamp(f1, -1.0, 1.0);
-			int32_t c1=(int32_t)(f1 * 0x7fffffff);
+			int32_t c1=(int32_t)(f1 * Integer_MAX_VALUE);
 			stream[j++]=(Uint8)(c1 & 0xff);
 			stream[j++]=(Uint8)((c1 >> 8) & 0xff);
 			stream[j++]=(Uint8)((c1 >> 16) & 0xff);
@@ -234,11 +234,11 @@ int main(int argc, char * argv[]){
 	mixer=new Mixer2(floatBufferLen);
 	mixer->setSynthMode(Mixer2::MODE_THREAD_POOL, -1);
 	mixer->setSampleRate(ctx.sampleRate);
-	std::shared_ptr<SimpleMIDIInstrument> simple=std::make_shared<SimpleMIDIInstrument>();
-	std::shared_ptr <ReplaceableInstrument> rin=std::make_shared<ReplaceableInstrument>(simple);
+	u_sp<SimpleMIDIInstrument> simple=mksp<SimpleMIDIInstrument>();
+	u_sp <ReplaceableInstrument> rin=mksp<ReplaceableInstrument>(simple);
 	mixer->getGlobalConfig().setInstrumentProvider(rin);
 	ctx.setMixer(mixer);
-	//rin->setDrumSet(std::make_shared<TR808DrumSet>());
+	//rin->setDrumSet(mksp<TR808DrumSet>());
 	SDL_AudioSpec spec;
 	spec.freq=ctx.sampleRate;
 	spec.format=AUDIO_S32SYS;
@@ -262,7 +262,7 @@ int main(int argc, char * argv[]){
 		String l1=sp[0];
 		String l2="";
 		if(sp.length == 2)l2=sp[1];
-		ctx.LANG.add(std::make_shared<Locale>(l1, l2), std::make_shared<Properties>(f));
+		ctx.LANG.add(mksp<Locale>(l1, l2), mksp<Properties>(f));
 	}
 	registerAllNoteProcessor(ctx.LANG, allNoteProcessor);
 	registerAllDSP(ctx.LANG, allDSP);

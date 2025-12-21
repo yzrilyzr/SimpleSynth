@@ -1,0 +1,171 @@
+{
+	"comment": "value请使用小写",
+	"homePage": "/index.html",
+	"defaultContent": "introduction/projectintroduction",
+	"placeholder": {
+		"PlatformName": "SimpleSynth"
+	},
+	"contents": [
+		{
+			"title": "介绍",
+			"icon": "",
+			"value": "introduction",
+			"subitem": [
+				{
+					"title": "项目介绍",
+					"value": "projectintroduction"
+				}
+			]
+		},
+		{
+			"title": "库/接口使用",
+			"icon": "",
+			"value": "use",
+			"subitem": [
+				{
+					"title": "快速上手",
+					"value": "quickstart"
+				},
+				{
+					"title": "混音器配置",
+					"value": "mixerconfig"
+				},
+				{
+					"title": "通道配置",
+					"value": "channelconfig"
+				},
+				{
+					"title": "事件系统",
+					"value": "eventsystem"
+				},
+				{
+					"title": "调律系统",
+					"value": "tuningsystem"
+				},
+				{
+					"title": "音源加载",
+					"value": "loadsoundbank"
+				},
+				{
+					"title": "序列加载",
+					"value": "loadsequence"
+				},
+				{
+					"title": "渲染并导出",
+					"value": "renderexport"
+				},
+				{
+					"title": "非注册参数编号",
+					"value": "nrpn"
+				}
+			]
+		},
+
+		{
+			"title": "合成器模块",
+			"icon": "",
+			"value": "synthmodule",
+			"subitem": [
+				{
+					"title": "复合模块",
+					"value": "composed"
+				},
+				{
+					"title": "包络模块",
+					"value": "envelopers"
+				},
+				{
+					"title": "滤波模块",
+					"value": "filters"
+				},
+				{
+					"title": "非线性模块",
+					"value": "nonlinear"
+				},
+				{
+					"title": "鼓发生器模块",
+					"value": "nonlinear"
+				},
+				{
+					"title": "噪声发生器模块",
+					"value": "nonlinear"
+				},
+				{
+					"title": "物理建模模块",
+					"value": "nonlinear"
+				},
+				{
+					"title": "脉冲发生器模块",
+					"value": "nonlinear"
+				},
+				{
+					"title": "采样器模块",
+					"value": "nonlinear"
+				},
+				{
+					"title": "正弦模块",
+					"value": "nonlinear"
+				},
+				{
+					"title": "常量模块",
+					"value": "const"
+				}
+			]
+		},
+		{
+			"title": "音频驱动对接",
+			"icon": "",
+			"value": "audiodriver",
+			"subitem": [
+				{
+					"title": "SDL",
+					"value": "sdl"
+				},
+				{
+					"title": "Android oboe",
+					"value": "oboe"
+				},
+				{
+					"title": "WinMM MIDI",
+					"value": "winmmmidi"
+				},
+				{
+					"title": "VST插件",
+					"value": "vst"
+				},
+				{
+					"title": "foobar2000 组件",
+					"value": "fb2kcomponent"
+				}
+			]
+		},
+		{
+			"title": "个性化开发",
+			"icon": "",
+			"value": "development",
+			"subitem": [
+				{
+					"title": "编写自己的合成算法",
+					"value": "buildnoteprocessor"
+				},
+				{
+					"title": "自定义音符数据存储",
+					"value": "notedata"
+				},
+				{
+					"title": "了解音符对象",
+					"value": "note"
+				},
+				{
+					"title": "了解音符更新器",
+					"value": "noteupdater"
+				},
+				{
+					"title": "lua脚本编写合成器",
+					"value": "luascript"
+				}
+
+			]
+		}
+	]
+}

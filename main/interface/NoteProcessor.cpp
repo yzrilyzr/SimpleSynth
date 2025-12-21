@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void NoteProcessor::registerParamPhaseSrc(const String & name,
-											  std::shared_ptr<PhaseSrc> * value){
+											  u_sp<PhaseSrc> * value){
 		registerParam(name, ParamType::PhaseSrc, value, nullptr, nullptr);
 	}
 
@@ -20,16 +20,16 @@ namespace yzrilyzr_simplesynth{
 		registerParam(name, ParamType::NoteSrc, value, nullptr, nullptr);
 	}
 
-	void NoteProcessor::registerParamOscSrc(const String & name, std::shared_ptr<Osc> * value){
+	void NoteProcessor::registerParamOscSrc(const String & name, u_sp<Osc> * value){
 		registerParam(name, ParamType::OscSrc, value, nullptr, nullptr);
 	}
 
-	void NoteProcessor::registerParamDSP(const String & name, std::shared_ptr<DSP> * value){
+	void NoteProcessor::registerParamDSP(const String & name, u_sp<DSP> * value){
 		registerParam(name, ParamType::DSP, value, nullptr, nullptr);
 	}
 
 	void NoteProcessor::registerParamSample(const String & name,
-											std::shared_ptr<SampleProvider> * value){
+											u_sp<SampleProvider> * value){
 		registerParam(name, ParamType::SampleData, value, nullptr, nullptr);
 	}
 

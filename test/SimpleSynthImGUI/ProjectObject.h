@@ -20,7 +20,7 @@ EBCLASS(ProjectObject){
 	yzrilyzr_lang::String name;
 	yzrilyzr_lang::String showName;
 	json fromJSON=nullptr;
-	std::shared_ptr<yzrilyzr_util::ParamRegister> paramRegPtr=nullptr;
+	u_sp<yzrilyzr_util::ParamRegister> paramRegPtr=nullptr;
 	bool showWindow=true;
 	bool isSelected=false;
 	bool loadStoredData=false;
@@ -30,7 +30,7 @@ EBCLASS(ProjectObject){
 	ImVec2 rightButtonCenter;
 	MenuRegister::RenderFunc renderFunc;
 	bool enableOriginalRender=true;
-	std::unordered_map<yzrilyzr_lang::String, std::shared_ptr<yzrilyzr_lang::Object>> storeData;
+	std::unordered_map<yzrilyzr_lang::String, u_sp<yzrilyzr_lang::Object>> storeData;
 	json to_json() const;
 	void from_json(const json & j);
 	void renderWindow(CurrentProjectContext & ctx);
@@ -42,7 +42,7 @@ EBCLASS(ProjectObject){
 	template<typename T>
 	static bool renderProjectObjectParam(CurrentProjectContext & ctx, yzrilyzr_util::ParamReg & param, const char * paramName, std::vector<const char *> payloadType){
 		bool uiInputChange=false;
-		std::shared_ptr<T> * paramValue=static_cast<std::shared_ptr<T> *>(param.value);
+		u_sp<T> * paramValue=static_cast<u_sp<T> *>(param.value);
 		bool currentHighLightType=false;
 		if(ctx.dragPayloadType){
 			for(auto type : payloadType){

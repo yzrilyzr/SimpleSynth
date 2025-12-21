@@ -9,9 +9,9 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	SimpleDrumAmp::SimpleDrumAmp(u_freq startFreq, u_freq endFreq, u_time duration) : SimpleDrumAmp(std::make_shared<SineWave>(), startFreq, endFreq, duration){}
+	SimpleDrumAmp::SimpleDrumAmp(u_freq startFreq, u_freq endFreq, u_time duration) : SimpleDrumAmp(mksp<SineWave>(), startFreq, endFreq, duration){}
 	SimpleDrumAmp::SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration) : SimpleDrumAmp(osc, startFreq, endFreq, duration, MODE_FIXED, Pow(-5)){}
-	SimpleDrumAmp::SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, int mode, std::shared_ptr<Interpolator> curve){
+	SimpleDrumAmp::SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, int mode, u_sp<Interpolator> curve){
 		this->src=osc;
 		this->mode=mode;
 		this->startFreq=startFreq;
@@ -19,13 +19,13 @@ namespace yzrilyzr_simplesynth{
 		this->duration=duration;
 		this->curve=curve;
 	}
-	SimpleDrumAmp::SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, std::shared_ptr<Interpolator> curve) : SimpleDrumAmp(osc,
+	SimpleDrumAmp::SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, u_sp<Interpolator> curve) : SimpleDrumAmp(osc,
 																																						  startFreq,
 																																						  endFreq,
 																																						  duration,
 																																						  MODE_FIXED,
 																																						  curve){}
-	SimpleDrumAmp::SimpleDrumAmp() : SimpleDrumAmp(std::make_shared<SineWave>(), 200, 50, 0.3){
+	SimpleDrumAmp::SimpleDrumAmp() : SimpleDrumAmp(mksp<SineWave>(), 200, 50, 0.3){
 		registerParamFreq("StartFreq", &startFreq);
 		registerParamFreq("EndFreq", &endFreq);
 		registerParamTime("Duration", &duration);
@@ -69,7 +69,7 @@ namespace yzrilyzr_simplesynth{
 		return note.passedTime > duration || note.closed(*note.cfg);
 	}
 	NoteProcPtr SimpleDrumAmp::clone(){
-		return std::make_shared<SimpleDrumAmp>(src->clone(), startFreq, endFreq, duration, mode, curve);
+		return mksp<SimpleDrumAmp>(src->clone(), startFreq, endFreq, duration, mode, curve);
 	}
 	SimpleDrumAmpKeyData * SimpleDrumAmp::init(SimpleDrumAmpKeyData * data, Note & note){
 		if(data == nullptr) data=new SimpleDrumAmpKeyData();

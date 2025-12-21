@@ -3,8 +3,8 @@
 #include "array/SampleProvider.h"
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
-	std::shared_ptr<SampleProvider> SimpleWaveTable::Piano_Wave=
-		std::make_shared<FloatArrayProvider>(FloatArray({
+	u_sp<SampleProvider> SimpleWaveTable::Piano_Wave=
+		mksp<FloatArrayProvider>(FloatArray({
 			(float)-0.035889767,
 			(float)-0.12808618,
 			(float)-0.20731224,

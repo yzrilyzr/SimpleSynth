@@ -37,7 +37,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	NoteProcPtr TapeSaturationDistortion::clone(){
-		return std::make_shared<TapeSaturationDistortion>(a->clone(), inputGain, drive, bias, outputGain);
+		return mksp<TapeSaturationDistortion>(a->clone(), inputGain, drive, bias, outputGain);
 	}
 
 	String TapeSaturationDistortion::toString() const{

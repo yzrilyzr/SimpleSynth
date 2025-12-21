@@ -14,9 +14,9 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_dsp::RingBufferSample * resonanceStrings=nullptr;
 	yzrilyzr_dsp::RingBufferSample * resonanceStringDelays=nullptr;
 	int resonanceStringsCount=13;
-	std::shared_ptr<yzrilyzr_array::DoubleArray> resonanceStringFreq;
-	std::shared_ptr<yzrilyzr_dsp::IIR> boxFilter=nullptr;
-	std::shared_ptr<yzrilyzr_dsp::IIR> filter=nullptr;
+	u_sp<yzrilyzr_array::DoubleArray> resonanceStringFreq;
+	u_sp<yzrilyzr_dsp::IIR> boxFilter=nullptr;
+	u_sp<yzrilyzr_dsp::IIR> filter=nullptr;
 	public:
 	~Sitar();
 	Sitar();

@@ -2,7 +2,7 @@
 
 namespace yzrilyzr_simplesynth{
 	ReplaceableInstrument::ReplaceableInstrument(){}
-	ReplaceableInstrument::ReplaceableInstrument(std::shared_ptr<InstrumentProvider> parent) : ReplaceableInstrument(){
+	ReplaceableInstrument::ReplaceableInstrument(u_sp<InstrumentProvider> parent) : ReplaceableInstrument(){
 		this->parent=parent;
 	}
 	NoteProcPtr ReplaceableInstrument::getDrumSet(){

@@ -32,7 +32,7 @@ namespace yzrilyzr_simplesynth{
 		MSEPointType type;
 		MSEPointMode mode;
 		float modeValue=0;
-		u_index index=0;
+		u_index index=0;//无需初始化指定
 	};
 	EBCLASS(MultiStageEnvelopeKeyData){
 		public:

@@ -47,7 +47,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	NoteProcPtr FoldbackDistortion::clone(){
-		return std::make_shared<FoldbackDistortion>(a->clone(), inputGain, threshold, foldRatio, outputGain);
+		return mksp<FoldbackDistortion>(a->clone(), inputGain, threshold, foldRatio, outputGain);
 	}
 
 	String FoldbackDistortion::toString() const{

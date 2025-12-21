@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 	CymbalOsc();
 	CymbalOsc(double mul);
 	CymbalOsc(NoteProcPtr mul);
-	CymbalOsc(std::shared_ptr<PhaseSrc> freqSrc, NoteProcPtr mul);
+	CymbalOsc(u_sp<PhaseSrc> freqSrc, NoteProcPtr mul);
 	u_sample getAmp(Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;

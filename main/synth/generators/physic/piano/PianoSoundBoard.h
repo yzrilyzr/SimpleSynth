@@ -23,7 +23,7 @@ namespace yzrilyzr_simplesynth{
 	void init(u_sample_rate sampleRate) override;
 	void resetMemory() override;
 	void cloneParam(DSP * obj1)override;
-	std::shared_ptr<DSP> cloneDSP() override;
+	u_sp<DSP> cloneDSP() override;
 	void setParam(PianoSoundBoardParameters & param);
 	};
 }

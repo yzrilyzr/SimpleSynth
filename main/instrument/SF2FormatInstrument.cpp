@@ -46,14 +46,14 @@ namespace yzrilyzr_simplesynth{
 		}
 		return NOT_FOUND;
 	}
-	int32_t SF2FormatInstrument::getGeneratorValue(int32_t id, std::shared_ptr<HashMap<int32_t, int16_t>> g1){
+	int32_t SF2FormatInstrument::getGeneratorValue(int32_t id, u_sp<HashMap<int32_t, int16_t>> g1){
 		auto res=g1->get(id);
 		if(res.has_value()) return res.value();
 		return NOT_FOUND;
 	}
 	SF2FormatInstrument::~SF2FormatInstrument(){}
 	SF2FormatInstrument::SF2FormatInstrument(InputStream & inputStream){
-		sbx=std::make_shared<SF2Soundbank>(inputStream);
+		sbx=mksp<SF2Soundbank>(inputStream);
 		inputStream.close();
 		for(auto & in : sbx->instruments){
 			if(in->getBank() == 128) putDrumSet(*in);
@@ -89,23 +89,23 @@ namespace yzrilyzr_simplesynth{
 		return nullptr;
 	}
 	void SF2FormatInstrument::putInst(SF2Instrument & instr){
-		std::shared_ptr<RegionAmp> src1=std::make_shared<RegionAmp>();
+		u_sp<RegionAmp> src1=mksp<RegionAmp>();
 		programMap[{instr.getBank(), instr.getPreset()}]=src1;
-		for(std::shared_ptr<SF2InstrumentRegion> instrumentRegion : instr.getRegions()){
+		for(u_sp<SF2InstrumentRegion> instrumentRegion : instr.getRegions()){
 			SF2Layer * layer=instrumentRegion->getLayer();
-			for(std::shared_ptr<SF2LayerRegion> r1 : layer->getRegions()){
+			for(u_sp<SF2LayerRegion> r1 : layer->getRegions()){
 				putLayerRegion(*src1, instr, *instrumentRegion, *r1, *layer);
 			}
 		}
 		src1->build();
 	}
 	void SF2FormatInstrument::putDrumSet(SF2Instrument & instr){
-		auto drums=std::make_shared<NonInterpolateAmpSet>();
+		auto drums=mksp<NonInterpolateAmpSet>();
 		drumSetMap[instr.getPreset()]=drums;
 		EqualTemperament tuning;
-		for(std::shared_ptr<SF2InstrumentRegion> instrumentRegion : instr.getRegions()){
+		for(u_sp<SF2InstrumentRegion> instrumentRegion : instr.getRegions()){
 			SF2Layer * layer=instrumentRegion->getLayer();
-			for(std::shared_ptr<SF2LayerRegion> r1 : layer->getRegions()){
+			for(u_sp<SF2LayerRegion> r1 : layer->getRegions()){
 				SF2Sample * sample=r1->getSample();
 				int type=sample->getSampleType();
 				uint8_t op=0;
@@ -145,7 +145,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		return op;
 	}
-	std::shared_ptr<SampleProvider> SF2FormatInstrument::getSampleProvider(ModelByteBuffer & buf){
+	u_sp<SampleProvider> SF2FormatInstrument::getSampleProvider(ModelByteBuffer & buf){
 		int64_t length=buf.capacity();
 		int64_t offset=buf.arrayOffset();
 		int64_t hash=offset ^ length;
@@ -159,7 +159,7 @@ namespace yzrilyzr_simplesynth{
 				val|=(byteArr[bi++] & 0xff) << 8;
 				arr[si++]=val;
 			}
-			it=sampleMap.emplace(hash, std::make_shared<ShortArrayProvider>(arr)).first;
+			it=sampleMap.emplace(hash, mksp<ShortArrayProvider>(arr)).first;
 		}
 		return it->second;
 	}
@@ -192,7 +192,7 @@ namespace yzrilyzr_simplesynth{
 		int32_t coarseTune=getGeneratorValue(SF2Region::GENERATOR_COARSETUNE, lReg, iReg, layer, in);
 		if(fineTune == NOT_FOUND)fineTune=0;
 		if(coarseTune == NOT_FOUND)coarseTune=0;
-		std::shared_ptr<WaveSampler> sampler=WaveSamplerBuilder()
+		u_sp<WaveSampler> sampler=WaveSamplerBuilder()
 			.loop(sloop, eloop, sustainable?WaveSampler::LOOP_LOOP:WaveSampler::LOOP_DISABLE)
 			.sample(getSampleProvider(*buf))
 			.sampleFreq(tuning.getFrequencyByID(op - coarseTune - (double)fineTune / 100.0),

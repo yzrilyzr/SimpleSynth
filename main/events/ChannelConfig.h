@@ -17,14 +17,14 @@ namespace yzrilyzr_simplesynth{
 	class IChannel;
 	class ChannelEvent;
 	class InstrumentProvider;
-	typedef std::shared_ptr<NoteProcessor> NoteProcPtr;
+	typedef u_sp<NoteProcessor> NoteProcPtr;
 	EBCLASS(ChannelConfig){
 		private:
 		NoteProcPtr sp_noteProcessor=nullptr;
-		std::shared_ptr<yzrilyzr_dsp::DSP3D> sp_dsp3d=nullptr;
-		std::shared_ptr<InstrumentProvider> sp_instrument=nullptr;
-		std::shared_ptr<NoteTuning> sp_tuning=nullptr;
-		std::shared_ptr<yzrilyzr_interpolator::Interpolator> sp_velocityMap=nullptr;
+		u_sp<yzrilyzr_dsp::DSP3D> sp_dsp3d=nullptr;
+		u_sp<InstrumentProvider> sp_instrument=nullptr;
+		u_sp<NoteTuning> sp_tuning=nullptr;
+		u_sp<yzrilyzr_interpolator::Interpolator> sp_velocityMap=nullptr;
 		public:
 		//基础信息（需要初始化）
 		u_sample_rate sampleRate=0;
@@ -78,15 +78,15 @@ namespace yzrilyzr_simplesynth{
 		~ChannelConfig();
 		//
 		public:		
-		//std::shared_ptr<InstrumentProvider> getInstrumentProvider()const;
-		void setInstrumentProvider(std::shared_ptr<InstrumentProvider> instr);
-		//std::shared_ptr<NoteTuning> getNoteTuning()const;
-		void setNoteTuning(std::shared_ptr<NoteTuning> tun);
-		//std::shared_ptr<yzrilyzr_interpolator::Interpolator> getNoteVelocityMap()const;
-		void setNoteVelocityMap(std::shared_ptr<yzrilyzr_interpolator::Interpolator> val);
-		void set3DEffect(std::shared_ptr<yzrilyzr_dsp::DSP3D> dsp3d);
-		//std::shared_ptr<yzrilyzr_dsp::DSP3D> get3DEffect();
+		//u_sp<InstrumentProvider> getInstrumentProvider()const;
+		void setInstrumentProvider(u_sp<InstrumentProvider> instr);
+		//u_sp<NoteTuning> getNoteTuning()const;
+		void setNoteTuning(u_sp<NoteTuning> tun);
+		//u_sp<yzrilyzr_interpolator::Interpolator> getNoteVelocityMap()const;
+		void setNoteVelocityMap(u_sp<yzrilyzr_interpolator::Interpolator> val);
+		void set3DEffect(u_sp<yzrilyzr_dsp::DSP3D> dsp3d);
+		//u_sp<yzrilyzr_dsp::DSP3D> get3DEffect();
 		void set(const ChannelConfig & other);
-		static std::shared_ptr<ChannelConfig> DefaultConfig();
+		static u_sp<ChannelConfig> DefaultConfig();
 	};
 }

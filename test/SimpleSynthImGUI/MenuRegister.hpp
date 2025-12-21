@@ -11,7 +11,7 @@ class CurrentProjectContext;
 class ProjectObject;
 EBCLASS(MenuRegister){
 	public:
-	using CreatorFunc=std::function<std::shared_ptr<yzrilyzr_util::ParamRegister>()>;
+	using CreatorFunc=std::function<u_sp<yzrilyzr_util::ParamRegister>()>;
 	using RenderFunc=std::function<void(CurrentProjectContext &, ProjectObject &)>;
 	struct MenuRegisterObject{
 		yzrilyzr_lang::String name;

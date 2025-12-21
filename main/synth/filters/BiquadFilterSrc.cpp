@@ -73,7 +73,7 @@ namespace yzrilyzr_simplesynth{
 		return src->noMoreData(note);
 	}
 	NoteProcPtr BiquadFilterSrc::clone(){
-		return std::make_shared<BiquadFilterSrc>(src->clone(), freqEnv->clone(), qEnv->clone(), type);
+		return mksp<BiquadFilterSrc>(src->clone(), freqEnv->clone(), qEnv->clone(), type);
 	}
 	BiquadFilterSrcKeyData * BiquadFilterSrc::init(BiquadFilterSrcKeyData * data, Note & note){
 		if(data == nullptr){

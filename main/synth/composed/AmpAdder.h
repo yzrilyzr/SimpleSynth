@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 		return a->noMoreData(note) && b->noMoreData(note);
 	}
 	NoteProcPtr clone() override{
-		return std::make_shared<AmpAdder>(a->clone(), b->clone());
+		return mksp<AmpAdder>(a->clone(), b->clone());
 	}
 	yzrilyzr_lang::String toString() const override;
 	};

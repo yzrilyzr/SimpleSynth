@@ -27,7 +27,7 @@ namespace yzrilyzr_simplesynth{
 		return sum1 + string1 * 0.8;
 	}
 	NoteProcPtr BowedString::clone(){
-		return std::make_shared<BowedString>(boxCombFreq, boxBandFreq, boxNotchFreq);
+		return mksp<BowedString>(boxCombFreq, boxBandFreq, boxNotchFreq);
 	}
 	u_sample BowedString::getAmp(Note & note){
 		BowedStringKeyData & data=*getData(note);

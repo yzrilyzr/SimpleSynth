@@ -71,7 +71,7 @@ namespace yzrilyzr_simplesynth{
 		return sum;
 	}
 	NoteProcPtr clone() override{
-		std::shared_ptr<RegionAmp> re=std::make_shared<RegionAmp>();
+		u_sp<RegionAmp> re=mksp<RegionAmp>();
 		re->region=region;
 		re->addedAllRegions=addedAllRegions;
 		re->build();

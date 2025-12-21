@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 	public:
 	NoteProcPtr notes[CHANNEL_MAX_NOTE_ID]={nullptr};
 	~NearestAmpSet();
-	NearestAmpSet(std::shared_ptr<PhaseSrc> freq);
+	NearestAmpSet(u_sp<PhaseSrc> freq);
 	NearestAmpSet();
 	yzrilyzr_lang::String toString() const override;
 	bool noMoreData(Note & note) override;
@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 	};
 	EBCLASS(NearestAmpSetBuilder){
 	private:
-	std::shared_ptr<NearestAmpSet> objptr=nullptr;
+	u_sp<NearestAmpSet> objptr=nullptr;
 	public:
 	NearestAmpSetBuilder();
 	NearestAmpSetBuilder & add(int note, NoteProcPtr noteProcessor);
