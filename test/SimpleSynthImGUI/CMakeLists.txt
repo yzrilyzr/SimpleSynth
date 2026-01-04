@@ -2,25 +2,22 @@
 
 set(SDL2_DIR "${REFERENCE_DIR}/SDL2-2.0.16")
 set(JSON_DIR "${REFERENCE_DIR}/nlohmann_json")
+set(IMGUI_STATIC_DIR "${REFERENCE_DIR}/imgui-static")
 set(IMGUI_DIR "${REFERENCE_DIR}/imgui-1.91.5")
 set(IMGUI_FILEDLG_DIR "${REFERENCE_DIR}/ImGuiFileDialog-0.6.7")
 set(IMPLOT_DIR "${REFERENCE_DIR}/implot-master")
+set(IMNODES_DIR "${REFERENCE_DIR}/imnodes-master")
 set(IMGUI_KNOBS_DIR "${REFERENCE_DIR}/imgui-knobs")
 set(IMGUI_BACKENDS_DIR "${IMGUI_DIR}/backends")
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(IMGUI_STATIC_FILE "${IMGUI_STATIC_DIR}/out/build/x64-Debug/ImGUI-Static.lib")
+else()
+    set(IMGUI_STATIC_FILE "${IMGUI_STATIC_DIR}/out/build/x64-Release/ImGUI-Static.lib")
+endif()
+
 
 add_executable (${PROJECT_NAME} "main.cpp"
-"${IMGUI_BACKENDS_DIR}/imgui_impl_sdl2.cpp"
-"${IMGUI_BACKENDS_DIR}/imgui_impl_opengl3.cpp"
-"${IMGUI_DIR}/imgui.cpp"
-"${IMGUI_DIR}/imgui_draw.cpp"
-"${IMGUI_DIR}/imgui_tables.cpp"
-"${IMGUI_DIR}/imgui_widgets.cpp"
-"${IMGUI_DIR}/imgui_demo.cpp"
-"${IMPLOT_DIR}/implot.cpp"
-"${IMPLOT_DIR}/implot_items.cpp"
-"${IMGUI_FILEDLG_DIR}/ImGuiFileDialog.cpp"
-"${IMGUI_KNOBS_DIR}/imgui-knobs.cpp"
  "SimpleSynthWindow.cpp"
  "ProjectObject.cpp"
  "CurrentProjectContext.cpp"
@@ -44,11 +41,12 @@ add_executable (${PROJECT_NAME} "main.cpp"
  "ProjectObject.h"
  "sswindow/EQWindow.cpp"
  "LangToEnum.h"
+ "ParamHelper.h"
  "sswindow/OscilloscopeWindow.cpp"
  "sswindow/ChannelSettingWindow.cpp"
  "sswindow/MixerSettingWindow.cpp"
 "notesrcrender/FM6x6Render.cpp"
- "notesrcrender/NoteSrcRender.h" "notesrcrender/MultiStageEnvRender.cpp")
+ "notesrcrender/NoteSrcRender.h" "notesrcrender/MultiStageEnvRender.cpp" "ParamHelper.cpp")
 
 #find_package(nlohmann_json REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -61,6 +59,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 "${IMGUI_FILEDLG_DIR}"
 "${IMGUI_KNOBS_DIR}"
 "${IMPLOT_DIR}"
+"${IMNODES_DIR}"
 "${IMGUI_BACKENDS_DIR}"
 "${CMAKE_SOURCE_DIR}/yzrutil/main"
 "${CMAKE_SOURCE_DIR}/SimpleDSP/main"
@@ -70,7 +69,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 target_link_directories(${PROJECT_NAME} PRIVATE "${SDL2_DIR}/lib/x64")
-target_link_libraries(${PROJECT_NAME} PRIVATE yzrutil SimpleDSP SimpleSynth "${SDL2_DIR}/lib/x64/SDL2.lib" OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} PRIVATE yzrutil SimpleDSP SimpleSynth "${SDL2_DIR}/lib/x64/SDL2.lib" "${IMGUI_STATIC_FILE}" OpenGL::GL)
 
 if(WIN32)
   target_sources(${PROJECT_NAME} PRIVATE win32res.rc)

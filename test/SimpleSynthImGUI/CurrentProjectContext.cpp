@@ -1,15 +1,26 @@
 ﻿#include "interface/IChannel.h"
 #include "interface/IMixer.h"
 #include "ImGuiFileDialog.h"
-#include "ProjectWindowSelect.h"
+#include "ParamHelper.h"
 #include "SimpleSynthProject.h"
 #include "SynthUtil.h"
-#include <shared_mutex>
+#include "synth/source/AmplitudeSources.h"
+#include "lang/String.h"
+#include "lang/System.h"
+#include "imnodes.h"
 #include <string>
+#include <imgui_internal.h>
 using json=nlohmann::json;
+
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_collection;
 using namespace yzrilyzr_util;
+using namespace yzrilyzr_lang;
+using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_interpolator;
+using namespace yzrilyzr_array;
+
+
 void CurrentProjectContext::setMixer(IMixer * mixer){
 	this->mixer=mixer;
 }
@@ -18,7 +29,6 @@ void CurrentProjectContext::newProject(){
 	objects.clear();
 	dragPayloadType=nullptr;
 	finalProcessor=nullptr;
-	paramUIBindings.clear();
 }
 void CurrentProjectContext::openFile(const std::string & filePath){
 	try{
@@ -69,86 +79,78 @@ void CurrentProjectContext::saveFile(){
 		);
 	}
 }
+ProjectObject * CurrentProjectContext::findNode(int nodeId){
+	for(auto * obj : objects){
+		int objId=reinterpret_cast<int>(obj);
+		if(objId == nodeId){
+			return obj;
+		}
+	}
+	return nullptr;
+}
+
+ParamReg * CurrentProjectContext::findParam(ProjectObject & obj, int attrId){
+	//查找哪个被连接了
+	for(ParamReg & param : obj.paramRegPtr->RegisteredParams){
+		int paramId=reinterpret_cast<int>(param.value);
+		if(attrId == paramId){
+			return &param;
+		}
+	}
+}
+
+ParamReg * CurrentProjectContext::findParam(int nodeId, int attrId){
+	ProjectObject * obj=findNode(nodeId);
+	if(obj == nullptr)return nullptr;
+	return findParam(*obj, attrId);
+}
 
 void CurrentProjectContext::renderCurrentProjectWindow(){
-	//ImGui::Begin(LANG.getf("window.current_project.title", file).c_str());
-	paramUIBindings.clear();
-	// 处理和绘制选择框
-	HandleSelectionAndDrag();
+	ImGui::SetNextWindowSizeConstraints(ImVec2(200, 200), ImVec2(20000, 20000));
 
-	// 检查右键点击的窗口
-	if(ImGui::IsMouseClicked(ImGuiMouseButton_Right)){
-		ImVec2 mousePos=ImGui::GetIO().MousePos;
-		rightClickedObj=nullptr;
-
-		// 检查点击的是哪个窗口
-		for(auto * obj : objects){
-			if(!obj->showWindow) continue;
-
-			if(mousePos.x >= obj->windowPos.x &&
-			   mousePos.x <= obj->windowPos.x + obj->windowSize.x &&
-			   mousePos.y >= obj->windowPos.y &&
-			   mousePos.y <= obj->windowPos.y + obj->windowSize.y){
-				rightClickedObj=obj;
-				obj->isSelected=true;
-				break;
-			}
+	ImGui::Begin(LANG.getf("window.current_project.title", file).c_str(UTF8));
+	/*ImGui::SetWindowFontScale(zoom);
+	bool is_window_hovered=ImGui::IsWindowHovered();
+	if(is_window_hovered){
+		float wheel=ImGui::GetIO().MouseWheel;
+		if(wheel != 0.0f){
+			float old_zoom=zoom;
+			zoom*=wheel > 0?1.1:0.9;;
+			zoom=ImClamp(zoom, 0.3f, 3.0f);
 		}
-	}
-
+	}*/
 	// 渲染窗口
-	auto itr=objects.iterator();
-	while(itr->hasNext()){
-		ProjectObject * p=itr->next();
-		// 如果窗口被选中，可以绘制高亮边框
-		if(p->isSelected){
-			ImDrawList * drawList=ImGui::GetForegroundDrawList();
-			drawList->AddRect(
-				p->windowPos,
-				ImVec2(p->windowPos.x + p->windowSize.x,
-					   p->windowPos.y + p->windowSize.y),
-				IM_COL32(255, 255, 0, 255), // 黄色边框
-				0.0f, // 圆角
-				0,    // 标志
-				2.0f  // 线宽
-			);
-		}
-		p->renderWindow(*this);
-		if(!p->showWindow){
-			itr->remove();
-		}
+	ImNodes::BeginNodeEditor();
+
+
+	for(auto * obj : objects){
+		obj->renderWindow(*this);
+
 	}
 	//输出窗口
-	ImGui::Begin(LANG.getc("window.notesrc_output.title"));
+
+	ImNodes::BeginNode(OUTPUT_NODE_ID);
+	ImNodes::SetNodeGridSpacePos(OUTPUT_NODE_ID, ImVec2(0, 0));
+	ImNodes::SetNodeDraggable(OUTPUT_NODE_ID, false);
+	ImNodes::BeginNodeTitleBar();
+	ImGui::TextUnformatted(LANG.getc("window.notesrc_output.title"));
+	ImNodes::EndNodeTitleBar();
+
 	static int sendToChannel=20;
-	static u_sp<ParamRegister> params=mksp<ParamRegister>();
-	static bool unregistered=true;
-	if(unregistered){
-		params->registerParam("Output", ParamType::NoteSrc, &finalProcessor, 0, 0);
-		unregistered=false;
-	}
-	//
-	bool currentType=dragPayloadType && strcmp(dragPayloadType, payloadType_NoteProcessor) == 0;
-	if(currentType)ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.2f, 1.0f)); // 高亮颜色
+
+	auto color=IM_COL32(100, 220, 100, 255);
+	ImNodes::PushColorStyle(ImNodesCol_Pin, color);
+
+	ImNodes::BeginInputAttribute(OUTPUT_ATTR_ID, ImNodesPinShape_TriangleFilled);
 	ImGui::Text(LANG.getc("window.notesrc_output.connect_here"));
-	ImVec2 button2Min=ImGui::GetItemRectMin();
-	ImVec2 button2Max=ImGui::GetItemRectMax();
-	paramUIBindings.push_back(ParamUIBinding{params->RegisteredParams[0].value, ImVec2((button2Min.x + button2Max.x) * 0.5f, (button2Min.y + button2Max.y) * 0.5f)});
-	if(currentType)ImGui::PopStyleColor();
-	if(ImGui::BeginDragDropTarget()){
-		if(const ImGuiPayload * payload=ImGui::AcceptDragDropPayload(payloadType_NoteProcessor)){
-			IM_ASSERT(payload->DataSize == sizeof(ProjectObject));
-			ProjectObject * pj=(ProjectObject *)(payload->Data);
-			finalProcessor=std::dynamic_pointer_cast<NoteProcessor>(pj->paramRegPtr);
-		}
-		if(const ImGuiPayload * payload=ImGui::AcceptDragDropPayload(payloadType_Osc)){
-			IM_ASSERT(payload->DataSize == sizeof(ProjectObject));
-			ProjectObject * pj=(ProjectObject *)(payload->Data);
-			finalProcessor=std::dynamic_pointer_cast<NoteProcessor>(pj->paramRegPtr);
-		}
-		ImGui::EndDragDropTarget();
-	}
+	ImNodes::EndInputAttribute();
+
+	ImNodes::PopColorStyle();
+
+	ImGui::PushItemWidth(100.0f);
 	ImGui::InputInt(LANG.getc("window.notesrc_output.channel"), &sendToChannel);
+	ImGui::PopItemWidth();
+
 	if((ImGui::Button(LANG.getc("window.notesrc_output.set")) || paramChange) && finalProcessor != nullptr){
 		const char * group="WM_MIDI_Instant";
 		try{
@@ -169,29 +171,87 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 		paramChange=false;
 	}
 
-	ImGui::End();
+	ImNodes::EndNode();
+
 	//find connect lines
-	std::vector<ConnectLine> connectLines;
+	links.clear();
 	for(ProjectObject * obj : objects){
+		int nodeId=reinterpret_cast<int>(obj);
+		auto oldWindowPos=ImNodes::GetNodeGridSpacePos(nodeId);
+		if(oldWindowPos.x == 0 && oldWindowPos.y == 0){
+			ImNodes::SetNodeGridSpacePos(nodeId, obj->windowPos);
+		} else{
+			obj->windowPos=oldWindowPos;
+		}		
+
 		if(obj->paramRegPtr == finalProcessor){
-			connectLines.push_back(ConnectLine{obj->paramRegPtr.get(), params->RegisteredParams[0].value});
+			int started_at_attribute_id=reinterpret_cast<int>(obj->paramRegPtr.get());
+			links.push_back(LinkLine{nodeId, started_at_attribute_id, OUTPUT_NODE_ID, OUTPUT_ATTR_ID, color});
 		}
-		buildConnectLines(*obj, *obj->paramRegPtr, connectLines);
+		buildLinks(*obj, *obj->paramRegPtr);
 	}
-	//
-	ImDrawList * drawList=ImGui::GetForegroundDrawList();
-	for(auto & c : connectLines){
-		ImVec2 v1, v2;
-		for(auto & d : paramUIBindings){
-			if(d.param == c.left)v1=d.ui;
-			if(d.param == c.right)v2=d.ui;
+
+	for(size_t i=0; i < links.size(); ++i){
+		auto & link=links[i];
+		ImNodes::PushColorStyle(ImNodesCol_Link, link.color);
+		ImNodes::Link(i, link.started_at_attribute_id, link.ended_at_attribute_id);
+		ImNodes::PopColorStyle();
+	}
+	ImNodes::MiniMap(0.2f, ImNodesMiniMapLocation_BottomRight);
+	ImNodes::EndNodeEditor();
+
+	int  started_at_attribute_id=0;
+	int  ended_at_attribute_id=0;
+	int  started_at_node_id=0;
+	int  ended_at_node_id=0;
+	bool created_from_snap=0;
+	int destroyed_link_id=0;
+	if(ImNodes::IsLinkDestroyed(&destroyed_link_id)){
+		LinkLine & link=links[destroyed_link_id];
+		System::out.println(String("LinkDestroyed: ") + link.started_at_node_id + " " + link.started_at_attribute_id + " " + link.ended_at_node_id + " " + link.ended_at_attribute_id);
+
+	}
+	if(ImNodes::IsLinkCreated(&started_at_node_id,
+							  &started_at_attribute_id,
+							  &ended_at_node_id,
+							  &ended_at_attribute_id,
+							  &created_from_snap)){
+		if(ended_at_node_id == OUTPUT_NODE_ID){
+			System::out.println(String("LinkOutput: ") + started_at_node_id + " " + started_at_attribute_id + " " + ended_at_node_id + " " + ended_at_attribute_id);
+			//查找输出
+			ProjectObject * nodeStart=findNode(started_at_node_id);
+			if(nodeStart){
+				if(auto ptr=std::dynamic_pointer_cast<NoteProcessor>(nodeStart->paramRegPtr)){
+					//创建新有效连接
+					finalProcessor=ptr;
+				} else{
+					finalProcessor=nullptr;
+				}
+				paramChange=true;
+			}
+		} else{
+			ProjectObject * nodeStart=nullptr;
+			ProjectObject * nodeEnd=nullptr;
+			for(auto * obj : objects){
+				int objId=reinterpret_cast<int>(obj);
+				if(objId == started_at_node_id)nodeStart=obj;
+				if(objId == ended_at_node_id)nodeEnd=obj;
+			}
+			if(nodeStart && nodeEnd){
+				System::out.println(String("Link: ") + started_at_node_id + " " + started_at_attribute_id + " " + ended_at_node_id + " " + ended_at_attribute_id);
+				ParamReg * endParam=findParam(*nodeEnd, ended_at_attribute_id);
+				if(endParam){
+					paramChange=setParamValue(*endParam, nodeStart->paramRegPtr) || paramChange;
+				}
+			}
 		}
-		drawList->AddLine(v1, v2, IM_COL32(255, 0, 0, 255), 2.0f); // 红色线条，线宽为2.0
 	}
 	// 显示右键菜单
 	ShowContextMenu();
+	ImGui::End();
+	//ImGui::SetWindowFontScale(1.0);
 }
-void CurrentProjectContext::buildConnectLines(ProjectObject & obj, ParamRegister & params, std::vector<ConnectLine> & connectLines){
+void CurrentProjectContext::buildLinks(ProjectObject & obj, ParamRegister & params){
 	for(auto & param : params.RegisteredParams){
 		switch(param.type){
 			case ParamType::Float:
@@ -209,7 +269,7 @@ void CurrentProjectContext::buildConnectLines(ProjectObject & obj, ParamRegister
 			case ParamType::Sub:
 			{
 				ParamRegister * val=static_cast<ParamRegister *>(param.value);
-				buildConnectLines(obj, *val, connectLines);
+				buildLinks(obj, *val);
 			}
 			break;
 			default:
@@ -220,7 +280,11 @@ void CurrentProjectContext::buildConnectLines(ProjectObject & obj, ParamRegister
 					if(obj2 == &obj)continue;
 					void * poPtr=obj2->paramRegPtr.get();
 					if(value == poPtr){
-						connectLines.push_back(ConnectLine{param.value, poPtr});
+						int started_at_node_id=reinterpret_cast<int>(obj2);
+						int started_at_attribute_id=reinterpret_cast<int>(obj2->paramRegPtr.get());
+						int ended_at_node_id=reinterpret_cast<int>(&obj);
+						int ended_at_attribute_id=reinterpret_cast<int>(param.value);
+						links.push_back(LinkLine{started_at_node_id, started_at_attribute_id, ended_at_node_id, ended_at_attribute_id, getPinColor(param)});
 						break;
 					}
 				}
@@ -228,69 +292,4 @@ void CurrentProjectContext::buildConnectLines(ProjectObject & obj, ParamRegister
 			break;
 		}
 	}
-}
-void CurrentProjectContext::deleteSelected(){
-	auto itr=objects.iterator();
-	while(itr->hasNext()){
-		ProjectObject * p=itr->next();
-		if(p->isSelected){
-			itr->remove();
-		}
-	}
-}
-void CurrentProjectContext::copySelected(){
-	clipboardObjects.clear();
-	for(auto * obj : objects){
-		if(obj->isSelected){
-			clipboardObjects.add(obj);
-		}
-	}
-}
-void CurrentProjectContext::pasteSelected(){
-	auto j=obj2json(clipboardObjects, nullptr);
-	ArrayList<ProjectObject *> n;
-	json2obj(j, n);
-	for(auto * a : objects){
-		a->isSelected=false;
-	}
-	for(auto * a : n){
-		a->isSelected=true;
-		a->windowPos+=ImVec2(20, 20);
-		objects.add(a);
-	}
-	n.clear();
-}
-void CurrentProjectContext::duplicateSelected(){
-	ArrayList<ProjectObject *> n;
-	for(auto * obj : objects){
-		if(obj->isSelected){
-			n.add(obj);
-		}
-	}
-	auto j=obj2json(n, nullptr);
-	n.clear();
-	json2obj(j, n);
-	for(auto * a : objects){
-		a->isSelected=false;
-	}
-	for(auto * a : n){
-		a->isSelected=true;
-		a->windowPos+=ImVec2(20, 20);
-		objects.add(a);
-	}
-	n.clear();
-}
-void CurrentProjectContext::saveAsSub(bool selectedOnly){
-	ArrayList<ProjectObject *> n;
-	if(selectedOnly){
-		for(auto * obj : objects){
-			if(obj->isSelected)n.add(obj);
-		}
-	} else{
-		for(auto * obj : objects)n.add(obj);
-	}
-	auto j=obj2json(n, nullptr);
-	n.clear();
-	std::ofstream file1("/");
-	file1 << j.dump(4);
 }

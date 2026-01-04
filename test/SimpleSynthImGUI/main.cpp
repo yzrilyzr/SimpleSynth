@@ -8,6 +8,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui.h"
 #include "implot.h"
+#include "imnodes.h"
 #include "instrument/ReplaceableInstrument.h"
 #include "instrument/SimpleMIDIInstrument.h"
 #include "io/File.h"
@@ -30,7 +31,6 @@
 #include "SDL_opengl.h"
 #endif
 
-#define USE_IMGUI
 #pragma comment(lib,"winmm.lib")
 #if defined(_WIN32) && defined (_DEBUG)
 #endif
@@ -66,14 +66,13 @@ void saveFileDlg(){
 	IGFD::FileDialogConfig cfg;
 	cfg.fileName=ctx.LANG.get("save_file_dialog.default_file_name").tostring();
 	cfg.flags=ImGuiFileDialogFlags_Modal;
-	ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", ctx.LANG.get("save_file_dialog.title").tostring(), ".ssp", cfg);
+	ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", ctx.LANG.get("save_file_dialog.title").tostring(UTF8), ".ssp", cfg);
 }
 void newProject(){
 	ctx.file="";
 	ctx.objects.clear();
 	ctx.dragPayloadType=nullptr;
 	ctx.finalProcessor=nullptr;
-	ctx.paramUIBindings.clear();
 }
 void openFileDlg(){
 	 // 创建对话框配置
@@ -83,7 +82,7 @@ void openFileDlg(){
 	// 打开文件对话框
 	ImGuiFileDialog::Instance()->OpenDialog(
 		"OpenFileDlgKey",    // 对话框唯一标识key
-		ctx.LANG.get("open_file_dialog.title").tostring(),         // 对话框标题
+		ctx.LANG.get("open_file_dialog.title").tostring(UTF8),         // 对话框标题
 		".ssp",      // 文件过滤器
 		config              // 配置参数
 	);
@@ -238,7 +237,6 @@ int main(int argc, char * argv[]){
 	u_sp <ReplaceableInstrument> rin=mksp<ReplaceableInstrument>(simple);
 	mixer->getGlobalConfig().setInstrumentProvider(rin);
 	ctx.setMixer(mixer);
-	//rin->setDrumSet(mksp<TR808DrumSet>());
 	SDL_AudioSpec spec;
 	spec.freq=ctx.sampleRate;
 	spec.format=AUDIO_S32SYS;
@@ -269,7 +267,6 @@ int main(int argc, char * argv[]){
 	registerAllInterpolator(ctx.LANG, allInterpolator);
 	registerAllPhaseSrc(ctx.LANG, allPhaseSrc);
 
-#ifdef USE_IMGUI
 // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 	// GL ES 2.0 + GLSL 100
@@ -316,10 +313,12 @@ int main(int argc, char * argv[]){
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO & io=ImGui::GetIO();
 
+	ImGui::CreateContext();	
 	ImPlot::CreateContext();
+	ImNodes::CreateContext();
+
+	ImGuiIO & io=ImGui::GetIO();
 	io.ConfigFlags|=ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags|=ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -495,14 +494,6 @@ int main(int argc, char * argv[]){
 
 	SDL_GL_DeleteContext(gl_context);
 	SDL_DestroyWindow(window);
-#endif // USE_IMGUI
-#ifndef USE_IMGUI
-	string a;
-	while(true){
-		std::getline(std::cin, a);
-	}
-#endif // !USE_IMGUI
-
 	closeAndExit();
 
 	return 0;

@@ -1,5 +1,7 @@
 将`[PlatformName]`打包成foobar2000插件，作为MIDI合成器（自定义解码器）使用
 
+> 注意：如果发生闪退，需要替换foobar2000安装目录下的msvcpxxx.dll为最新版（自带的版本线程锁有bug）
+
 ```cpp
 #define WIN32_LEAN_AND_MEAN 
 #include <windows.h>

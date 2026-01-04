@@ -1,11 +1,10 @@
-﻿#include "ProjectObject.h"
+﻿#include "ParamHelper.h"
+#include "ProjectObject.h"
 #include "SimpleSynthProject.h"
-#include "array/SampleProvider.h"
-#include "dsp/DSP.h"
-#include "interpolator/Interpolator.h"
+#include "imnodes.h"
 #include "lang/Boxing.h"
-#include <string>
 #include "synth/source/AmplitudeSources.h"
+#include <string>
 using json=nlohmann::json;
 using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_dsp;
@@ -224,37 +223,37 @@ void ProjectObject::from_json(const json & j){
 }
 
 void ProjectObject::renderWindow(CurrentProjectContext & ctx){
-	String windowName=showName + "##" + std::to_string((int64_t)this);
-	ImGui::SetNextWindowPos(windowPos);
-	ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
-	ImGui::Begin(windowName.c_str(UTF8), &showWindow, ImGuiWindowFlags_None);
-	windowPos=ImGui::GetWindowPos();
-	windowSize=ImGui::GetWindowSize();
-	if(ImGui::Button(ctx.LANG.getc("window.project_object.drag_this"))){}
-	if(ImGui::BeginDragDropSource()){
-		if(std::dynamic_pointer_cast<Osc>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_Osc;
-		else if(std::dynamic_pointer_cast<NoteProcessor>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_NoteProcessor;
-		else if(std::dynamic_pointer_cast<PhaseSrc>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_PhaseSrc;
-		else if(std::dynamic_pointer_cast<Interpolator>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_Interpolator;
-		else if(std::dynamic_pointer_cast<DSP>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_DSP;
-		else if(std::dynamic_pointer_cast<SampleProvider>(paramRegPtr))ctx.dragPayloadType=ctx.payloadType_Sample;
-		ImGui::SetDragDropPayload(ctx.dragPayloadType, this, sizeof(ProjectObject));
-		ImGui::Text(ctx.LANG.getf("window.project_object.dragging_this").c_str(UTF8));
-		ImGui::EndDragDropSource();
+	int paramId=reinterpret_cast<int>(paramRegPtr.get());
+	int nodeId=reinterpret_cast<int>(this);
+	auto color=getPinColor(paramRegPtr);
+	ImNodes::PushColorStyle(ImNodesCol_TitleBar, color);
+	ImNodes::BeginNode(nodeId);
+	
+	ImNodes::BeginNodeTitleBar();
+	ImGui::TextUnformatted(showName.c_str(UTF8));
+	ImNodes::EndNodeTitleBar();
+
+	//输出节点
+	ImNodes::PushColorStyle(ImNodesCol_Pin, color);
+
+	ImNodes::BeginOutputAttribute(paramId, ImNodesPinShape_TriangleFilled);
+	ImGui::Text(ctx.LANG.getc("window.project_object.output"));
+	ImNodes::EndOutputAttribute();
+
+	ImNodes::PopColorStyle();
+
+	if(paramRegPtr->RegisteredParams.empty()){
+		ImNodes::BeginStaticAttribute(paramId);
+		ImNodes::EndStaticAttribute();
+	} else{
+		//ImGui::Text(ctx.LANG.getc("window.project_object.params"));
+		if(enableOriginalRender){
+			ctx.paramChange=renderParams(ctx, paramRegPtr->RegisteredParams) || ctx.paramChange;
+		}
+		if(renderFunc != nullptr)renderFunc(ctx, *this);
 	}
-	ImVec2 button1Min=ImGui::GetItemRectMin();
-	ImVec2 button1Max=ImGui::GetItemRectMax();
-	ctx.paramUIBindings.push_back(ParamUIBinding{paramRegPtr.get(), ImVec2((button1Min.x + button1Max.x) * 0.5f, (button1Min.y + button1Max.y) * 0.5f)});
-	ImGui::Separator();
-	ImGui::Text(ctx.LANG.getc("window.project_object.params"));
-	if(enableOriginalRender){
-		ctx.paramChange=renderParams(ctx, std::static_pointer_cast<ParamRegister>(paramRegPtr)->RegisteredParams) || ctx.paramChange;
-	}
-	if(renderFunc != nullptr)renderFunc(ctx, *this);
-	if(!ImGui::IsMouseDragging(ImGuiMouseButton_Left)){
-		ctx.dragPayloadType=nullptr;
-	}
-	ImGui::End();
+	ImNodes::EndNode();
+	ImNodes::PopColorStyle();
 }
 
 bool ProjectObject::renderParams(CurrentProjectContext & ctx, std::vector<ParamReg> & paramReg){
@@ -271,65 +270,91 @@ bool ProjectObject::renderParams(CurrentProjectContext & ctx, std::vector<ParamR
 				localChange=ImGui::Checkbox(cstrName, static_cast<bool *>(param.value));
 				break;
 			case ParamType::Double:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Float:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Float, param.value, param.valueMin, param.valueMax);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Freq:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax, "%.3f Hz", ImGuiSliderFlags_Logarithmic);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Time:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax, "%.3f s", ImGuiSliderFlags_Logarithmic);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::TimeMs:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax, "%.3f ms", ImGuiSliderFlags_Logarithmic);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Int:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_S32, param.value, param.valueMin, param.valueMax);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::UInt:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_U32, param.value, param.valueMin, param.valueMax);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Long:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_S64, param.value, param.valueMin, param.valueMax);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::ULong:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_U64, param.value, param.valueMin, param.valueMax);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Size:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, sizeof(u_index) == 8?ImGuiDataType_U64:ImGuiDataType_U32, param.value, param.valueMin, param.valueMax);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Gain:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, sizeof(u_sample) == 8?ImGuiDataType_Double:ImGuiDataType_Float, param.value, param.valueMin, param.valueMax, "%.3f mul", ImGuiSliderFlags_Logarithmic);
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Sample:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::SliderScalar(cstrName, sizeof(u_sample) == 8?ImGuiDataType_Double:ImGuiDataType_Float, param.value, param.valueMin, param.valueMax, "%.3f");
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Enum:
+				ImGui::PushItemWidth(150.0f);
 				localChange=ImGui::Combo(cstrName, static_cast<int *>(param.value), static_cast<const char **>(param.valueMin), *static_cast<int *>(param.valueMax));
+				ImGui::PopItemWidth();
 				break;
 			case ParamType::Sub:
 				ImGui::Text(cstrName);
 				localChange=renderParams(ctx, static_cast<ParamRegister *>(param.value)->RegisteredParams);
 				break;
 			case ParamType::NoteSrc:
-				localChange=renderProjectObjectParam<NoteProcessor>(ctx, param, cstrName, {ctx.payloadType_NoteProcessor, ctx.payloadType_Osc});
+				renderObjectParamInput(ctx, param, cstrName);
 				break;
 			case ParamType::PhaseSrc:
-				localChange=renderProjectObjectParam<PhaseSrc>(ctx, param, cstrName, {ctx.payloadType_PhaseSrc});
+				renderObjectParamInput(ctx, param, cstrName);
 				break;
 			case ParamType::OscSrc:
-				localChange=renderProjectObjectParam<Osc>(ctx, param, cstrName, {ctx.payloadType_Osc});
+				renderObjectParamInput(ctx, param, cstrName);
 				break;
 			case ParamType::SampleData:
-				localChange=renderProjectObjectParam<SampleProvider>(ctx, param, cstrName, {ctx.payloadType_Sample});
+				renderObjectParamInput(ctx, param, cstrName);
 				break;
 			case ParamType::Interpolator:
-				localChange=renderProjectObjectParam<Interpolator>(ctx, param, cstrName, {ctx.payloadType_Interpolator});
+				renderObjectParamInput(ctx, param, cstrName);
 				break;
 			case ParamType::DSP:
-				localChange=renderProjectObjectParam<DSP>(ctx, param, cstrName, {ctx.payloadType_DSP});
+				renderObjectParamInput(ctx, param, cstrName);
 				break;
 			default:
 				std::cout << "ImGui Type " << param.type << std::endl;
@@ -339,3 +364,6 @@ bool ProjectObject::renderParams(CurrentProjectContext & ctx, std::vector<ParamR
 	}
 	return change;
 }
+
+
+

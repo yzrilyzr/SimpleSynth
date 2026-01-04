@@ -5,12 +5,15 @@ using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	CymbalOsc::CymbalOsc() : CymbalOsc(0){
 		static double mulMin=0, mulMax=10;
-		registerParam("Multiply", yzrilyzr_util::ParamType::Double, &mul, &mulMin, &mulMax);
+		registerParam("Multiply", yzrilyzr_util::ParamType::NoteSrc, &mul, &mulMin, &mulMax);
 	}
 	CymbalOsc::CymbalOsc(double mul) : CymbalOsc(nullptr, ConstAmp(mul)){}
 	CymbalOsc::CymbalOsc(NoteProcPtr mul) : CymbalOsc(nullptr, mul){}
 	CymbalOsc::CymbalOsc(u_sp<PhaseSrc> freqSrc, NoteProcPtr mul) : Osc(freqSrc){
 		this->mul=mul;
+	}
+	void CymbalOsc::init(ChannelConfig & cfg){
+		if(mul == nullptr)mul=ConstAmp(1);
 	}
 	u_sample CymbalOsc::getAmp(Note & note){
 		u_sample sum=0;

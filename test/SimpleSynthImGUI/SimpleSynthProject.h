@@ -4,33 +4,25 @@
 #include "ProjectObject.h"
 #include "collection/ArrayList.hpp"
 #include "imgui.h"
-#include "interface/IChannel.h"
 #include "interface/IMixer.h"
 #include "nlohmann/json.hpp"
 #include "util/Lang.h"
 #include "util/ParamRegister.h"
 #include "yzrutil.h"
-#include <memory>
 #include <string>
 #include <vector>
+
+#define OUTPUT_NODE_ID 44948
+#define OUTPUT_ATTR_ID 18447
+
 using json=nlohmann::json;
 
-struct ParamUIBinding{
-	void * param;
-	ImVec2 ui;
-};
-struct ConnectLine{
-	void * left;
-	void * right;
-};
-
-struct SelectionBox{
-	ImVec2 start;         // 开始点
-	ImVec2 current;       // 当前点
-	bool isSelecting;     // 是否正在选择
-	bool isLeftToRight;   // 是否从左上到右下
-	bool isDragging;        // 是否正在拖动
-	ImVec2 dragStartPos;    // 拖动开始时的鼠标位置
+struct LinkLine{
+	int started_at_node_id;
+	int started_at_attribute_id;
+	int ended_at_node_id;
+	int ended_at_attribute_id;
+	ImU32 color;
 };
 
 class CurrentProjectContext{
@@ -47,12 +39,12 @@ class CurrentProjectContext{
 	yzrilyzr_simplesynth::NoteProcPtr finalProcessor=nullptr;
 	yzrilyzr_collection::ArrayList<ProjectObject *> objects;
 	yzrilyzr_collection::ArrayList<ProjectObject *> clipboardObjects;
-	std::vector<ParamUIBinding> paramUIBindings;
+	std::vector<LinkLine> links;
+	float zoom=1.0f;
 	std::string file="";
 	bool paramChange=false;
 	NotificationManager notificationManager;
 	ProjectObject * rightClickedObj=nullptr;
-	SelectionBox selection;
 	yzrilyzr_simplesynth::IMixer * mixer;
 	u_time_f processTime=0;
 	void setMixer(yzrilyzr_simplesynth::IMixer * mixer);
@@ -62,9 +54,12 @@ class CurrentProjectContext{
 	void HandleShortcuts();
 	void ShowContextMenu();
 	void renderCurrentProjectWindow();
-	void buildConnectLines(ProjectObject & obj, yzrilyzr_util::ParamRegister & params, std::vector<ConnectLine> & connectLine);
-	void HandleSelectionAndDrag();
+	void buildLinks(ProjectObject & obj, yzrilyzr_util::ParamRegister & params);
+	ProjectObject * findNode(int nodeId);
+	yzrilyzr_util::ParamReg * findParam(ProjectObject & obj, int attrId);
+	yzrilyzr_util::ParamReg * findParam(int nodeId, int attrId);
 
+	void autoLayout();
 	void deleteSelected();
 	void copySelected();
 	void pasteSelected();
