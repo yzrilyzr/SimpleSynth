@@ -17,11 +17,11 @@ void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 		data["PointSize"]=mksp<Integer>(3);
 	}*/
 	// TODO fix
-	/*Integer & PointSize=*std::dynamic_pointer_cast<Integer>(data["PointSize"]);
+	/*Integer & PointSize=*spdc<Integer>(data["PointSize"]);
 	ImGui::InputInt(ctx.LANG.getc("module.interpolator.graph.points"), &PointSize.value);
 	if(PointSize.value < 1)PointSize.value=1;
 	if(data.find("Points") != data.end()){
-		paramRegPtr->xys=std::dynamic_pointer_cast<DoubleArray>(data["Points"]);
+		paramRegPtr->xys=spdc<DoubleArray>(data["Points"]);
 	}
 	if(ImGui::Button(ctx.LANG.getc("module.interpolator.graph.init"))){
 		paramRegPtr->xys=DoubleArray(PointSize.value * 2);

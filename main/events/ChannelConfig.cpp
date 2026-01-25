@@ -36,6 +36,7 @@ namespace yzrilyzr_simplesynth{
 		CoarseTune=other.CoarseTune;
 		NoteShift=other.NoteShift;
 		Bank=other.Bank;
+		Program=other.Program;
 		lastNote=other.lastNote;
 		noteProcessor=other.noteProcessor;
 		tuning=other.tuning;
@@ -99,6 +100,7 @@ namespace yzrilyzr_simplesynth{
 		rpn.reset();
 		nrpn.reset();
 		Bank=0;
+		Program=0;
 	}
 	void ChannelConfig::setContext(IMixer * mixer,  IChannel * channel){
 		this->mixer=mixer;

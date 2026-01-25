@@ -161,7 +161,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 		Chorus & c=ch->getChorus(i);
 		ImGui::PushID(i + 100);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.depth"), ImGuiDataType_Double, &c.depthMs, &def_min, &depthMax);
-		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.freq"), ImGuiDataType_Double, &(std::dynamic_pointer_cast<Oscillator>(c.osc)->freq), &def_min, &rateMax);
+		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.freq"), ImGuiDataType_Double, &(spdc<Oscillator>(c.osc)->freq), &def_min, &rateMax);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.feedback"), ImGuiDataType_Double, &c.feedback, &feedBackMin, &feedBackMax);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.wet_ratio"), ImGuiDataType_Double, &c.wetRatio, &def_min, &def_max);
 		ImGui::PopID();

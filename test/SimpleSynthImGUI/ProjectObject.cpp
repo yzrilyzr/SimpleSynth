@@ -90,27 +90,27 @@ json ProjectObject::to_json() const{
 	json storedDataJSON;
 	for(auto & p : storeData){
 		auto datap=p.second;
-		if(auto datap2=std::dynamic_pointer_cast<SampleArray>(datap)){
+		if(auto datap2=spdc<SampleArray>(datap)){
 			json jsonArray=json::array();
 			for(u_index i=0;i < datap2->length;i++){
 				jsonArray.push_back((*datap2)[i]);
 			}
 			storedDataJSON[p.first.c_str()]={{"data", jsonArray}, {"type", "SampleArray"}};
-		} else if(auto datap2=std::dynamic_pointer_cast<DoubleArray>(datap)){
+		} else if(auto datap2=spdc<DoubleArray>(datap)){
 			json jsonArray=json::array();
 			for(u_index i=0;i < datap2->length;i++){
 				jsonArray.push_back((*datap2)[i]);
 			}
 			storedDataJSON[p.first.c_str()]={{"data", jsonArray}, {"type", "DoubleArray"}};
-		} else if(auto datap2=std::dynamic_pointer_cast<Short>(datap)){
+		} else if(auto datap2=spdc<Short>(datap)){
 			storedDataJSON[p.first.c_str()]=datap2->value;
-		} else if(auto datap2=std::dynamic_pointer_cast<Integer>(datap)){
+		} else if(auto datap2=spdc<Integer>(datap)){
 			storedDataJSON[p.first.c_str()]=datap2->value;
-		} else if(auto datap2=std::dynamic_pointer_cast<Long>(datap)){
+		} else if(auto datap2=spdc<Long>(datap)){
 			storedDataJSON[p.first.c_str()]=datap2->value;
-		} else if(auto datap2=std::dynamic_pointer_cast<Float>(datap)){
+		} else if(auto datap2=spdc<Float>(datap)){
 			a[p.first.c_str()]=datap2->value;
-		} else if(auto datap2=std::dynamic_pointer_cast<Double>(datap)){
+		} else if(auto datap2=spdc<Double>(datap)){
 			storedDataJSON[p.first.c_str()]=datap2->value;
 		}
 	}

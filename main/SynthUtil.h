@@ -28,6 +28,7 @@ namespace yzrilyzr_simplesynth{
 		//static u_sp<IChannel> getMIDIChannelOrNew(IMixer * mixer, const yzrilyzr_lang::String & groupName, s_midichannel_id channelID);
 		//static u_sp<IChannel> getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID);
 		static u_sp<MixerSequence> parseXM(yzrilyzr_io::InputStream & is);
+		static void sequenceToMIDI(u_sp<MixerSequence> seq,yzrilyzr_io::OutputStream & os);
 		static NoteProcPtr getDefault();
 		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2);
 		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const yzrilyzr_lang::String & groupName);

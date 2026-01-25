@@ -7,6 +7,9 @@ using namespace yzrilyzr_array;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
+	bool IMixer::isDrumSetChannel(s_midichannel_id id){
+		return (id % 16) == 9;
+	}
 	bool IMixer::hasMIDIChannel(s_midichannel_id id){
 		return hasMIDIChannel(DEFAULT_MIDI_CHANNEL_GROUP_NAME, id);
 	}

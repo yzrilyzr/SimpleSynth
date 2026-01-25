@@ -45,7 +45,7 @@ namespace yzrilyzr_simplesynth{
 
 		// 如果没有找到任何处理器，直接返回
 		if(firstNote == -1){
-			return std::dynamic_pointer_cast<NoteProcessor>(objptr);
+			return spdc<NoteProcessor>(objptr);
 		}
 
 		// 填充第一个有数据音符之前的部分
@@ -78,7 +78,7 @@ namespace yzrilyzr_simplesynth{
 			objptr->notes[i]=lastProcessor;
 		}
 
-		return std::dynamic_pointer_cast<NoteProcessor>(objptr);
+		return spdc<NoteProcessor>(objptr);
 	}
 	u_sample NearestAmpSet::getAmp(Note & note){
 		uint8_t id=note.id;

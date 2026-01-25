@@ -199,7 +199,7 @@ namespace yzrilyzr_simplesynth{
 	std::vector<u_sp<IChannel>> Mixer::getAllChannels()const{
 		std::vector<u_sp<IChannel>> chann;
 		for(auto & i : channels){
-			chann.emplace_back(std::dynamic_pointer_cast<IChannel>(i));
+			chann.emplace_back(spdc<IChannel>(i));
 		}
 		return chann;
 	}
@@ -220,11 +220,11 @@ namespace yzrilyzr_simplesynth{
 		if(res == midiChannelMap.end()){
 			auto channel=mksp<Channel>();
 			channel->setName(name + " #" + std::to_string(channelID));
-			if(channelID == 9) channel->setSustain(true);
+			if(IMixer::isDrumSetChannel(channelID)) channel->setSustain(true);
 			setMIDIChannel(name, channelID, channel);
-			return std::dynamic_pointer_cast<IChannel>(channel);
+			return spdc<IChannel>(channel);
 		}
-		return std::dynamic_pointer_cast<IChannel>(res->second);
+		return spdc<IChannel>(res->second);
 	}
 	u_sp<yzrilyzr_dsp::DSPChain> * Mixer::getEQ(){
 		return finalEQ;
@@ -319,11 +319,11 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer::sendInstantEvent(ChannelEvent * event){
 		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
-		u_sp<Channel> ch=std::dynamic_pointer_cast<Channel>(getMIDIChannel(event->groupName, event->channelID));
+		u_sp<Channel> ch=spdc<Channel>(getMIDIChannel(event->groupName, event->channelID));
 		ch->sendInstantEvent(event);
 	}
 	void Mixer::postEvent(ChannelEvent * event, u_time startAt){
-		u_sp<Channel> ch=std::dynamic_pointer_cast<Channel>(getMIDIChannel(event->groupName, event->channelID));
+		u_sp<Channel> ch=spdc<Channel>(getMIDIChannel(event->groupName, event->channelID));
 		ch->sendPostEvent(event, startAt);
 	}
 	bool Mixer::hasMIDIChannel(const String & groupName, s_midichannel_id channelID){
@@ -340,7 +340,7 @@ namespace yzrilyzr_simplesynth{
 	void NotePool::onReuse(Note * note){}
 	void Channel::setChannelId(s_midichannel_id id){
 		this->channelID=id;
-		if(id == 9){
+		if(IMixer::isDrumSetChannel(id)){
 			setDrumSetChannel(true);
 			channelConfig.setNoteProcessor(channelConfig.instrument->getDrumSet(channelConfig.Bank, getSampleRate()));
 		}
@@ -523,14 +523,14 @@ namespace yzrilyzr_simplesynth{
 			p->setChannel(1);
 			p->procBlock(s_outputR, blen);
 		} else{
-			std::dynamic_pointer_cast<AmpMultiply>(panner[0])->setValue(Util::clamp01(1 - channelConfig.Pan));
-			std::dynamic_pointer_cast<AmpMultiply>(panner[1])->setValue(Util::clamp01(1 + channelConfig.Pan));
-			std::dynamic_pointer_cast<DSP>(dspChain[0])->procBlock(s_outputL, blen);
-			std::dynamic_pointer_cast<DSP>(dspChain[1])->procBlock(s_outputR, blen);
+			spdc<AmpMultiply>(panner[0])->setValue(Util::clamp01(1 - channelConfig.Pan));
+			spdc<AmpMultiply>(panner[1])->setValue(Util::clamp01(1 + channelConfig.Pan));
+			spdc<DSP>(dspChain[0])->procBlock(s_outputL, blen);
+			spdc<DSP>(dspChain[1])->procBlock(s_outputR, blen);
 		}
 		if(channelConfig.mixer->isUseLimiter()){
-			std::dynamic_pointer_cast<DSP>(limiter[0])->procBlock(s_outputL, blen);
-			std::dynamic_pointer_cast<DSP>(limiter[1])->procBlock(s_outputR, blen);
+			spdc<DSP>(limiter[0])->procBlock(s_outputL, blen);
+			spdc<DSP>(limiter[1])->procBlock(s_outputR, blen);
 		}
 		if(isnan(s_outputL[0]) || isnan(s_outputL[1])){
 			std::cout << "Output NaN" << std::endl;
@@ -880,7 +880,7 @@ namespace yzrilyzr_simplesynth{
 	u_sp<AHDSREnvelop> Channel::getAHDSREnv()const{
 		auto a=dynamic_cast<EnvelopMultiplier *>(channelConfig.noteProcessor);
 		if(!a)return nullptr;
-		auto b=std::dynamic_pointer_cast<AHDSREnvelop>(a->a);
+		auto b=spdc<AHDSREnvelop>(a->a);
 		return b;
 	}
 	void Channel::procDataEntry(){
@@ -913,7 +913,7 @@ namespace yzrilyzr_simplesynth{
 		} else if(instr == nullptr){
 			std::cout << "Midi Instrument not set" << std::endl;
 			src=SynthUtil::getDefault();
-		} else if(channelID == IMixer::MIDI_DRUM_CHANNEL){
+		} else if(IMixer::isDrumSetChannel(channelID)){
 			src=instr->getDrumSet(channelConfig.Bank, getSampleRate());
 			setDrumSetChannel(true);
 		} else{
@@ -980,13 +980,13 @@ namespace yzrilyzr_simplesynth{
 		this->channelConfig.NoteShift=noteShift;
 	}
 	Chorus & Channel::getChorus(u_index ch)const{
-		return *(std::dynamic_pointer_cast<Chorus>(choruser[ch]));
+		return *(spdc<Chorus>(choruser[ch]));
 	}
 	Phaser & Channel::getPhaser(u_index ch)const{
-		return *(std::dynamic_pointer_cast<Phaser>(phaser[ch]));
+		return *(spdc<Phaser>(phaser[ch]));
 	}
 	Freeverb & Channel::getReverb(u_index ch)const{
-		return *(std::dynamic_pointer_cast<Freeverb>(reverber[ch]));
+		return *(spdc<Freeverb>(reverber[ch]));
 	}
 	void Channel::setSostenuto(bool sostenuto){
 		this->channelConfig.Sostenuto=sostenuto;

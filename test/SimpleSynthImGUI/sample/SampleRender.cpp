@@ -40,16 +40,16 @@ void gaussianSmooth(SampleArray & data, SampleArray & smoothed, u_sample sigma, 
 }
 void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	// TODO fix
-	//u_sp<SampleArrayProvider> paramRegPtr=std::dynamic_pointer_cast<SampleArrayProvider, ParamRegister>(obj.paramRegPtr);
+	//u_sp<SampleArrayProvider> paramRegPtr=spdc<SampleArrayProvider, ParamRegister>(obj.paramRegPtr);
 	//auto & data=obj.storeData;
 	//if(data.find("SampleLength") == data.end()){
 	//	data["SampleLength"]=mksp<Integer>(256);
 	//}
-	//Integer & SampleLength=*std::dynamic_pointer_cast<Integer>(data["SampleLength"]);
+	//Integer & SampleLength=*spdc<Integer>(data["SampleLength"]);
 	//ImGui::InputInt(ctx.LANG.getc("module.sample.length"), &SampleLength.value);
 	//if(SampleLength.value < 1)SampleLength.value=1;
 	//if(data.find("SampleData") != data.end()){
-	//	paramRegPtr->array=std::dynamic_pointer_cast<SampleArray>(data["SampleData"]);
+	//	paramRegPtr->array=spdc<SampleArray>(data["SampleData"]);
 	//	paramRegPtr->length=paramRegPtr->array.length;
 	//}
 	//if(ImGui::Button(ctx.LANG.getc("module.sample.init"))){

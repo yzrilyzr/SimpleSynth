@@ -83,7 +83,7 @@ void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & 
 		obj.loadStoredData=false;
 		auto it=data.find("FM_Matrix");
 		if(it != data.end()){
-			u_sp<SampleArray> arr=std::dynamic_pointer_cast<SampleArray>(it->second);
+			u_sp<SampleArray> arr=spdc<SampleArray>(it->second);
 			u_index k=0;
 			for(u_index x=0;x < MTX_SIZE;x++){
 				for(u_index y=0;y < MTX_SIZE;y++){
@@ -93,7 +93,7 @@ void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & 
 		}
 		it=data.find("RM_Matrix");
 		if(it != data.end()){
-			u_sp<SampleArray> arr=std::dynamic_pointer_cast<SampleArray>(it->second);
+			u_sp<SampleArray> arr=spdc<SampleArray>(it->second);
 			u_index k=0;
 			for(u_index x=0;x < MTX_SIZE;x++){
 				for(u_index y=0;y < MTX_SIZE;y++){

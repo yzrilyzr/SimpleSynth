@@ -82,7 +82,7 @@ namespace yzrilyzr_simplesynth{
 		return *this;
 	}
 	NoteProcPtr build(){
-		return std::dynamic_pointer_cast<NoteProcessor>(ks);
+		return spdc<NoteProcessor>(ks);
 	}
 	};
 }

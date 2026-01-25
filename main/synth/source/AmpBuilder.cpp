@@ -75,8 +75,8 @@ namespace yzrilyzr_simplesynth{
 	 * 音符时长为 this->_src和mul两者 中的最短
 	 */
 	AmpBuilder & AmpBuilder::mul(NoteProcPtr mul1){
-		if(std::dynamic_pointer_cast<Enveloper>(this->_src)) this->_src=mksp<EnvelopMultiplier>(this->_src, mul1);
-		else if(std::dynamic_pointer_cast<Enveloper>(mul1)) this->_src=mksp<EnvelopMultiplier>(mul1, this->_src);
+		if(spdc<Enveloper>(this->_src)) this->_src=mksp<EnvelopMultiplier>(this->_src, mul1);
+		else if(spdc<Enveloper>(mul1)) this->_src=mksp<EnvelopMultiplier>(mul1, this->_src);
 		else this->_src=mksp<AmpMultiplier>(this->_src, mul1);
 		return *this;
 	}
@@ -101,9 +101,9 @@ namespace yzrilyzr_simplesynth{
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::freqSrc(u_sp<PhaseSrc> src){
-		if(!(std::dynamic_pointer_cast<Osc>(this->_src)))
+		if(!(spdc<Osc>(this->_src)))
 			throw Exception("this->_src not FreqBasedGenerator");
-		std::dynamic_pointer_cast<Osc>(this->_src)->setPhaseSource(src);
+		spdc<Osc>(this->_src)->setPhaseSource(src);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::cc(const yzrilyzr_array::IntArray & cc){
@@ -258,19 +258,19 @@ namespace yzrilyzr_simplesynth{
 		return mul(mksp<MultiStageEnvelope>(points));
 	}
 	AmpBuilder & AmpBuilder::pm(u_sp<Osc> pmSrc, double amp, double noteRatio){
-		std::dynamic_pointer_cast<Osc>(this->_src)->pm(pmSrc, amp, noteRatio);
+		spdc<Osc>(this->_src)->pm(pmSrc, amp, noteRatio);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::pm(NoteProcPtr pmSrc, double amp){
-		std::dynamic_pointer_cast<Osc>(this->_src)->pm(pmSrc, amp);
+		spdc<Osc>(this->_src)->pm(pmSrc, amp);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::lpm(u_sp<Osc> pmSrc, double amp, u_freq lpmHz){
-		std::dynamic_pointer_cast<Osc>(this->_src)->lpm(pmSrc, amp, lpmHz);
+		spdc<Osc>(this->_src)->lpm(pmSrc, amp, lpmHz);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::lpm(NoteProcPtr lpmSrc, double amp){
-		std::dynamic_pointer_cast<Osc>(this->_src)->lpm(lpmSrc, amp);
+		spdc<Osc>(this->_src)->lpm(lpmSrc, amp);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::ks(u_normal_01 alpha){

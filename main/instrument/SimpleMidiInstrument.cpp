@@ -1,4 +1,9 @@
-﻿#include "SimpleDrumSet.h"
+﻿/**
+ * 默认简单音色，开箱即用
+ * 不喜欢的话，可以直接删掉，没有任何影响(～￣▽￣)～
+ */
+
+#include "SimpleDrumSet.h"
 #include "SimpleMIDIInstrument.h"
 #include "dsp/Chorus.h"
 #include "dsp/DSPGroupBuilder.h"
@@ -33,12 +38,256 @@ using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_array;
 
 namespace yzrilyzr_simplesynth{
+	u_sp<PianoSrc> acoustic_grand_piano(){
+		u_sp<PianoSrc> sp=mksp<PianoSrc>();
+		auto & sb=sp->soundboardParameters;
+		sb.eq1=200;
+		sb.eq2=500;
+		sb.eq3=3000;
+		sb.eq4=5000;
+		sb.eq5=8000;
+		sb.c1=9;
+		sb.c3=30;
+		GraphInterpolator vol(DoubleArray({//
+			36, 1,//
+			48, 1,//
+			60, 1,//
+			66, 2,//
+			72, 3,//
+			78, 4,//
+			83, 4,//
+			96, 18,//
+			120, 40//
+										  }));
+		GraphInterpolator pos(DoubleArray({//
+			36, 0.4,//
+			48, 0.4,//
+			60, 0.3,//
+			72, 0.2,//
+			84, 0.1,//
+			120, 0.05//
+										  }));
+		GraphInterpolator weight(DoubleArray({//
+			36, 8,//
+			42, 5,//
+			48, 4,//
+			54, 6,//
+			60, 5,//
+			72, 3,//
+			78, 3,//
+			84, 3,//
+			90, 2,//
+			120, 2//
+											 }));
+		GraphInterpolator detune(DoubleArray({//
+			0, 0.00015,  // 低音区更小的detune
+			36, 0.00015, // 低音区
+			48, 0.00020, // 低音到中音过渡
+			60, 0.00040, // 中音区
+			72, 0.00080, // 中音到高音过渡
+			84, 0.00120, // 高音区
+			96, 0.00180, // 高音区
+			108, 0.00200, // 极高音区
+			128, 0.00250  // 极高音区
+											 }));
+		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+			auto & kp=sp->keyParams[i];
+			kp.noteID=i;
+			kp.minr=0.34;
+			kp.maxr=2;
+			kp.minL=0.07;
+			kp.maxL=1.39;
+			kp.hammer_type=2;
+			kp.weight=weight.y(i) * 3;
+			kp.ampLl=-4;
+			kp.ampLr=4;
+			kp.amprl=4;
+			kp.amprr=8;
+			kp.mult_density_string=1;
+			kp.mult_modulus_string=1;
+			kp.mult_impedance_bridge=1;
+			kp.mult_impedance_hammer=0;
+			kp.mult_mass_hammer=1;
+			kp.mult_force_hammer=1;
+			kp.mult_hysteresis_hammer=1;
+			kp.mult_stiffness_exponent_hammer=1;
+			kp.position_hammer=pos.y(i);
+			kp.mult_loss_filter=1;
+			kp.detune=detune.y(i);
+			kp.mult_radius_core_string=1;
+			kp.outputVolume=vol.y(i) * 15;
+		}
+		return sp;
+	}
+	u_sp<PianoSrc> bright_acoustic_piano(){
+		u_sp<PianoSrc> sp=mksp<PianoSrc>();
+		auto & sb=sp->soundboardParameters;
+		sb.eq1=200;
+		sb.eq2=500;
+		sb.eq3=3000;
+		sb.eq4=5000;
+		sb.eq5=8000;
+		sb.c1=9;
+		sb.c3=30;
+		GraphInterpolator vol(DoubleArray({//
+			36, 1,//
+			48, 1,//
+			60, 1,//
+			66, 2,//
+			72, 3,//
+			78, 4,//
+			83, 4,//
+			96, 18,//
+			120, 40//
+										  }));
+		GraphInterpolator pos(DoubleArray({//
+			36, 0.4,//
+			48, 0.4,//
+			60, 0.3,//
+			72, 0.2,//
+			84, 0.1,//
+			120, 0.05//
+										  }));
+		GraphInterpolator weight(DoubleArray({//
+			36, 8,//
+			42, 5,//
+			48, 4,//
+			54, 6,//
+			60, 5,//
+			72, 3,//
+			78, 3,//
+			84, 3,//
+			90, 2,//
+			120, 2//
+											 }));
+		GraphInterpolator detune(DoubleArray({//
+			0, 0.00015,  // 低音区更小的detune
+			36, 0.00015, // 低音区
+			48, 0.00020, // 低音到中音过渡
+			60, 0.00040, // 中音区
+			72, 0.00080, // 中音到高音过渡
+			84, 0.00120, // 高音区
+			96, 0.00180, // 高音区
+			108, 0.00200, // 极高音区
+			128, 0.00250  // 极高音区
+											 }));
+		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+			auto & kp=sp->keyParams[i];
+			kp.noteID=i;
+			kp.minr=0.34;
+			kp.maxr=2;
+			kp.minL=0.07;
+			kp.maxL=1.39;
+			kp.hammer_type=2;
+			kp.weight=weight.y(i) * 4;
+			kp.ampLl=-4;
+			kp.ampLr=4;
+			kp.amprl=4;
+			kp.amprr=8;
+			kp.mult_density_string=1;
+			kp.mult_modulus_string=1;
+			kp.mult_impedance_bridge=1;
+			kp.mult_impedance_hammer=0;
+			kp.mult_mass_hammer=1.1;
+			kp.mult_force_hammer=1.1;
+			kp.mult_hysteresis_hammer=1;
+			kp.mult_stiffness_exponent_hammer=1.1;
+			kp.position_hammer=pos.y(i);
+			kp.mult_loss_filter=1;
+			kp.detune=detune.y(i);
+			kp.mult_radius_core_string=1;
+			kp.outputVolume=vol.y(i) * 15;
+		}
+		return sp;
+	}
+	u_sp<PianoSrc> honky_tonk_piano(){
+		u_sp<PianoSrc> sp=mksp<PianoSrc>();
+		auto & sb=sp->soundboardParameters;
+		sb.eq1=200;
+		sb.eq2=500;
+		sb.eq3=3000;
+		sb.eq4=5000;
+		sb.eq5=8000;
+		sb.c1=9;
+		sb.c3=30;
+		GraphInterpolator vol(DoubleArray({//
+			36, 1,//
+			48, 1,//
+			60, 1,//
+			66, 2,//
+			72, 3,//
+			78, 4,//
+			83, 4,//
+			96, 18,//
+			120, 40//
+										  }));
+		GraphInterpolator pos(DoubleArray({//
+			36, 0.4,//
+			48, 0.4,//
+			60, 0.3,//
+			72, 0.2,//
+			84, 0.1,//
+			120, 0.05//
+										  }));
+		GraphInterpolator weight(DoubleArray({//
+			36, 8,//
+			42, 5,//
+			48, 4,//
+			54, 6,//
+			60, 5,//
+			72, 3,//
+			78, 3,//
+			84, 3,//
+			90, 2,//
+			120, 2//
+											 }));
+		GraphInterpolator detune(DoubleArray({//
+			0, 0.0015,  // 低音区更小的detune
+			36, 0.0015, // 低音区
+			48, 0.0020, // 低音到中音过渡
+			60, 0.0040, // 中音区
+			72, 0.0080, // 中音到高音过渡
+			84, 0.0120, // 高音区
+			96, 0.0180, // 高音区
+			108, 0.0200, // 极高音区
+			128, 0.0250  // 极高音区
+											 }));
+		for(u_index i=0;i < CHANNEL_MAX_NOTE_ID;i++){
+			auto & kp=sp->keyParams[i];
+			kp.noteID=i;
+			kp.minr=0.34;
+			kp.maxr=2;
+			kp.minL=0.07;
+			kp.maxL=1.39;
+			kp.hammer_type=2;
+			kp.weight=weight.y(i) * 3;
+			kp.ampLl=-4;
+			kp.ampLr=4;
+			kp.amprl=4;
+			kp.amprr=8;
+			kp.mult_density_string=1;
+			kp.mult_modulus_string=1;
+			kp.mult_impedance_bridge=1;
+			kp.mult_impedance_hammer=0;
+			kp.mult_mass_hammer=1;
+			kp.mult_force_hammer=1;
+			kp.mult_hysteresis_hammer=1;
+			kp.mult_stiffness_exponent_hammer=1;
+			kp.position_hammer=pos.y(i);
+			kp.mult_loss_filter=1;
+			kp.detune=detune.y(i);
+			kp.mult_radius_core_string=1;
+			kp.outputVolume=vol.y(i) * 15;
+		}
+		return sp;
+	}
 	NoteProcPtr SimpleMIDIInstrument::get(s_bank_id bank, s_program_id program, u_sample_rate sampleRate){
 		switch(program){
 			case MIDIFile::Instruments::PIANO_ACOUSTIC_GRAND_PIANO:
-				return mksp<PianoSrc>();
+				return acoustic_grand_piano();
 			case MIDIFile::Instruments::PIANO_BRIGHT_ACOUSTIC_PIANO:
-				return SakuraBuilder()
+				return bright_acoustic_piano();
+				/*return SakuraBuilder()
 					.exciter(0.676, 1)
 					.exciterHiCut(0.839, 0.996)
 					.exciterHiCutEnv(0, 0, 298.611, 0)
@@ -50,10 +299,11 @@ namespace yzrilyzr_simplesynth{
 					.stringLevel(0.442)
 					.comb(0.497, 0.366, -0.396, 0.124)
 					.resonatorLevel(1)
-					.build();
+					.build();*/
 			case MIDIFile::Instruments::PIANO_ELECTRIC_GRAND_PIANO:
-			case MIDIFile::Instruments::PIANO_HONKY_TONK_PIANO:
 				return SynthUtil::getDefault();
+			case MIDIFile::Instruments::PIANO_HONKY_TONK_PIANO:
+				return honky_tonk_piano();
 			case MIDIFile::Instruments::PIANO_ELECTRIC_PIANO_1:
 				return
 					AmpBuilder()
@@ -77,7 +327,7 @@ namespace yzrilyzr_simplesynth{
 							 .build(), 1)
 						 .ADSR(0, 1000, 0.25, true, 1000, Line(), Pow(5), Pow(2))
 						 .build())
-					.ADSR(10, 8000, 0.5, false, 1000, Pow(5), Pow(5), Pow(2))
+					.ADSR(10, 8000, 0.5, false, 500, Pow(5), Pow(5), Pow(2))
 					.noteDSP(mksp<Chorus>(1.0, 2.0, 1.0, 0.0))
 					.noteDSP(mksp<Delayer>(220, -0.8, 0.05))
 					.build();
@@ -95,7 +345,7 @@ namespace yzrilyzr_simplesynth{
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 5, 0.006)
 								  .build())
 					.mul(0.3)
-					.ADSR(1, 9000, 0, false, 100, Pow(-5), Pow(3), Pow(1))
+					.ADSR(1, 9000, 0, false, 500, Pow(-5), Pow(3), Pow(1))
 					.noteDSP(mksp<Chorus>(1.0, 2.0, 1.0, 0.0))
 					.noteDSP(mksp<Delayer>(220, -0.8, 0.05))
 					.build();
@@ -115,6 +365,9 @@ namespace yzrilyzr_simplesynth{
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.mul(0.5)
 					.ADSR(5, 5000, 0, false, 100, Pow(-5), Pow(8), Pow(15)).build();
+
+			//=====================================
+
 			case MIDIFile::Instruments::CHROMATIC_PERCUSSION_CELESTA:
 				return AmpBuilder().src(mksp<SineWave>())
 					.pm(mksp<SineWave>(), 0.3, 7)
@@ -133,6 +386,7 @@ namespace yzrilyzr_simplesynth{
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 4, 3.2)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 5, 0.006)
 								  .build())
+					.mul(0.5)
 					.ADSR(1, 9000, 0, false, 100, Pow(-5), Pow(5), Pow(1))
 					.build();
 			case MIDIFile::Instruments::CHROMATIC_PERCUSSION_MUSIC_BOX:
@@ -179,6 +433,9 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::CHROMATIC_PERCUSSION_DULCIMER:
 				return AmpBuilder().ks(0.9).ADSR(10, 5000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build();
+
+			//=====================================
+
 			case MIDIFile::Instruments::ORGAN_HAMMOND_ORGAN:
 				return AmpBuilder()
 					.src(mksp<SineBasePowHarmonicWave>(DoubleArray({
@@ -281,6 +538,9 @@ namespace yzrilyzr_simplesynth{
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.ADSR(37, 2000, 0.71, true, 100, Pow(5), Pow(5), Pow(5))
 					.build();
+
+			//=====================================
+
 			case MIDIFile::Instruments::GUITAR_ACOUSTIC_GUITAR_NYLON:
 				return AmpBuilder()
 					.src(mksp<SquareWave>())
@@ -368,6 +628,9 @@ namespace yzrilyzr_simplesynth{
 					.comb(1, 1, -1, 1)
 					.resonatorLevel(1)
 					.build();
+
+			//=====================================
+
 			case MIDIFile::Instruments::BASS_ACOUSTIC_BASS:
 				return AmpBuilder()
 					.src(mksp<SquareWave>())
@@ -428,6 +691,319 @@ namespace yzrilyzr_simplesynth{
 					.mul(1.2)
 					.ADSR(5, 1000, 0.3, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
+
+			//=====================================
+
+			case MIDIFile::Instruments::SOLO_STRING_VIOLIN:
+				return AmpBuilder()
+					.src(mksp<BowedString>(150, 300, 500))
+					.biquadEnvVel(70, 127, 1, LOWPASS)
+					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
+					.build();
+
+			case MIDIFile::Instruments::SOLO_STRING_VIOLA:
+				return AmpBuilder()
+					.src(mksp<BowedString>(130, 250, 400))
+					.biquadEnvVel(70, 127, 1, LOWPASS)
+					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
+					.build();
+
+			case MIDIFile::Instruments::SOLO_STRING_CELLO:
+				return AmpBuilder()
+					.src(mksp<BowedString>(100, 200, 300))
+					.biquadEnvVel(70, 127, 1, LOWPASS)
+					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
+					.build();
+
+			case MIDIFile::Instruments::SOLO_STRING_CONTRABASS:
+				return AmpBuilder()
+					.src(mksp<BowedString>(70, 150, 200))
+					.biquadEnvVel(70, 127, 1, LOWPASS)
+					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::SOLO_STRING_TREMOLO_STRINGS:
+				return AmpBuilder()
+					.src(mksp<BowedString>(150, 300, 500))
+					.biquadEnvVel(70, 127, 1, LOWPASS)
+					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::SOLO_STRING_PIZZICATO_STRINGS:
+				return AmpBuilder()
+					.src(mksp<BowedString>(70, 150, 200))
+					.ADSR(1, 1, 1, false, 1000, Pow(-5), Pow(5), Pow(8))
+					.addMul(AmpBuilder()
+							.src(mksp<Pulse>(0.4, 0.1, 0.1, 0))
+							.ks(0.3)
+							.ADSR(10, 1, 1, false, 1500, Pow(-5), Pow(5), Pow(10))
+							.build(), 0.7)
+					.biquad(sampleRate, LOWPASS, 2000, 0.5, 0)
+					.biquadEnvVel(70, 127, 1, LOWPASS)
+					.build();
+			case MIDIFile::Instruments::SOLO_STRING_ORCHESTRAL_HARP:
+				return AmpBuilder().src(mksp<Pulse>(0.4, 0.1, 0.1, 0))
+					.addMul(mksp<NoiseSrc>(), 0.2)
+					.ks(0.3)
+					.mul(0.8)
+					.ADSR(5, 5000, 0, false, 300, Pow(-5), Pow(8), Pow(5))
+					.biquadEnvVel(70, 127, 1, LOWPASS)
+					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.build();
+			case MIDIFile::Instruments::SOLO_STRING_TIMPANI:
+				return AmpBuilder(Matrix6x6ModulationBuilder()
+								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 3112, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0.58, 0.0, 0.0, 1.0, 1.0)
+								  .setOp(1, AmpBuilder(SineW()).ADSR(1, 100, 0, false, 100, Pow(-5), Pow(50), Pow(5)).build(), 0.86, 0.0, 0.0, 1.0, 0.0)
+								  .setOp(2, AmpBuilder(SineW()).ADSR(1, 3111, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0.58, 0.0, 0.0, 1.0, 1.0)
+								  .setOp(3, AmpBuilder(SineW()).ADSR(1, 1514, 0.05, false, 100, Pow(-5), Pow(5), Pow(2)).build(), 0.0, 47.86, 0.0, 0.1, 0.0)
+								  .setOp(4, AmpBuilder(SineW()).ADSR(1, 1139, 0.05, true, 100, Pow(-5), Pow(3), Pow(5)).build(), 0.0, 53.70, 0.0, 0.8, 0.0)
+								  .setOp(5, AmpBuilder(SineW()).ADSR(1, 1961, 0.13, true, 100, Pow(-5), Pow(2), Pow(5)).build(), 2.0, 0.0, 0.0, 0.4, 0.0)
+								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 0, 8.8)
+								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 1, 0.084)
+								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 3, 2, 10.88)
+								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 4, 3, 10.56)
+								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 4, 10.36)
+								  .build())
+					.ADSR(1, 5000, 0, false, 100, Pow(-5), Pow(1), Pow(1))
+					.build();
+
+			//=====================================
+
+			case MIDIFile::Instruments::ENSEMBLE_STRING_ENSEMBLE_1:
+				return SakuraBuilder()
+					.exciter(0.142, 0.612)
+					.exciterHiCut(0.693, 1.322)
+					.exciterHiCutEnv(0, 0, 0, 1)
+					.exciterLowCut(0.407, 0.756)
+					.string1(1, 0.866, 0.694)
+					.string2(1, 0.866, 0.716)
+					.stringMix(0)
+					.stringEnv(201.469, 2.78742, 0.1, true, 1, 534.769)
+					.stringLevel(0.336)
+					.comb(1, 1, 1, 0)
+					.resonatorLevel(1)
+					.build();
+			case MIDIFile::Instruments::ENSEMBLE_STRING_ENSEMBLE_2:
+				return SakuraBuilder()
+					.exciter(0.142, 0.612).exciterHiCut(0.706, 1.994)
+					.exciterHiCutEnv(0, 0, 0, 1)
+					.exciterLowCut(0.407, 0.756)
+					.string1(1, 0.866, 0.694)
+					.string2(1, 0.866, 0.716)
+					.stringMix(0)
+					.stringEnv(200, 2.78742, 0.1, true, 1, 1000)
+					.stringLevel(0.336)
+					.comb(1, 1, 1, 0)
+					.resonatorLevel(1)
+					.build();
+			case MIDIFile::Instruments::ENSEMBLE_SYNTH_STRINGS_1:
+				return SakuraBuilder()
+					.exciter(mksp<Pulse>(0.0, 0.714, 0.04, 0))
+					.exciterHiCut(0.802, 1.994)
+					.exciterHiCutEnv(0, 0, 0, 1)
+					.exciterLowCut(0.098, 0.756)
+					.string1(1, 0.343, 0.47)
+					.string2(1, 0.433, 0.559)
+					.stringMix(0)
+					.stringEnv(200, 2.78742, 0.1, true, 1, 1000)
+					.stringLevel(0.007)
+					.comb(1, 1, 1, 0)
+					.resonatorLevel(1)
+					.build();
+			case MIDIFile::Instruments::ENSEMBLE_SYNTH_STRINGS_2:
+				return SakuraBuilder()
+					.exciter(mksp<Pulse>(0.0, 0.714, 0.04, 0))
+					.exciterHiCut(1, 1.994)
+					.exciterHiCutEnv(0, 0, 0, 1)
+					.exciterLowCut(0.098, 0.756)
+					.string1(1, 0.343, 0.47)
+					.string2(1, -0.537, 0.649)
+					.stringMix(0.045)
+					.stringEnv(200, 2.78742, 0.1, true, 1, 1000)
+					.stringLevel(0.022)
+					.comb(1, 1, 1, 0)
+					.resonatorLevel(1)
+					.build();
+			case MIDIFile::Instruments::ENSEMBLE_CHOIR_AAHS:
+			case MIDIFile::Instruments::ENSEMBLE_SYNTH_VOICE:
+				return AmpBuilder().src(mksp<AHarmonicWave>())
+					.autoMod(0.2, 0.3, 5.0, 0.75)
+					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::ENSEMBLE_VOICE_OOHS:
+				return AmpBuilder()
+					.src(mksp<SineWaveTable>(269.53125, DoubleArray({
+					269.53125, 1.0,
+					525, 0.005,
+					784, 0.01,
+					1051, 0.01,
+					1308, 0.005,
+					3122, 0.01
+																	})))
+					.autoMod(0.1, 0.3, 5, 0.8)
+					.addMul(
+						AmpBuilder(mksp<NoiseSrc>())
+						.biquad(sampleRate, BANDPASS, 500, 3, 0)
+						.ADSR(1, 20, 0, false, 20, Line(), Line(), Line())
+						.build(), 0.3)
+					.AHDSR(5, 50, 180, 0.8, true, 630, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::ENSEMBLE_ORCHESTRA_HIT:
+				return AmpBuilder()
+					.src(SakuraBuilder()
+						 .exciter(1, 0.257)
+						 .exciterHiCut(1, 1.043)
+						 .exciterHiCutEnv(1, 105.625, 1000, 0.222222)
+						 .exciterLowCut(0.01, 1.004)
+						 .string1(1, -1, 0.494)
+						 .string2(0.25, 1, 0.485)
+						 .stringMix(0.019)
+						 .stringEnv(1, 0.1, 1000, false, 0, 104.256)
+						 .stringLevel(0.098)
+						 .comb(0.251, 0.792, 0.902, 0.593)
+						 .resonator(0, 336, 0.007)
+						 .resonator(1, 192.1, 0.014)
+						 .resonator(2, 136.6, 0)
+						 .resonatorLevel(0.177)
+						 .build())
+					.multyKey(IntArray({0, 12, 24}), DoubleArray({0.5, 0.5, 0.5}))
+					.mul(3)
+					.ADSR(1, 1000, 0, false, 100, Pow(5), Pow(5), Pow(5))
+					.build();
+
+			//=====================================
+
+			case MIDIFile::Instruments::BRASS_TRUMPET:
+				return
+					AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.03, 0.0))
+					.biquadEnvGroup(DSPGroupBuilder::TYPE_CHAIN, {
+						{FilterPassType::BELL, NoteFreqAmp, 0.7, 10},
+						{FilterPassType::LOWPASS, NoteFreqAmp*40, 0.5, 0}
+						}
+					)
+					.biquad(sampleRate, LOWPASS, 17000, 0.20, 0)
+					.biquad(sampleRate, HIGHPASS, 250, 0.20, 0)
+					.autoMod(0.5, 0.3, 5.0, 0.1,
+							 AmpBuilder().src(
+								 mksp<Pulse>(0.2, 0.3, 0.35, 0))
+							 .DAHDSR(100, 300, 10, 1, 1, true, 100, 100, Line(), Line(), Line()).build())
+					.mul(1.5)
+					.ADSR(30, 108, 0.9, true, 100, Pow(5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::BRASS_MUTED_TRUMPET:
+				return AmpBuilder().src(mksp<SawWave>())
+					.pm(mksp<SineWave>(), 0.15, 1)
+					.autoMod(0.2, 0.3, 5.2, 0.75)
+					.IIR(sampleRate, 2, 10.1, 5000)
+					.ADSR(50, 108, 0.8, true, 100, Pow(5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::BRASS_TROMBONE:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.1, 0.46))
+					.biquad(sampleRate, BANDPASS, 1500, 0.30, 0)
+					.autoMod(0.1, 0.1, 5.3, 0.5)
+					.mul(3)
+					.ADSR(50, 108, 0.8, true, 100, Pow(5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::BRASS_TUBA:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.1, 0.46))
+					.biquad(sampleRate, BANDPASS, 100, 0.30, 0)
+					.autoMod(0.1, 0.1, 5.3, 0.5)
+					.mul(8)
+					.ADSR(50, 762, 0.6, true, 100, Pow(5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::BRASS_FRENCH_HORN:
+				return AmpBuilder().src(SawW())
+					.detune(3, 0.05)
+					.biquad(sampleRate, BANDPASS, 500, 0.30, 0)
+					.autoMod(0.1, 0.1, 5.3, 0.5)
+					.ADSR(50, 762, 0.6, true, 100, Pow(5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::BRASS_BRASS_SECTION:
+				return AmpBuilder(mksp<Pulse>(0.0, 0.0, 0.1, 0))
+					.detune(3, 0.05)
+					.biquad(sampleRate, HIGHPASS, 500, 1, 0)
+					.biquad(sampleRate, LOWPASS, 10000, 0.5, 0)
+					.ADSR(50, 100, 0.8, true, 1000, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::BRASS_SYNTH_BRASS_1:
+				return AmpBuilder(SawW())
+					.detune(3, 0.07)
+					.biquadEnv(AmpBuilder().src(ConstAmp(45)).ADSR(100, 500, 0, true, 100, Pow(5), Pow(3), Pow(5)).add(ConstAmp(75)).build(), ConstAmp(1), LOWPASS)
+					.ADSR(50, 100, 0.8, true, 1000, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::BRASS_SYNTH_BRASS_2:
+				return AmpBuilder(SawW())
+					.detune(3, 0.1)
+					.biquadEnv(AmpBuilder().src(ConstAmp(30)).ADSR(100, 1000, 0, true, 100, Pow(5), Pow(3), Pow(5)).add(ConstAmp(90)).build(), ConstAmp(1), LOWPASS)
+					.ADSR(50, 100, 0.8, true, 1000, Pow(-5), Pow(5), Pow(5))
+					.build();
+
+			//=====================================
+
+			case MIDIFile::Instruments::REED_SOPRANO_SAX:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
+					.pm(mksp<SineWave>(), 0.3, 3)
+					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(34.6).clamp(90).build(), ConstAmp(7), FilterPassType::LOWPASS)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.mul(0.5)
+					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::REED_ALTO_SAX:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
+					.pm(mksp<SineWave>(), 0.3, 3)
+					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(44.6).clamp(100).build(), ConstAmp(7), FilterPassType::LOWPASS)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.mul(0.5)
+					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::REED_TENOR_SAX:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
+					.pm(mksp<SineWave>(), 0.3, 3)
+					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(54.6).clamp(105).build(), ConstAmp(7), FilterPassType::LOWPASS)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.mul(0.5)
+					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::REED_BARITONE_SAX:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
+					.pm(mksp<SineWave>(), 0.3, 3)
+					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(60.6).clamp(115).build(), ConstAmp(5), FilterPassType::LOWPASS)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.mul(0.5)
+					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::REED_OBOE:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.71, 0.06, 0.0))
+					.pm(mksp<SineWave>(), 0.2, 3)
+					.add(mksp< AHarmonicWave>())
+					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(24.6).build(), ConstAmp(7), FilterPassType::LOWPASS)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.mul(0.3)
+					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::REED_ENGLISH_HORN:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
+					.pm(mksp<SineWave>(), 0.3, 3)
+					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(60.6).clamp(110).build(), ConstAmp(7), FilterPassType::LOWPASS)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.mul(0.5)
+					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::REED_BASSOON:
+				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
+					.pm(mksp<SineWave>(), 0.3, 3)
+					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(50.6).clamp(100).build(), ConstAmp(5), FilterPassType::LOWPASS)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.mul(0.5)
+					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+			case MIDIFile::Instruments::REED_CLARINET:
+				return AmpBuilder().src(mksp<SineWave>())
+					.pm(mksp<SineWave>(), 0.3, 3)
+					.autoMod(0.2, 0.3, 5.11, 0.75)
+					.ADSR(50, 100, 0.7, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
+
+			//=====================================
+
 			case MIDIFile::Instruments::PIPE_PICCOLO:
 				return AmpBuilder().src(mksp<SineWave>())
 					.pm(mksp<SineWave>(), 0.05, 2)
@@ -488,309 +1064,20 @@ namespace yzrilyzr_simplesynth{
 					.comb(0.508, 1, -1, 0)
 					.resonatorLevel(1)
 					.build();
+			case MIDIFile::Instruments::PIPE_WHISTLE:
+				return AmpBuilder().src(mksp<SineWave>())
+					.am(mksp<SineWave>(), 0.3, 5)
+					.ADSR(50, 100, 0.7, true, 100, Pow(-5), Pow(5), Pow(5))
+					.build();
 			case MIDIFile::Instruments::PIPE_OCARINA:
 				return AmpBuilder().src(mksp<SineWave>())
 					.pm(mksp<SineWave>(), 0.2, 2)
 					.autoMod(0.2, 0.3, 5.3, 0.75)
 					.ADSR(50, 100, 0.7, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
-			case MIDIFile::Instruments::PIPE_WHISTLE:
-				return AmpBuilder().src(mksp<SineWave>())
-					.am(mksp<SineWave>(), 0.3, 5)
-					.ADSR(50, 100, 0.7, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_TRUMPET:
-				return
-					AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.03, 0.0))
-					.biquadEnvGroup(DSPGroupBuilder::TYPE_CHAIN, {
-						{FilterPassType::BELL, NoteFreqAmp, 0.7, 10},
-						{FilterPassType::LOWPASS, NoteFreqAmp*40, 0.5, 0}
-						}
-					)
-					.biquad(sampleRate, LOWPASS, 15000, 0.20, 0)
-					.biquad(sampleRate, HIGHPASS, 250, 0.20, 0)
-					.autoMod(0.5, 0.3, 5.0, 0.1,
-							 AmpBuilder().src(
-								 mksp<Pulse>(0.2, 0.3, 0.35, 0))
-							 .DAHDSR(100, 300, 10, 1, 1, true, 100, 100, Line(), Line(), Line()).build())
-					.mul(1.5)
-					.ADSR(30, 108, 0.9, true, 100, Pow(5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_MUTED_TRUMPET:
-				return AmpBuilder().src(mksp<SawWave>())
-					.pm(mksp<SineWave>(), 0.15, 1)
-					.autoMod(0.2, 0.3, 5.2, 0.75)
-					.IIR(sampleRate, 2, 10.1, 5000)
-					.ADSR(50, 108, 0.8, true, 100, Pow(5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_TROMBONE:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.1, 0.46))
-					.biquad(sampleRate, BANDPASS, 1500, 0.30, 0)
-					.autoMod(0.1, 0.1, 5.3, 0.5)
-					.mul(3)
-					.ADSR(50, 108, 0.8, true, 100, Pow(5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_TUBA:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.1, 0.46))
-					.biquad(sampleRate, BANDPASS, 100, 0.30, 0)
-					.autoMod(0.1, 0.1, 5.3, 0.5)
-					.mul(8)
-					.ADSR(50, 762, 0.6, true, 100, Pow(5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_FRENCH_HORN:
-				return AmpBuilder().src(SawW())
-					.detune(3, 0.05)
-					.biquad(sampleRate, BANDPASS, 500, 0.30, 0)
-					.autoMod(0.1, 0.1, 5.3, 0.5)
-					.ADSR(50, 762, 0.6, true, 100, Pow(5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_BRASS_SECTION:
-				return AmpBuilder(mksp<Pulse>(0.0, 0.0, 0.1, 0))
-					.detune(3, 0.05)
-					.biquad(sampleRate, HIGHPASS, 500, 1, 0)
-					.biquad(sampleRate, LOWPASS, 10000, 0.5, 0)
-					.ADSR(50, 100, 0.8, true, 1000, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_SYNTH_BRASS_1:
-				return AmpBuilder(SawW())
-					.detune(3, 0.07)
-					.biquadEnv(AmpBuilder().src(ConstAmp(45)).ADSR(100, 500, 0, true, 100, Pow(5), Pow(3), Pow(5)).add(ConstAmp(75)).build(), ConstAmp(1), LOWPASS)
-					.ADSR(50, 100, 0.8, true, 1000, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::BRASS_SYNTH_BRASS_2:
-				return AmpBuilder(SawW())
-					.detune(3, 0.1)
-					.biquadEnv(AmpBuilder().src(ConstAmp(30)).ADSR(100, 1000, 0, true, 100, Pow(5), Pow(3), Pow(5)).add(ConstAmp(90)).build(), ConstAmp(1), LOWPASS)
-					.ADSR(50, 100, 0.8, true, 1000, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_SOPRANO_SAX:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
-					.pm(mksp<SineWave>(), 0.3, 3)
-					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(34.6).clamp(90).build(), ConstAmp(7), FilterPassType::LOWPASS)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_ALTO_SAX:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
-					.pm(mksp<SineWave>(), 0.3, 3)
-					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(44.6).clamp(100).build(), ConstAmp(7), FilterPassType::LOWPASS)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_TENOR_SAX:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
-					.pm(mksp<SineWave>(), 0.3, 3)
-					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(54.6).clamp(105).build(), ConstAmp(7), FilterPassType::LOWPASS)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_BARITONE_SAX:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
-					.pm(mksp<SineWave>(), 0.3, 3)
-					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(60.6).clamp(115).build(), ConstAmp(5), FilterPassType::LOWPASS)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_OBOE:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.71, 0.06, 0.0))
-					.pm(mksp<SineWave>(), 0.2, 3)
-					.add(mksp< AHarmonicWave>())
-					.mul(0.5)
-					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(24.6).build(), ConstAmp(7), FilterPassType::LOWPASS)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_ENGLISH_HORN:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
-					.pm(mksp<SineWave>(), 0.3, 3)
-					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(60.6).clamp(110).build(), ConstAmp(7), FilterPassType::LOWPASS)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_BASSOON:
-				return AmpBuilder().src(mksp<Pulse>(0.0, 0.91, 0.06, 0.0))
-					.pm(mksp<SineWave>(), 0.3, 3)
-					.biquadEnv(AmpBuilder().src(NoteIDAmp).add(50.6).clamp(100).build(), ConstAmp(5), FilterPassType::LOWPASS)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(70, 100, 0.8, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::REED_CLARINET:
-				return AmpBuilder().src(mksp<SineWave>())
-					.pm(mksp<SineWave>(), 0.3, 3)
-					.autoMod(0.2, 0.3, 5.11, 0.75)
-					.ADSR(50, 100, 0.7, true, 100, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::ENSEMBLE_STRING_ENSEMBLE_1:
-				return SakuraBuilder()
-					.exciter(0.142, 0.612)
-					.exciterHiCut(0.693, 1.322)
-					.exciterHiCutEnv(0, 0, 0, 1)
-					.exciterLowCut(0.407, 0.756)
-					.string1(1, 0.866, 0.694)
-					.string2(1, 0.866, 0.716)
-					.stringMix(0)
-					.stringEnv(201.469, 2.78742, 0.1, true, 1, 534.769)
-					.stringLevel(0.336)
-					.comb(1, 1, 1, 0)
-					.resonatorLevel(1)
-					.build();
-			case MIDIFile::Instruments::ENSEMBLE_STRING_ENSEMBLE_2:
-				return SakuraBuilder()
-					.exciter(0.142, 0.612).exciterHiCut(0.706, 1.994)
-					.exciterHiCutEnv(0, 0, 0, 1)
-					.exciterLowCut(0.407, 0.756)
-					.string1(1, 0.866, 0.694)
-					.string2(1, 0.866, 0.716)
-					.stringMix(0)
-					.stringEnv(200, 2.78742, 0.1, true, 1, 1000)
-					.stringLevel(0.336)
-					.comb(1, 1, 1, 0)
-					.resonatorLevel(1)
-					.build();
-			case MIDIFile::Instruments::ENSEMBLE_SYNTH_STRINGS_1:
-				return SakuraBuilder()
-					.exciter(mksp<Pulse>(0.0, 0.714, 0.04, 0))
-					.exciterHiCut(0.802, 1.994)
-					.exciterHiCutEnv(0, 0, 0, 1)
-					.exciterLowCut(0.098, 0.756)
-					.string1(1, 0.343, 0.47)
-					.string2(1, 0.433, 0.559)
-					.stringMix(0)
-					.stringEnv(200, 2.78742, 0.1, true, 1, 1000)
-					.stringLevel(0.007)
-					.comb(1, 1, 1, 0)
-					.resonatorLevel(1)
-					.build();
-			case MIDIFile::Instruments::ENSEMBLE_SYNTH_STRINGS_2:
-				return SakuraBuilder()
-					.exciter(mksp<Pulse>(0.0, 0.714, 0.04, 0))
-					.exciterHiCut(1, 1.994)
-					.exciterHiCutEnv(0, 0, 0, 1)
-					.exciterLowCut(0.098, 0.756)
-					.string1(1, 0.343, 0.47)
-					.string2(1, -0.537, 0.649)
-					.stringMix(0.045)
-					.stringEnv(200, 2.78742, 0.1, true, 1, 1000)
-					.stringLevel(0.022)
-					.comb(1, 1, 1, 0)
-					.resonatorLevel(1)
-					.build();
-			case MIDIFile::Instruments::ENSEMBLE_ORCHESTRA_HIT:
-				return AmpBuilder()
-					.src(SakuraBuilder()
-						 .exciter(1, 0.257)
-						 .exciterHiCut(1, 1.043)
-						 .exciterHiCutEnv(1, 105.625, 1000, 0.222222)
-						 .exciterLowCut(0.01, 1.004)
-						 .string1(1, -1, 0.494)
-						 .string2(0.25, 1, 0.485)
-						 .stringMix(0.019)
-						 .stringEnv(1, 0.1, 1000, false, 0, 104.256)
-						 .stringLevel(0.098)
-						 .comb(0.251, 0.792, 0.902, 0.593)
-						 .resonator(0, 336, 0.007)
-						 .resonator(1, 192.1, 0.014)
-						 .resonator(2, 136.6, 0)
-						 .resonatorLevel(0.177)
-						 .build())
-					.multyKey(IntArray({0, 12, 24}), DoubleArray({0.5, 0.5, 0.5}))
-					.mul(3)
-					.ADSR(1, 1000, 0, false, 100, Pow(5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::ENSEMBLE_CHOIR_AAHS:
-			case MIDIFile::Instruments::ENSEMBLE_SYNTH_VOICE:
-				return AmpBuilder().src(mksp<AHarmonicWave>())
-					.autoMod(0.2, 0.3, 5.0, 0.75)
-					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::ENSEMBLE_VOICE_OOHS:
-				return AmpBuilder()
-					.src(mksp<SineWaveTable>(269.53125, DoubleArray({
-					269.53125, 1.0,
-					525, 0.005,
-					784, 0.01,
-					1051, 0.01,
-					1308, 0.005,
-					3122, 0.01
-																				})))
-					.autoMod(0.1, 0.3, 5, 0.8)
-					.addMul(
-						AmpBuilder(mksp<NoiseSrc>())
-						.biquad(sampleRate, BANDPASS, 500, 3, 0)
-						.ADSR(1, 20, 0, false, 20, Line(), Line(), Line())
-						.build(), 0.3)
-					.AHDSR(5, 50, 180, 0.8, true, 630, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::SOLO_STRING_VIOLIN:
-				return AmpBuilder()
-					.src(mksp<BowedString>(150, 300, 500))
-					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
-					.build();
 
-			case MIDIFile::Instruments::SOLO_STRING_VIOLA:
-				return AmpBuilder()
-					.src(mksp<BowedString>(130, 250, 400))
-					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
-					.build();
+			//=====================================
 
-			case MIDIFile::Instruments::SOLO_STRING_CELLO:
-				return AmpBuilder()
-					.src(mksp<BowedString>(100, 200, 300))
-					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
-					.build();
-
-			case MIDIFile::Instruments::SOLO_STRING_CONTRABASS:
-				return AmpBuilder()
-					.src(mksp<BowedString>(70, 150, 200))
-					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::SOLO_STRING_TREMOLO_STRINGS:
-				return AmpBuilder()
-					.src(mksp<BowedString>(150, 300, 500))
-					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.ADSR(30, 100, 0.9, true, 500, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::SOLO_STRING_PIZZICATO_STRINGS:
-				return AmpBuilder()
-					.src(mksp<BowedString>(70, 150, 200))
-					.ADSR(1, 1, 1, false, 1000, Pow(-5), Pow(5), Pow(8))
-					.addMul(AmpBuilder()
-							.src(mksp<Pulse>(0.4, 0.1, 0.1, 0))
-							.ks(0.3)
-							.ADSR(10, 1, 1, false, 1500, Pow(-5), Pow(5), Pow(10))
-							.build(), 0.7)
-					.biquad(sampleRate, LOWPASS, 2000, 0.5, 0)
-					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.build();
-			case MIDIFile::Instruments::SOLO_STRING_TIMPANI:
-				return AmpBuilder(Matrix6x6ModulationBuilder()
-								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 3112, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0.58, 0.0, 0.0, 1.0, 1.0)
-								  .setOp(1, AmpBuilder(SineW()).ADSR(1, 100, 0, false, 100, Pow(-5), Pow(50), Pow(5)).build(), 0.86, 0.0, 0.0, 1.0, 0.0)
-								  .setOp(2, AmpBuilder(SineW()).ADSR(1, 3111, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0.58, 0.0, 0.0, 1.0, 1.0)
-								  .setOp(3, AmpBuilder(SineW()).ADSR(1, 1514, 0.05, false, 100, Pow(-5), Pow(5), Pow(2)).build(), 0.0, 47.86, 0.0, 0.1, 0.0)
-								  .setOp(4, AmpBuilder(SineW()).ADSR(1, 1139, 0.05, true, 100, Pow(-5), Pow(3), Pow(5)).build(), 0.0, 53.70, 0.0, 0.8, 0.0)
-								  .setOp(5, AmpBuilder(SineW()).ADSR(1, 1961, 0.13, true, 100, Pow(-5), Pow(2), Pow(5)).build(), 2.0, 0.0, 0.0, 0.4, 0.0)
-								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 0, 8.8)
-								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 1, 0.084)
-								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 3, 2, 10.88)
-								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 4, 3, 10.56)
-								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 4, 10.36)
-								  .build())
-					.ADSR(1, 5000, 0, false, 100, Pow(-5), Pow(1), Pow(1))
-					.build();
-			case MIDIFile::Instruments::SOLO_STRING_ORCHESTRAL_HARP:
-				return AmpBuilder().src(mksp<Pulse>(0.4, 0.1, 0.1, 0))
-					.addMul(mksp<NoiseSrc>(), 0.2)
-					.ks(0.3)
-					.mul(0.8)
-					.ADSR(5, 5000, 0, false, 300, Pow(-5), Pow(8), Pow(5))
-					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
-					.build();
 			case MIDIFile::Instruments::LEAD_SQUARE:
 				return AmpBuilder().src(NearestAmpSetBuilder()
 										.add(24, mksp<Pulse>(0.125, 0, 0, 0))
@@ -810,12 +1097,6 @@ namespace yzrilyzr_simplesynth{
 					.autoMod(0.3, 0.3, 5.4, 0.75)
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.AHDSR(5, 30, 300, 0.75, true, 300, Pow(-5), Pow(5), Pow(5))
-					.build();
-			case MIDIFile::Instruments::LEAD_VOICE:
-				return AmpBuilder().src(mksp<AHarmonicWave>())
-					.detune(3, 0.2)
-					.autoMod(0.2, 0.3, 5.5, 0.75)
-					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::LEAD_CALIOPE_LEAD:
 				return SakuraBuilder()
@@ -842,11 +1123,11 @@ namespace yzrilyzr_simplesynth{
 					.biquad(sampleRate, LOWPASS, 6000, 1, 0)
 					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
-			case MIDIFile::Instruments::LEAD_BASS_LEAD:
-				return AmpBuilder().src(mksp<SawWave>())
-					.biquadEnv(NoteIDAmp + ConstAmp(30) + (AmpBuilder(ConstAmp(30)).ADSR(5, 1000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build()), ConstAmp(1), LOWPASS)
-					.biquad(sampleRate, LOWPASS, 6000, 1, 0)
-					.ADSR(50, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
+			case MIDIFile::Instruments::LEAD_VOICE:
+				return AmpBuilder().src(mksp<AHarmonicWave>())
+					.detune(3, 0.2)
+					.autoMod(0.2, 0.3, 5.5, 0.75)
+					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::LEAD_FIFTHS:
 				return AmpBuilder().src(mksp<SawWave>())
@@ -857,6 +1138,15 @@ namespace yzrilyzr_simplesynth{
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.AHDSR(5, 30, 300, 0.75, true, 300, Pow(-5), Pow(5), Pow(5))
 					.build();
+			case MIDIFile::Instruments::LEAD_BASS_LEAD:
+				return AmpBuilder().src(mksp<SawWave>())
+					.biquadEnv(NoteIDAmp + ConstAmp(30) + (AmpBuilder(ConstAmp(30)).ADSR(5, 1000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build()), ConstAmp(1), LOWPASS)
+					.biquad(sampleRate, LOWPASS, 6000, 1, 0)
+					.ADSR(50, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
+					.build();
+
+			//=====================================
+
 			case MIDIFile::Instruments::PAD_NEW_AGE:
 				return  AmpBuilder().src(SakuraBuilder()
 										 .exciter(0, 1)
@@ -972,6 +1262,9 @@ namespace yzrilyzr_simplesynth{
 										 .build())
 					.mul(2)
 					.build();
+
+			//=====================================
+
 			case MIDIFile::Instruments::FX_SOUNDTRACK:
 				return AmpBuilder().src(mksp<TriWave>())
 					.pm(mksp<TriWave>(), 0.61, 1)
@@ -989,22 +1282,17 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(10, 1025, 0.26, true, 100, Pow(5), Pow(5), Pow(5))
 					.clamp(0.87, 0.29)
 					.build();
-			case MIDIFile::Instruments::FX_GOBLINS:
-				return AmpBuilder().src(mksp<SineWave>())
-					.pm(mksp<SineWave>(), 0.04, 0.09090909090909091)
-					.am(mksp<SineWave>(), 0.51, 6)
-					.ADSR(200, 2455, 0.44, true, 1500, Pow(5), Pow(5), Pow(5))
-					.build();
 			case MIDIFile::Instruments::FX_BRIGHTNESS:
 				return AmpBuilder().src(mksp<SineWave>())
 					.pm(mksp<SineWave>(), 0.19, 1)
 					.ADSR(33, 694, 0.68, true, 171, Pow(5), Pow(5), Pow(5))
 					.IIR(sampleRate, 1, 10.1, 552.1)
 					.build();
-			case MIDIFile::Instruments::FX_SCI_FI:
-				return AmpBuilder().src(mksp<SawWave>())
-					.biquadEnv(NoteIDAmp + ConstAmp(25), ConstAmp(1), LOWPASS)
-					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
+			case MIDIFile::Instruments::FX_GOBLINS:
+				return AmpBuilder().src(mksp<SineWave>())
+					.pm(mksp<SineWave>(), 0.04, 0.09090909090909091)
+					.am(mksp<SineWave>(), 0.51, 6)
+					.ADSR(200, 2455, 0.44, true, 1500, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::FX_ECHOES:
 				return AmpBuilder().src(mksp<AHarmonicWave>())
@@ -1012,6 +1300,13 @@ namespace yzrilyzr_simplesynth{
 					.autoMod(0.2, 0.3, 5.5, 0.75)
 					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
+			case MIDIFile::Instruments::FX_SCI_FI:
+				return AmpBuilder().src(mksp<SawWave>())
+					.biquadEnv(NoteIDAmp + ConstAmp(25), ConstAmp(1), LOWPASS)
+					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
+					.build();
+			
+			//=====================================
 
 			case MIDIFile::Instruments::ETHNIC_SITAR:
 				return AmpBuilder().src(mksp<Sitar>()).ADSR(50, 5000, 0, false, 100, Pow(5), Pow(5), Pow(5)).build();

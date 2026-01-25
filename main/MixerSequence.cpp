@@ -39,7 +39,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	void MixerSequence::postToMixer(IMixer * mixer, u_time startDelay, u_time sequenceOffset, const yzrilyzr_lang::String & groupName)const{
 		if(instrument != nullptr) mixer->getGlobalConfig().setInstrumentProvider(instrument);
-		u_time t1=mixer->getCurrentTime() + startDelay;
+		u_time t1=mixer->getCurrentTime() + startDelay - sequenceOffset;
 		if(auto m1=dynamic_cast<Mixer *>(mixer)){
 			for(auto & entry : channelEvents){
 				s_midichannel_id index=entry.first;
@@ -65,6 +65,13 @@ namespace yzrilyzr_simplesynth{
 			std::sort(eventsv.begin(), eventsv.end(), compareMixerEvents);
 			for(auto & entry : eventsv){
 				auto ev=entry.event;
+				if(ev->getType() == EventType::NOTE_ON){
+					t1-=ev->startAtTime;
+					break;
+				}
+			}
+			for(auto & entry : eventsv){
+				auto ev=entry.event;
 				if(ev->startAtTime < sequenceOffset){
 					auto et=ev->getType();
 					switch(et){
@@ -72,10 +79,10 @@ namespace yzrilyzr_simplesynth{
 						case EventType::NOTE_OFF:
 						case EventType::NOTE_PRESSURE:
 						case EventType::NOTE_PITCH_BEND:
-							continue;						
+							continue;
 					}
 				}
-				m2->postEvent(ev, ev->startAtTime + t1 - sequenceOffset);
+				m2->postEvent(ev, ev->startAtTime + t1);
 			}
 		}
 	}

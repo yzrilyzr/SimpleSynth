@@ -97,13 +97,13 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	Chorus & ChannelData::getChorus(u_index ch)const{
-		return *std::dynamic_pointer_cast<Chorus>(choruser[ch]);
+		return *spdc<Chorus>(choruser[ch]);
 	}
 	Freeverb & ChannelData::getReverb(u_index ch)const{
-		return *std::dynamic_pointer_cast<Freeverb>(reverber[ch]);
+		return *spdc<Freeverb>(reverber[ch]);
 	}
 	Phaser & ChannelData::getPhaser(u_index ch)const{
-		return *std::dynamic_pointer_cast<Phaser>(phaser[ch]);
+		return *spdc<Phaser>(phaser[ch]);
 	}
 	void ChannelData::reset(){}
 	u_sample * ChannelData::getOutput(uint32_t chIndex)const{
@@ -404,7 +404,7 @@ namespace yzrilyzr_simplesynth{
 
 		if(useEQ){
 			for(u_index ch=0; ch < chc; ch++){
-				std::dynamic_pointer_cast<DSP>(finalEQ[ch])->procBlock(output[ch]._array, bufSize);
+				spdc<DSP>(finalEQ[ch])->procBlock(output[ch]._array, bufSize);
 			}
 		}
 
@@ -562,7 +562,7 @@ namespace yzrilyzr_simplesynth{
 			//应用DSP链
 			if(channelUseDSP){
 				for(u_index ch=0;ch < chc;ch++){
-					std::dynamic_pointer_cast<DSP>(data.dspChain[ch])->procBlock(data.output[ch]._array, bufSize);
+					spdc<DSP>(data.dspChain[ch])->procBlock(data.output[ch]._array, bufSize);
 				}
 			}
 		}
@@ -739,7 +739,7 @@ namespace yzrilyzr_simplesynth{
 	void Mixer2::procNoteOff(ChannelData & data, ChannelConfig & cfg, NoteOff & event){
 		if(Note::idInvalid(event.id)) return;
 		cfg.noteHoldMap[event.id]=false;
-		if(cfg.Sustain || cfg.sostenutoLock[event.id] || event.channelID == MIDI_DRUM_CHANNEL){
+		if(cfg.Sustain || cfg.sostenutoLock[event.id] || IMixer::isDrumSetChannel(event.channelID)){
 			return;
 		}
 		if(cfg.noteProcessor != nullptr)cfg.noteProcessor->noteOff(cfg, event.id, event.velocity);
@@ -813,7 +813,7 @@ namespace yzrilyzr_simplesynth{
 				}
 				break;
 			case MIDIFile::CC::SUSTAIN_SWITCH:
-				if(cc.channelID == MIDI_DRUM_CHANNEL){
+				if(IMixer::isDrumSetChannel(cc.channelID)){
 					cfg.Sustain=true;
 					return;
 				}
@@ -1032,7 +1032,7 @@ namespace yzrilyzr_simplesynth{
 	std::vector<u_sp<IChannel>> Mixer2::getAllChannels()const{
 		std::vector<u_sp<IChannel>> chann;
 		for(auto & i : allChannelData){
-			chann.emplace_back(std::dynamic_pointer_cast<IChannel>(i));
+			chann.emplace_back(spdc<IChannel>(i));
 		}
 		return chann;
 	}
@@ -1061,11 +1061,12 @@ namespace yzrilyzr_simplesynth{
 		} else if(instr == nullptr){
 			std::cout << "InstrumentProvider not set" << std::endl;
 			ptr=SynthUtil::getDefault();
-		} else if(event.channelID == IMixer::MIDI_DRUM_CHANNEL){
+		} else if(isDrumSetChannel(event.channelID)){
 			ptr=instr->getDrumSet(cfg.Bank, sampleRate);
 			cfg.Sustain=true;
 		} else{
 			ptr=instr->get(cfg.Bank, event.id, sampleRate);
+			cfg.Program=event.id;
 			if(ptr == nullptr){
 				std::cout << "ProgramChange[Not found]: " << std::to_string(event.id) << ", CH:" << event.channelID << std::endl;
 				ptr=SynthUtil::getDefault();

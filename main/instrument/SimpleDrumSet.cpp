@@ -1,4 +1,9 @@
-﻿#include "SimpleDrumSet.h"
+﻿/**
+ * 默认简单鼓组，开箱即用
+ * 不喜欢的话，可以直接删掉，没有任何影响(～￣▽￣)～
+ */
+
+#include "SimpleDrumSet.h"
 #include "SimpleSynth.h"
 #include "dsp/DSPGroupBuilder.h"
 #include "interpolator/GraphInterpolator.h"
@@ -38,7 +43,7 @@ namespace yzrilyzr_simplesynth{
 	u_sp<SineWaveTable> SimpleDrumSet::risset(){
 		return mksp<SineWaveTable>(100, DoubleArray({
 			100, 1, 160, 0.1, 226, 0.12
-																}));
+													}));
 	}
 
 	NoteProcPtr SimpleDrumSet::kickBassRaw(){
@@ -54,30 +59,17 @@ namespace yzrilyzr_simplesynth{
 			.clampV(1.35, 0.9)
 			.build();
 	}
-	std::vector<MSEPoint> releaseWithCompressorEffect(int count,u_time_ms sawPeriod,u_time_ms totalReleaseTime,float relValue){
-		/*return mksp<GraphInterpolator>(std::initializer_list<double>{
-			0, 0,
-				0.15, 0.01,
-				0.35, 0.05,
-				0.5, 0.1,
-				0.65, 0.2,
-				0.75, 0.4,
-				0.84, 0.8,
-				0.899, 1,
-				0.900, 0,
-				0.949, 1,
-				0.950, 0,
-				1, 1});*/
+	std::vector<MSEPoint> releaseWithCompressorEffect(int count, u_time_ms sawPeriodStart, u_time_ms sawPeriodEnd, u_time_ms totalReleaseTime, float relValue){
 		std::vector<MSEPoint> points;
 		float sumStartTime=0;
 		for(int i=0;i < count;i++){
 			points.push_back({sumStartTime, 1, MSEPointType::DEFAULT, MSEPointMode::HOLD, 0});
-			sumStartTime+=sawPeriod/1000.0;
+			sumStartTime+=Util::linearMap(0, count - 1, sawPeriodStart, sawPeriodEnd, i) / 1000.0;
 			points.push_back({sumStartTime, 0, MSEPointType::DEFAULT, MSEPointMode::SMOOTH, 0});
 			sumStartTime+=0.001;
 		}
 		points.push_back({sumStartTime, 1, MSEPointType::DEFAULT, MSEPointMode::HOLD, 0});
-		points.push_back({(float)(totalReleaseTime/1000.0), 0, MSEPointType::DEFAULT, MSEPointMode::SINGLE_CURVE, relValue});
+		points.push_back({(float)(totalReleaseTime / 1000.0), 0, MSEPointType::DEFAULT, MSEPointMode::SINGLE_CURVE, relValue});
 		return points;
 	}
 	void SimpleDrumSet::init(ChannelConfig & cfg){
@@ -210,7 +202,7 @@ namespace yzrilyzr_simplesynth{
 							 .biquad(sampleRate, FilterPassType::HIGHPASS, 500, 0.5, 0)
 							 .build())
 					.build(), 0.2)
-			.MultiStageEnv(releaseWithCompressorEffect(2, 10, 500,0.7))
+			.MultiStageEnv(releaseWithCompressorEffect(2, 10, 10, 500, 0.7))
 			.mul(0.8)
 			.build());
 		add(MIDIFile::DrumSet::SNARE_ELECTRIC,
@@ -228,7 +220,7 @@ namespace yzrilyzr_simplesynth{
 							 .biquad(sampleRate, FilterPassType::HIGHPASS, 500, 0.5, 0)
 							 .build())
 					.build(), 0.2)
-			.MultiStageEnv(releaseWithCompressorEffect(2, 10, 500,0.7))
+			.MultiStageEnv(releaseWithCompressorEffect(2, 10, 10, 500, 0.7))
 			.mul(0.8)
 			.build());
 		add(MIDIFile::DrumSet::HAND_CLAP,
@@ -242,43 +234,39 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 1243, 0.3, 0)
 					 .build())
 			.mul(1.3)
-			.MultiStageEnv(releaseWithCompressorEffect(3, 7, 500,1))
+			.MultiStageEnv(releaseWithCompressorEffect(3, 7, 7, 500, 1))
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_1,
 			AmpBuilder(mksp<CymbalOsc>(1))
 			.noteDSP(DSPGroupBuilder()
 					 .begin(DSPGroupBuilder::TYPE_CHAIN)
-					 .biquad(sampleRate, FilterPassType::NOTCH, 305, 0.9, 0)
-					 .biquad(sampleRate, FilterPassType::NOTCH, 444, 0.9, 0)
-					 .biquad(sampleRate, FilterPassType::NOTCH, 558, 0.9, 0)
-					 .biquad(sampleRate, FilterPassType::LOWPASS, 19000, 0.7, 0)
-					 .biquad(sampleRate, FilterPassType::HIGHPASS, 600, 0.5, 0)
+					 .biquad(sampleRate, FilterPassType::BELL, 4000, 0.5, 15)
+					 .biquad(sampleRate, FilterPassType::BELL, 8000, 0.1, 20)
+					 .biquad(sampleRate, FilterPassType::HIGHPASS, 200, 0.5, 0)
 					 .build())
-			.biquadEnv(AmpBuilder().src(ConstAmp(60))
+			/*.biquadEnv(AmpBuilder().src(ConstAmp(60))
 					   .AR(1, 3000, Line(), Line())
 					   .add(ConstAmp(70))
-					   .build(), ConstAmp(1), FilterPassType::LOWPASS)
+					   .build(), ConstAmp(1), FilterPassType::LOWPASS)*/
+			.mul(0.1)
 			.AR(100, 2000, Pow(-5), Pow(4))
 			.addMul(AmpBuilder().src(SineAmp(490)).AR(3, 3, Pow(-5), Pow(4)).build(), 0.25)
-			.mul(3)
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_2,
 			AmpBuilder(mksp<CymbalOsc>(0.9))
 			.noteDSP(DSPGroupBuilder()
 					 .begin(DSPGroupBuilder::TYPE_CHAIN)
-					 .biquad(sampleRate, FilterPassType::NOTCH, 305 * 0.9, 0.9, 0)
-					 .biquad(sampleRate, FilterPassType::NOTCH, 444 * 0.9, 0.9, 0)
-					 .biquad(sampleRate, FilterPassType::NOTCH, 558 * 0.9, 0.9, 0)
-					 .biquad(sampleRate, FilterPassType::LOWPASS, 19000, 0.7, 0)
-					 .biquad(sampleRate, FilterPassType::HIGHPASS, 600, 0.5, 0)
+					 .biquad(sampleRate, FilterPassType::BELL, 3600, 0.5, 15)
+					 .biquad(sampleRate, FilterPassType::BELL, 7200, 0.1, 20)
+					 .biquad(sampleRate, FilterPassType::HIGHPASS, 200, 0.5, 0)
 					 .build())
-			.biquadEnv(AmpBuilder().src(ConstAmp(60))
+			/*.biquadEnv(AmpBuilder().src(ConstAmp(60))
 					   .AR(1, 3000, Line(), Line())
 					   .add(ConstAmp(70))
-					   .build(), ConstAmp(1), FilterPassType::LOWPASS)
+					   .build(), ConstAmp(1), FilterPassType::LOWPASS)*/
+			.mul(0.1)
 			.AR(100, 2000, Pow(-5), Pow(4))
 			.addMul(AmpBuilder().src(SineAmp(420)).AR(3, 3, Pow(-5), Pow(4)).build(), 0.25)
-			.mul(3)
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_SPLASH,
 			AmpBuilder(mksp<CymbalOsc>(1))
@@ -385,8 +373,8 @@ namespace yzrilyzr_simplesynth{
 		add(MIDIFile::DrumSet::TOM_HIGH_MID, tom(sampleRate));
 		add(MIDIFile::DrumSet::TOM_HIGH, tom(sampleRate));
 		add(MIDIFile::DrumSet::COWBELL,
-			AmpBuilder().src(mksp<TriWave>(ConstPhase(824)))
-			.addMul(mksp<TriWave>(ConstPhase(558)), 0.15)
+			AmpBuilder().src(mksp<TriWave>(ConstPhase(800)))
+			.addMul(mksp<TriWave>(ConstPhase(540)), 0.15)
 			.clampV(0.8, 0.5f)
 			.mul(2)
 			.AR(10, 500, Pow(-5), Pow(5))
@@ -527,7 +515,7 @@ namespace yzrilyzr_simplesynth{
 			AmpBuilder()
 			.src(mksp<SineWaveTable>(114, DoubleArray({
 				114, 0.3, 215, 1, 306, 0.1, 383, 0.5, 412, 0.5
-																  })))
+													  })))
 			.arctanDistortion(1, 1.5, 1)
 			.drum(125, 114, 2, SimpleDrumAmp::MODE_FIXED, Pow(-15))
 			.add(AmpBuilder()
@@ -608,21 +596,69 @@ namespace yzrilyzr_simplesynth{
 			.build());
 		add(MIDIFile::DrumSet::WHISTLE_HIGH,
 			AmpBuilder().src(mksp<NoiseSrc>())
-			.biquad(sampleRate, FilterPassType::BELL, 2450, 20.0, 50)
-			.biquad(sampleRate, FilterPassType::BELL, 2650, 20.0, 50)
-			.biquad(sampleRate, FilterPassType::BANDPASS, 2520, 5.0, 0)
+			.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
+					 .biquad(sampleRate, FilterPassType::BELL, 2450, 20.0, 50)
+					 .biquad(sampleRate, FilterPassType::BELL, 2650, 20.0, 50)
+					 .biquad(sampleRate, FilterPassType::BANDPASS, 2520, 5.0, 0)
+					 .build())
 			.mul(0.005)
 			.am(mksp<SineWave>(), 1, 40)
 			.ADSR(5, 100, 0.5, false, 1000, Pow(5), Pow(5), Pow(-5))
 			.build());
 		add(MIDIFile::DrumSet::WHISTLE_LOW,
 			AmpBuilder().src(mksp<NoiseSrc>())
-			.biquad(sampleRate, FilterPassType::BELL, 1850, 20.0, 50)
-			.biquad(sampleRate, FilterPassType::BELL, 2050, 20.0, 50)
-			.biquad(sampleRate, FilterPassType::BANDPASS, 1920, 5.0, 0)
+			.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
+					 .biquad(sampleRate, FilterPassType::BELL, 1850, 20.0, 50)
+					 .biquad(sampleRate, FilterPassType::BELL, 2050, 20.0, 50)
+					 .biquad(sampleRate, FilterPassType::BANDPASS, 1920, 5.0, 0)
+					 .build())
 			.mul(0.005)
 			.am(mksp<SineWave>(), 1, 40)
 			.ADSR(5, 100, 0.5, false, 1000, Pow(5), Pow(5), Pow(-5))
+			.build());
+		add(MIDIFile::DrumSet::GUIRO_SHORT,
+			AmpBuilder().src(mksp<NoiseSrc>())
+			.add(0.5)
+			.MultiStageEnv(releaseWithCompressorEffect(10, 20, 5, 500, 1))
+			.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
+					 .biquad(sampleRate, FilterPassType::BELL, 740, 10, 40)
+					 .biquad(sampleRate, FilterPassType::BELL, 838, 10, 40)
+					 .biquad(sampleRate, FilterPassType::BELL, 1188, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 1418, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 1984, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 2544, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 3238, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 3803, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 4275, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 5984, 3.0, 20)
+					 .biquad(sampleRate, FilterPassType::BELL, 7373, 5.0, 20)
+					 .biquad(sampleRate, FilterPassType::BELL, 9077, 5.0, 20)
+					 .biquad(sampleRate, FilterPassType::HIGHSHELF, 1000, 0.7, 10)
+					 .build())
+			.mul(0.005)
+			.AR(5, 500, Pow(5), Pow(-5))
+			.build());
+		add(MIDIFile::DrumSet::GUIRO_LONG,
+			AmpBuilder().src(mksp<NoiseSrc>())
+			.add(0.5)
+			.MultiStageEnv(releaseWithCompressorEffect(30, 30, 2, 1000, 1))
+			.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
+					 .biquad(sampleRate, FilterPassType::BELL, 740, 10, 40)
+					 .biquad(sampleRate, FilterPassType::BELL, 838, 10, 40)
+					 .biquad(sampleRate, FilterPassType::BELL, 1188, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 1418, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 1984, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 2544, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 3238, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 3803, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 4275, 10.0, 30)
+					 .biquad(sampleRate, FilterPassType::BELL, 5984, 3.0, 20)
+					 .biquad(sampleRate, FilterPassType::BELL, 7373, 5.0, 20)
+					 .biquad(sampleRate, FilterPassType::BELL, 9077, 5.0, 20)
+					 .biquad(sampleRate, FilterPassType::HIGHSHELF, 1000, 0.7, 10)
+					 .build())
+			.mul(0.005)
+			.AR(5, 1000, Pow(5), Pow(-5))
 			.build());
 		add(MIDIFile::DrumSet::CUICA_HIGH,
 			AmpBuilder().src(mksp<SimpleDrumAmp>(mksp<Pulse>(), 873, 644, 0.3f, Pow(3)))
@@ -829,7 +865,7 @@ namespace yzrilyzr_simplesynth{
 			AmpBuilder()
 			.src(mksp<SineWaveTable>(84, DoubleArray({
 				84, 1, 108, 0.1, 143, 0.1
-																 })))
+													 })))
 			.drum(90, 84, 2)
 			.arctanDistortion(1, 3, 1)
 			.add(AmpBuilder()
@@ -852,6 +888,49 @@ namespace yzrilyzr_simplesynth{
 				 .build())
 			.AR(5, 1000, Pow(5), Pow(5))
 			.build());
+
+		//以下非GM标准音色映射
+
+		add(22, AmpBuilder()
+			.src(mksp<TriWave>(ConstPhase(1066)))
+			.AR(10, 100,  Pow(-5), Pow(5))
+			.build());
+		add(23, AmpBuilder()
+			.src(mksp<TriWave>(ConstPhase(2135)))
+			.AR(10, 100,  Pow(-5), Pow(5))
+			.build());
+		//GS标准附加底鼓
+		for(s_note_id i=1;i < 16;i++){
+			add(i, AmpBuilder().src(mksp<SimpleDrumAmp>(mksp<SineWave>(), 350, 50, 1.0f, SimpleDrumAmp::MODE_FIXED, Pow(-50)))
+				.AR(10, 500, 500, Pow(-5), Pow(10))
+				.arctanDistortion(1, 10, 1)
+				.add(AmpBuilder().src(mksp<SimpleDrumAmp>(mksp<SineWave>(), 1000, 100, 0.1f, SimpleDrumAmp::MODE_FIXED, Pow(-50)))
+					 .AR(10, 100, 100, Pow(-5), Pow(5))
+					 .arctanDistortion(1, 10, 0.3)
+					 .build())
+				.build());
+		}
+		//GS标准附加军鼓
+		for(s_note_id i=97;i < 127;i++){
+			add(i,
+				AmpBuilder()
+				.src(mksp<SimpleDrumAmp>(risset(), 180, 130, 0.3f, SimpleDrumAmp::MODE_FIXED, Pow(-5)))
+				.arctanDistortion(1, 5, 1.5)
+				.addMul(AmpBuilder()
+						.src(mksp<NoiseSrc>())
+						.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
+								 .biquad(sampleRate, FilterPassType::BELL, 740, 0.5, 5)
+								 .biquad(sampleRate, FilterPassType::BELL, 1337, 0.5, 5)
+								 .biquad(sampleRate, FilterPassType::BELL, 5000, 0.5, 10)
+								 .biquad(sampleRate, FilterPassType::BELL, 1254, 10, 7)
+								 .biquad(sampleRate, FilterPassType::BELL, 1554, 10, 7)
+								 .biquad(sampleRate, FilterPassType::HIGHPASS, 500, 0.5, 0)
+								 .build())
+						.build(), 0.2)
+				.MultiStageEnv(releaseWithCompressorEffect(2, 10, 10, 500, 0.7))
+				.mul(0.8)
+				.build());
+		}
 
 		NonInterpolateAmpSet::init(cfg);
 	}

@@ -35,7 +35,9 @@
 #endif
 #include "MixerSequence.h"
 #include "io/FileInputStream.h"
+#include "io/FileOutputStream.h"
 #include "io/ByteArrayOutputStream.h"
+#include "io/ByteArrayInputStream.h"
 #include "util/WAVWriter.h"
 
 #pragma comment(lib,"winmm.lib")
@@ -53,6 +55,7 @@ using namespace yzrilyzr_array;
 int floatBufferLen=256;
 u_sample_rate exportSampleRate=48000;
 u_sp<Mixer2> mixer2=nullptr;
+bool convertMIDIMode=false;
 bool exportMode=false;
 bool exportTrackMode=false;
 bool exportLimiter=true;
@@ -377,15 +380,30 @@ int main(int argc, char * argv[]){
 			}
 			if(str.endsWith(".xm")){
 				u_sp<MixerSequence> seq=SynthUtil::parseXM(FileInputStream(str));
+				String fileName=File(str).getName();
 				if(seq == nullptr)throw Exception("File read error");
-				if(exportMode || exportTrackMode)exportWAV(File(str).getName(), seq);
-				else seq->postToMixer(mixer2.get(), 1, "Console_XM");
+				if(exportMode || exportTrackMode){
+					System::out.printf("导出: %s\n", fileName);
+					exportWAV(fileName, seq);
+				} else{
+					System::out.printf("播放: %s\n", fileName);
+					seq->postToMixer(mixer2.get(), 1, "Console_XM");
+				}
 			} else if(str.endsWith(".mid")){
 				u_sp<MixerSequence> seq=SynthUtil::parseMIDI(FileInputStream(str));
 				if(seq == nullptr)throw Exception("File read error");
 				static int inc=0;
-				if(exportMode || exportTrackMode)exportWAV(File(str).getName(), seq);
-				else seq->postToMixer(mixer2.get(), 1, "Console_MIDI" + std::to_string(inc++));
+				String fileName=File(str).getName();
+				if(convertMIDIMode){
+					System::out.printf("转换: %s\n", fileName);
+					SynthUtil::sequenceToMIDI(seq, FileOutputStream(fileName + "_convert.mid"));					
+				} else if(exportMode || exportTrackMode){
+					System::out.printf("导出: %s\n", fileName);
+					exportWAV(fileName, seq);
+				} else{
+					System::out.printf("播放: %s\n", fileName);
+					seq->postToMixer(mixer2.get(), 1, "Console_MIDI" + std::to_string(inc++));
+				}
 			} else if(str.endsWith(".hrir")){
 				mixer2->getGlobalConfig().set3DEffect(HRIR::parseHRIR(FileInputStream(str)));
 			} else if(str == "3d"){
@@ -408,28 +426,31 @@ int main(int argc, char * argv[]){
 				rin->setDrumSet(mksp<TR808DrumSet>());
 			} else if(str == "export"){
 				exportMode=!exportMode;
-				System::out.println(String("ExportMode: ") + exportMode);
+				System::out.printf("导出模式开关: %b\n", exportMode);
+			} else if(str == "convertMIDI"){
+				convertMIDIMode=!convertMIDIMode;
+				System::out.printf("转换MIDI: %b\n", convertMIDIMode);
 			} else if(str == "exporttrack"){
 				exportTrackMode=!exportTrackMode;
-				System::out.println(String("ExportTrack: ") + exportTrackMode);
+				System::out.printf("分轨导出: %b\n", exportTrackMode);
 			} else if(str == "exportsamplerate"){
-				System::out.println("Input new sample rate");
+				System::out.println("输入新采样率");
 				str=Util::readLine(System::in);
 				exportSampleRate=parseInt(str);
-				System::out.println(String("ExportSampleRate: ") + (int)exportSampleRate);
+				System::out.printf("导出采样率: %d\n", (int)exportSampleRate);
 			} else if(str == "limiter"){
 				exportLimiter=!exportLimiter;
-				System::out.println(String("ExportLimiter:") + exportLimiter);
+				System::out.printf("导出限制器: %b\n", exportLimiter);
 			} else if(str == "channeldsp"){
 				exportChannelDSP=!exportChannelDSP;
-				System::out.println(String("ExportChannelDSP:") + exportChannelDSP);
+				System::out.printf("导出通道使用DSP:  %b\n", exportChannelDSP);
 			} else if(str == "exit"){
 				break;
 			} else if(str == "exportinfo"){
-				System::out.println(String("ExportMode: ") + exportMode);
-				System::out.println(String("ExportTrack: ") + exportTrackMode);
-				System::out.println(String("ExportLimiter:") + exportLimiter);
-				System::out.println(String("ExportSampleRate: ") + (int)exportSampleRate);
+				System::out.printf("导出模式开关: %b\n", exportMode);
+				System::out.printf("分轨导出: %b\n", exportTrackMode);
+				System::out.printf("导出限制器: %b\n", exportLimiter);
+				System::out.printf("导出采样率: %d\n", (int)exportSampleRate);
 			} else if(str.startsWith("midi ")){
 				auto & split=str.split(" ");
 				uint8_t ty=parseInt(split[1].tostring(), 16);
@@ -438,7 +459,7 @@ int main(int argc, char * argv[]){
 				SynthUtil::sendMIDIBytes(mixer2.get(), ty, data1, data2);
 			}
 		} catch(Exception e){
-			std::cerr << "Error: " << e.what() << std::endl;
+			System::err.printf("Error: %s\n", e.what());
 		}
 	}
 	closeAndExit();

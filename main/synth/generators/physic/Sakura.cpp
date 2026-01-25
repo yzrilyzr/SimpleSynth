@@ -28,7 +28,7 @@ namespace yzrilyzr_simplesynth{
 	void Sakura::init(ChannelConfig & cfg){
 		this->sampleRate=cfg.sampleRate;
 		if(exciter == nullptr)exciter=mksp<SakuraExciter>();
-		if(auto exciter1=std::dynamic_pointer_cast<SakuraExciter>(exciter)){
+		if(auto exciter1=spdc<SakuraExciter>(exciter)){
 			exciter1->noiseMixRatio=noiseMixRatio;
 			exciter1->noiseRate=noiseRate;
 		}

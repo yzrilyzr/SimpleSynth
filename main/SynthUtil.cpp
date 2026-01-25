@@ -22,21 +22,159 @@ namespace yzrilyzr_simplesynth{
 	String TickChange::toString() const{
 		return StringFormat::format("[TickChange:%.2fms Start:%d]", tick * 1000.0f, startAtTick);
 	}
+	void SynthUtil::sequenceToMIDI(u_sp<MixerSequence> mixerSeq, yzrilyzr_io::OutputStream & os){
+		auto midiSeq=mksp<MIDIFile::MIDISequence>();
+		midiSeq->midiFormat=1; // 多音轨格式
+		midiSeq->ticksForQuarterNote=480; // 标准PPQ
+		const double bpm=120;
+
+		const double ticksPerSecond=midiSeq->ticksForQuarterNote * bpm / 60.0;
+
+		auto tempoTrack=mksp<MIDIFile::Track>();
+		u_sp<MIDIFile::FFMessage> tickEvent=mksp<MIDIFile::FFMessage>(0);
+		tickEvent->type=0x51;
+		tickEvent->quarterNoteDurationMicroSeconds=midiSeq->ticksForQuarterNote / ticksPerSecond * 1000000.0;
+		tickEvent->b=ByteArray(3);
+		tickEvent->b[0]=(tickEvent->quarterNoteDurationMicroSeconds >> 16) & 0xff;
+		tickEvent->b[1]=(tickEvent->quarterNoteDurationMicroSeconds >> 8) & 0xff;
+		tickEvent->b[2]=(tickEvent->quarterNoteDurationMicroSeconds >> 0) & 0xff;
+
+		tempoTrack->events.add(tickEvent);
+		midiSeq->tracks.add(tempoTrack);
+
+		// 2. 遍历MixerSequence的所有通道和事件
+		for(const auto & channelEntry : mixerSeq->channelEvents){
+			s_midichannel_id globalChannel=channelEntry.first;
+			auto & events=channelEntry.second;
+
+			if(events.empty()) continue;
+
+			// 每个通道创建一个音轨
+			auto track=mksp<MIDIFile::Track>();
+
+			// 不添加端口元事件，直接使用通道ID作为轨道
+			int midiChannel=globalChannel % 16;  // 只使用通道部分
+
+			// 转换该通道的所有事件
+			u_time lastEventTime=0;
+
+			for(auto & eventWrapper : events){
+				ChannelEvent * event=eventWrapper.event;
+				u_time eventTime=event->startAtTime; // 绝对时间（秒）
+				int deltaTicks=static_cast<int>((eventTime - lastEventTime) * ticksPerSecond + 0.5f);
+				lastEventTime=eventTime;
+
+				// 根据事件类型创建MIDI事件
+				u_sp<MIDIFile::MIDIEvent> midiEvent=nullptr;
+
+				if(auto * noteOn=dynamic_cast<NoteOn *>(event)){
+					uint8_t status=0x90 | (midiChannel & 0x0F);
+					auto midiNote=mksp<MIDIFile::MIDINote>(
+						deltaTicks,
+						status,
+						noteOn->id,
+						static_cast<uint8_t>(noteOn->velocity * 127)
+					);
+					midiEvent=midiNote;
+				} else if(auto * noteOff=dynamic_cast<NoteOff *>(event)){
+					uint8_t status=0x80 | (midiChannel & 0x0F);
+					auto midiNote=mksp<MIDIFile::MIDINote>(
+						deltaTicks,
+						status,
+						noteOff->id,
+						static_cast<uint8_t>(noteOff->velocity * 127)
+					);
+					midiEvent=midiNote;
+				} else if(auto * progChange=dynamic_cast<ProgramChange *>(event)){
+					uint8_t status=0xC0 | (midiChannel & 0x0F);
+					auto midiPC=mksp<MIDIFile::MIDIProgramChange>(
+						deltaTicks,
+						status,
+						progChange->id
+					);
+					midiEvent=midiPC;
+				} else if(auto * pitchBend=dynamic_cast<ChannelPitchBend *>(event)){
+					uint8_t status=0xE0 | (midiChannel & 0x0F);
+					int midiValue=static_cast<int>((pitchBend->value + 1.0f) * 8192.0f);
+					midiValue=Util::clamp(midiValue, 0, 16383);
+					uint8_t lsb=midiValue & 0x7F;
+					uint8_t msb=(midiValue >> 7) & 0x7F;
+					auto midiPB=mksp<MIDIFile::MIDIPitchBend>(deltaTicks, status, lsb, msb);
+					midiEvent=midiPB;
+				} else if(auto * channelPressure=dynamic_cast<ChannelPressure *>(event)){
+					uint8_t status=0xD0 | (midiChannel & 0x0F);
+					auto midiPressure=mksp<MIDIFile::MIDIChannelPressure>(
+						deltaTicks,
+						status,
+						static_cast<uint8_t>(channelPressure->value * 127)
+					);
+					midiEvent=midiPressure;
+				} else if(auto * channelControl=dynamic_cast<ChannelControl *>(event)){
+					uint8_t status=0xB0 | (midiChannel & 0x0F);
+					auto midiCC=mksp<MIDIFile::MIDIChannelControl>(
+						deltaTicks,
+						status,
+						channelControl->control,
+						channelControl->value
+					);
+					midiEvent=midiCC;
+				} else if(auto * notePressure=dynamic_cast<NotePressure *>(event)){
+					uint8_t status=0xA0 | (midiChannel & 0x0F);
+					auto midiNote=mksp<MIDIFile::MIDINote>(
+						deltaTicks,
+						status,
+						notePressure->id,
+						static_cast<uint8_t>(notePressure->velocity * 127)
+					);
+					midiEvent=midiNote;
+				}
+
+				if(midiEvent){
+					track->events.add(midiEvent);
+				}
+
+			}
+
+			// 添加音轨结束事件
+			auto endMeta=mksp<MIDIFile::FFMessage>(0);
+			endMeta->type=0x2F;
+			endMeta->b=ByteArray(0);
+			track->events.add(endMeta);
+
+			// 只添加有事件的音轨
+			if(track->events.size() > 1){ // 大于1表示除了结束事件外还有其他事件
+				midiSeq->tracks.add(track);
+			}
+		}
+
+		midiSeq->midiTrackCount=midiSeq->tracks.size();
+
+		// 5. 将MIDISequence写入输出流
+		if(midiSeq->midiTrackCount > 0){
+			midiSeq->toStream(os);
+		}
+	}
 	u_sp<MixerSequence> SynthUtil::parseMIDI(InputStream & is){
 		try{
 			u_sp<MixerSequence> mixerSequence=mksp<MixerSequence>();
-			MIDIFile::MIDISequence * midiSequence=MIDIFile::parse(is);
+			auto midiSequence=MIDIFile::parse(is);
 			if(midiSequence == nullptr)return nullptr;
-			//Set<String> channelAndTrackName = new HashSet<>();
 			int noteShift=0;
 			ArrayList<ChannelEvent *> ticks;
+			bool isGS=midiSequence->standard == MIDIFile::Standard::ROLAND_GENERAL_STANDARD;
+			bool isXG=midiSequence->standard == MIDIFile::Standard::YAMAHA_EXTENDED_GENERAL;
+			if(isGS)System::out.println("MIDI GS");
+			if(isXG)System::out.println("MIDI XG");
+			int32_t mapToDrumDst=0;
+			int32_t mapToDrumSrc=0;
 			for(u_index ii=0;ii < midiSequence->tracks.size();ii++){
-				MIDIFile::Track * t=midiSequence->tracks.get(ii);
+				int midiPort=0;
+				auto t=midiSequence->tracks.get(ii);
 				double delay=0;
 				int delayTicks=0;
 				float ticksSecond=0.001f;
 				for(u_index jj=0;jj < t->events.size();jj++){
-					MIDIFile::MIDIEvent * e=t->events.get(jj);
+					auto e=t->events.get(jj);
 					if(e == nullptr)continue;
 					delayTicks+=e->deltaTimeTicks;
 					delay+=e->deltaTimeTicks * ticksSecond;
@@ -53,8 +191,12 @@ namespace yzrilyzr_simplesynth{
 					}
 					MIDIFile::EventType et=e->getType();
 					if(et == MIDIFile::EventType::Note){
-						MIDIFile::MIDINote * mnote=(MIDIFile::MIDINote *)e;
+						auto mnote=spdc<MIDIFile::MIDINote>(e);
 						int channel=mnote->channel;
+						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
+							channel=mapToDrumDst;
+						}
+						channel+=midiPort * 16;
 						if(mnote->action == 0){
 							ChannelEvent * n1=new NoteOff(mnote->id + noteShift, mnote->velocity / 127.0f);
 							mixerSequence->postToSequence(channel, n1, delay);
@@ -65,41 +207,72 @@ namespace yzrilyzr_simplesynth{
 							ChannelEvent * n1=new NotePressure(mnote->id + noteShift, mnote->velocity / 127.0f);
 							mixerSequence->postToSequence(channel, n1, delay);
 						}
-						//channelAndTrackName->add(t->name + " Channel:" + channel);
 					} else if(et == MIDIFile::EventType::ChannelPitchBend){
-						MIDIFile::MIDIPitchBend * pitchBend=(MIDIFile::MIDIPitchBend *)e;
+						auto pitchBend=spdc<MIDIFile::MIDIPitchBend>(e);
 						int channel=pitchBend->channel;
+						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
+							channel=mapToDrumDst;
+						}
+						channel+=midiPort * 16;
 						ChannelEvent * n1=new ChannelPitchBend((pitchBend->value - 8192.0f) / 8192.0f);
 						mixerSequence->postToSequence(channel, n1, delay);
 					} else if(et == MIDIFile::EventType::ChannelPressure){
-						MIDIFile::MIDIChannelPressure * pressure=(MIDIFile::MIDIChannelPressure *)e;
+						auto pressure=spdc<MIDIFile::MIDIChannelPressure>(e);
 						int channel=pressure->channel;
+						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
+							channel=mapToDrumDst;
+						}
+						channel+=midiPort * 16;
 						ChannelEvent * n1=new ChannelPressure(pressure->value / 127.0f);
 						mixerSequence->postToSequence(channel, n1, delay);
 					} else if(et == MIDIFile::EventType::ChannelControl){
-						MIDIFile::MIDIChannelControl * control=(MIDIFile::MIDIChannelControl *)e;
+						auto control=spdc<MIDIFile::MIDIChannelControl>(e);
 						int channel=control->channel;
+						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
+							channel=mapToDrumDst;
+						}
+						channel+=midiPort * 16;
 						ChannelEvent * n1=new ChannelControl(control->control, control->value);
 						mixerSequence->postToSequence(channel, n1, delay);
+					} else if(et == MIDIFile::EventType::ProgramChange){
+						auto setInstrument=spdc<MIDIFile::MIDIProgramChange>(e);
+						int channel=setInstrument->channel;
+						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
+							channel=mapToDrumDst;
+						}
+						channel+=midiPort * 16;
+						ChannelEvent * n1=new ProgramChange(setInstrument->num);
+						mixerSequence->postToSequence(channel, n1, delay);
+					} else if(et == MIDIFile::EventType::Sysex){
+						auto sys=spdc<MIDIFile::SysexMessage>(e);
+						auto & b=sys->b;
+						if(isGS){
+							static ByteArray toDrum=ByteArray({0x41, 0x10, 0x42, 0x12, 0x40, 0x1A, 0x15, 0x02, 0x0f, (int8_t)0xf7});
+							if(Arrays::equals(toDrum,b)){
+								mapToDrumSrc=10;
+								mapToDrumDst=256+9;
+								System::out.println("GS: Mapped Ch 11 To DrumSet");
+							}
+							else if(b[2] == 0x42&&(b[3]&0x10)==0x10){
+								int32_t channel=b[3] - 0x10;
+							}
+							
+						}
 					} else if(et == MIDIFile::EventType::FF){
-						MIDIFile::FFMessage * ffMessage=(MIDIFile::FFMessage *)e;
+						auto ffMessage=spdc<MIDIFile::FFMessage>(e);						
 						if(ffMessage->type == 0x51){
 							float newTick=ffMessage->quarterNoteDurationMicroSeconds / (float)midiSequence->ticksForQuarterNote / 1000000.0f;
 							ChannelEvent * ce=new TickChange(delayTicks, newTick);
 							ce->startAtTime=delay;
 							ticks.add(ce);
+						} else if(ffMessage->type == 0x21){
+							midiPort=ffMessage->b[0];
+							System::out.printf("MIDI File Port: %d\n", midiPort);
 						}
-					} else if(et == MIDIFile::EventType::ProgramChange){
-						MIDIFile::MIDIProgramChange * setInstrument=(MIDIFile::MIDIProgramChange *)e;
-						int channel=setInstrument->channel;
-						ChannelEvent * n1=new ProgramChange(setInstrument->num);
-						mixerSequence->postToSequence(channel, n1, delay);
-					}
+					} 
 				}
 			}
-			delete midiSequence;
 			mixerSequence->sortPosted();
-			//for (String s : channelAndTrackName) System->out->println(s);
 			return mixerSequence;
 		} catch(...){
 			return nullptr;
@@ -116,14 +289,14 @@ namespace yzrilyzr_simplesynth{
 	//}
 	//u_sp<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, const String & groupName, s_midichannel_id channelID){
 	//	if(auto m1=dynamic_cast<Mixer *>(mixer)){
-	//		u_sp<Channel> channel=std::dynamic_pointer_cast<Channel>(m1->getMIDIChannel(groupName, channelID));
+	//		u_sp<Channel> channel=spdc<Channel>(m1->getMIDIChannel(groupName, channelID));
 	//		if(channel == nullptr){
 	//			channel=mksp<Channel>();
 	//			channel->setName(groupName + " #" + std::to_string(channelID));
 	//			m1->setMIDIChannel(groupName, channelID, channel);
 	//		}
 	//		if(channelID == 9) channel->setSustain(true);
-	//		return std::dynamic_pointer_cast<IChannel>(channel);
+	//		return spdc<IChannel>(channel);
 	//	}
 	//	return nullptr;
 	//}
@@ -155,6 +328,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	void SynthUtil::sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const String & groupName){
 		auto * event=MIDIBytes2Event(ty, data1, data2);
+		if(event == nullptr)return;
 		event->groupName=groupName;
 		mixer->sendInstantEvent(event);
 	}

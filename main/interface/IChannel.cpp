@@ -60,4 +60,7 @@ namespace yzrilyzr_simplesynth{
 			au.init(sampleRate);
 		}
 	}
+	bool IChannel::isDrumSetChannel()const{
+		return IMixer::isDrumSetChannel(channelID);
+	}
 }

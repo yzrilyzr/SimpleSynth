@@ -56,6 +56,7 @@ namespace yzrilyzr_simplesynth{
 		float CoarseTune=0.0;          // 粗调音调(id)
 		float NoteShift=0.0;            // 音符偏移量
 		s_bank_id Bank=0;          // 音色库值
+		s_program_id Program=0;          // 音色库值
 		PNData rpn;                      // RPN参数
 		PNData nrpn;                     // NRPN参数
 		bool noteHoldMap[CHANNEL_MAX_NOTE_ID]={false}; // 音符是否按下映射

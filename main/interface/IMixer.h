@@ -42,7 +42,6 @@ namespace yzrilyzr_simplesynth{
 		static constexpr const int8_t MODE_SINGLE_THREAD=0;
 		static constexpr const int8_t MODE_FUTURE=1;
 		static constexpr const int8_t MODE_THREAD_POOL=2;
-		static constexpr const s_midichannel_id MIDI_DRUM_CHANNEL=9;
 		static constexpr const char * const DEFAULT_MIDI_CHANNEL_GROUP_NAME="DefaultMIDIChannelGroup";
 
 		virtual void mix()=0;
@@ -61,6 +60,7 @@ namespace yzrilyzr_simplesynth{
 		virtual bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)=0;
 		u_sp<IChannel> getMIDIChannel(s_midichannel_id id);
 		virtual u_sp<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)=0;
+		static bool isDrumSetChannel(s_midichannel_id id);
 
 		int8_t getSynthMode() const;
 		virtual void setSynthMode(int8_t mode, int32_t cores)=0;

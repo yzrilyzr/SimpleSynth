@@ -23,7 +23,7 @@ namespace yzrilyzr_simplesynth{
 		u_sample leftNodeAlphas[2];
 		// 右侧节点的alpha系数
 		u_sample rightNodeAlphas[2];
-		// 延迟缓冲区（替代原DWGDelay，存储声波延迟样本）
+		// 延迟缓冲区,存储声波延迟样本
 		yzrilyzr_dsp::RingBufferSample delayBuffers[2];
 		// 第一个延迟线的长度（采样数）
 		u_sample delayLength1;

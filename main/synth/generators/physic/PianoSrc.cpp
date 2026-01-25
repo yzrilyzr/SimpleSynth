@@ -80,7 +80,7 @@ namespace yzrilyzr_simplesynth{
 			kp.mult_loss_filter=1;
 			kp.detune=detune.y(i);
 			kp.mult_radius_core_string=1;
-			kp.outputVolume=vol.y(i) * 20;
+			kp.outputVolume=vol.y(i) * 15;
 		}
 	}
 

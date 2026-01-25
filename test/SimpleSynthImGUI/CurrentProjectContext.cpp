@@ -221,7 +221,7 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 			//查找输出
 			ProjectObject * nodeStart=findNode(started_at_node_id);
 			if(nodeStart){
-				if(auto ptr=std::dynamic_pointer_cast<NoteProcessor>(nodeStart->paramRegPtr)){
+				if(auto ptr=spdc<NoteProcessor>(nodeStart->paramRegPtr)){
 					//创建新有效连接
 					finalProcessor=ptr;
 				} else{

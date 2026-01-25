@@ -102,7 +102,7 @@ class input_midi : public input_stubs{
 		if(m_mixer){
 			m_mixer->reset();
 			if(m_sequence){
-				m_sequence->postToMixer(m_mixer.get(), 0, "foobar2000_decode");
+				m_sequence->postToMixer(m_mixer.get(), 0.1, "foobar2000_decode");
 			}
 		}
 	}

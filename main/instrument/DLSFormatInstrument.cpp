@@ -245,7 +245,7 @@ namespace yzrilyzr_simplesynth{
 	void DLSFormatInstrument::buildInstruments(){
 		auto instruments=soundbank->getInstruments();
 		for(auto & instrument : instruments){
-			auto dlsInstrument=std::dynamic_pointer_cast<DLSInstrument>(instrument);
+			auto dlsInstrument=spdc<DLSInstrument>(instrument);
 			if(!dlsInstrument)continue;
 			if(dlsInstrument->druminstrument){
 				buildDrumInstrument(*dlsInstrument);
@@ -276,7 +276,7 @@ namespace yzrilyzr_simplesynth{
 
 	void DLSFormatInstrument::buildDrumInstrument(DLSInstrument & instrument){
 		s_bank_id bank=instrument.getBank();
-		u_sp<NonInterpolateAmpSet> drumSet=std::dynamic_pointer_cast<NonInterpolateAmpSet>(getDrumSet(bank, 0));
+		u_sp<NonInterpolateAmpSet> drumSet=spdc<NonInterpolateAmpSet>(getDrumSet(bank, 0));
 		if(drumSet == nullptr){
 			drumSet=mksp<NonInterpolateAmpSet>();
 			drumSetMap[bank]=drumSet;

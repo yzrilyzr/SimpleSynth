@@ -121,7 +121,7 @@ namespace yzrilyzr_simplesynth{
 		//	}
 		//	break;
 		//	case 3://pm
-		//		amp->pm(std::dynamic_pointer_cast<Osc>(parseSrc()), readFloat(), readFloat());
+		//		amp->pm(spdc<Osc>(parseSrc()), readFloat(), readFloat());
 		//		break;
 		//	default:
 		//		std::cout << "Unknown command:" << regControl << std::endl;

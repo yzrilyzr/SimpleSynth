@@ -70,7 +70,7 @@ EBCLASS(ProjectObject){
 	//			if(const ImGuiPayload * payload=ImGui::AcceptDragDropPayload(type)){
 	//				IM_ASSERT(payload->DataSize == sizeof(ProjectObject));
 	//				ProjectObject * draggingObject=(ProjectObject *)(payload->Data);
-	//				*paramValue=std::dynamic_pointer_cast<T>(draggingObject->paramRegPtr);//目标赋值
+	//				*paramValue=spdc<T>(draggingObject->paramRegPtr);//目标赋值
 	//				uiInputChange=true;
 	//			}
 	//		}
