@@ -23,14 +23,14 @@ namespace yzrilyzr_simplesynth{
 	public:
 	SoftSync();
 	SoftSync(NoteProcPtr slave, float ratio, u_sp<yzrilyzr_interpolator::Interpolator> interp);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	static inline s_phase lerpPhase(s_phase start, s_phase end, s_phase t){
 		return start + (end - start) * t; // t∈[0,1]
 	}
 	// 设置同步插值器（如Bezier、Pow等）
 	void setSyncInterpolator(u_sp<yzrilyzr_interpolator::Interpolator> interp);
 	NoteProcPtr clone() override;
-	SoftSyncKeyData * init(SoftSyncKeyData * data, Note & note) override;
+	SoftSyncKeyData * init(SoftSyncKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
 	};
 }

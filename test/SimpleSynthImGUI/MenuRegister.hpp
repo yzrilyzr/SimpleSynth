@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <yzrutil.h>
 #include <util/Lang.h>
-#include <util/ParamRegister.h>
+#include <util/ClassRegister.h>
 #include <functional>
 #include <map>
 #include <vector>
@@ -11,7 +11,7 @@ class CurrentProjectContext;
 class ProjectObject;
 EBCLASS(MenuRegister){
 	public:
-	using CreatorFunc=std::function<u_sp<yzrilyzr_util::ParamRegister>()>;
+	using CreatorFunc=std::function<u_sp<yzrilyzr_util::ClassRegister>()>;
 	using RenderFunc=std::function<void(CurrentProjectContext &, ProjectObject &)>;
 	struct MenuRegisterObject{
 		yzrilyzr_lang::String name;

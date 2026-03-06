@@ -1,5 +1,6 @@
 ﻿#include "KarplusStrongSrc.h"
 #include "events/NoteUpdater.h"
+#include "dsp/DSP.h"
 #include "dsp/BufferDelayer.h"
 #include "dsp/InterpolateFunction.h"
 
@@ -7,13 +8,15 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	KarplusStrongSrc::KarplusStrongSrc() :Osc(nullptr){
-		registerParamNormal01("Alpha", &alpha);
-		registerParamSrc("Burst", &burst);
-		registerParamSample("BurstSample", &burstSampleData);
+	void KarplusStrongSrc::onRegisterParam(){
+		Osc::onRegisterParam();
+		RegisterUtil::registerParamNormal01(*this, "Alpha", &alpha);
+		RegisterUtil::registerParamSrc(*this, "Burst", &burst);
+		RegisterUtil::registerParamSampleData(*this, "BurstSample", &burstSampleData);
 		registerParamInterpolator("AlphaInterpolator", &alphaInterpolator);
 	}
-	KarplusStrongSrcKeyData * KarplusStrongSrc::init(KarplusStrongSrcKeyData * data, Note & note){
+	KarplusStrongSrc::KarplusStrongSrc() :Osc(nullptr){}
+	KarplusStrongSrcKeyData * KarplusStrongSrc::init(KarplusStrongSrcKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new KarplusStrongSrcKeyData();
 		}
@@ -50,21 +53,20 @@ namespace yzrilyzr_simplesynth{
 			u_time dt=cfg.deltaTime;
 			NoteProcessor & pro=*burst;
 			for(u_index i=0;i < lengthInt;i++){
-				NoteUpdater::preUpdateNote(initNote,cfg);
+				NoteUpdater::preUpdateNote(initNote, cfg);
 				buffer.write(pro.getAmp(initNote));
-				NoteUpdater::postUpdateNote(initNote,cfg);
+				NoteUpdater::postUpdateNote(initNote, cfg);
 				cfg.currentTime+=dt;
 			}
 			cfg.currentTime=cur;
 		} else{
-			static thread_local u_index randomIndex=0;
 			for(u_index i=0;i < lengthInt;i++){
-				buffer.write(random.next(&randomIndex) * note.velocitySynth);
+				buffer.write(random.next() * note.velocitySynth);
 			}
 		}
 		return data;
 	}
-	u_freq KarplusStrongSrc::getInitSetFreq(Note & note){
+	u_freq KarplusStrongSrc::getInitSetFreq(const Note & note){
 		u_freq freq2=constFreq;
 		if(freq2 == 0) freq2=note.freqSynth;
 		return freq2;
@@ -83,7 +85,7 @@ namespace yzrilyzr_simplesynth{
 			.freqSrc(getPhaseSource())
 			.build();
 	}
-	u_sample KarplusStrongSrc::getAmp(Note & note){
+	u_sample KarplusStrongSrc::getAmp(const Note & note){
 		KarplusStrongSrcKeyData & data=*getData(note);
 		RingBufferSample & buffer=data.buffer;
 		u_freq freq2=getSetFreq(note);
@@ -96,7 +98,7 @@ namespace yzrilyzr_simplesynth{
 		buffer.write(sum);
 		return sum;
 	}
-	u_freq KarplusStrongSrc::getSetFreq(Note & note){
+	u_freq KarplusStrongSrc::getSetFreq(const Note & note){
 		return constFreq == 0?note.freqSynth:constFreq;
 	}
 	String KarplusStrongSrc::toString()const{

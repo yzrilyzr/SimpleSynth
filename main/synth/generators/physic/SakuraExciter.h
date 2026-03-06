@@ -25,10 +25,12 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg) override;
 	//u_sample postProcess(u_sample output) override;
 	NoteProcPtr clone() override;
-	u_sample getAmp(Note & note) override;
-	//bool noMoreData(Note & note)override;
-	SakuraExciterKeyData * init(SakuraExciterKeyData * buffer, Note & note) override;
+	u_sample getAmp(const Note & note) override;
+	//bool noMoreData(const Note & note)override;
+	SakuraExciterKeyData * init(SakuraExciterKeyData * data, const Note & note) override;
 	static u_sample exciteClickFunc(s_phase mod);
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(SakuraExciter)
 
 	};
 }

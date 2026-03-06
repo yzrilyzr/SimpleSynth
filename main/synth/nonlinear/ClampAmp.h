@@ -11,8 +11,11 @@ namespace yzrilyzr_simplesynth{
 	public:
 	ClampAmp();
 	ClampAmp(NoteProcPtr a, u_sample inputGain, u_sample clamp, u_sample outputGain);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(ClampAmp)
+
 	};
 }

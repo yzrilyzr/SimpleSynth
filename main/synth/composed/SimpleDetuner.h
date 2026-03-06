@@ -11,7 +11,8 @@
 namespace yzrilyzr_simplesynth{
 	EBCLASS(SimpleDetunerKeyData){
 	public:
-	yzrilyzr_array::Array<Note *> * notes=nullptr;
+	yzrilyzr_array::Array<Note> notes;
+	bool uniqueIDSet=false;
 	};
 	ECLASS(SimpleDetuner, public AmpUnaryComposition, NoteData<SimpleDetunerKeyData>){
 	private:
@@ -19,20 +20,20 @@ namespace yzrilyzr_simplesynth{
 	public:
 	int32_t count=1;
 	s_note_id offset=0;
+	u_normal_01 initPhase=1;
 
 	~SimpleDetuner()=default;
-	SimpleDetuner() :AmpUnaryComposition(nullptr){
-		static int minCount=1, maxCount=7;
-		registerParam("Count", yzrilyzr_util::ParamType::Int, &count, &minCount, &maxCount);
-		registerParamNormal01("Offset", &offset);
-	}
+	SimpleDetuner() :AmpUnaryComposition(nullptr){}
 	SimpleDetuner(NoteProcPtr a, int32_t count, s_note_id offset) :
 		AmpUnaryComposition(a),
 		count(count),
 		offset(offset){}
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
-	SimpleDetunerKeyData * init(SimpleDetunerKeyData * data, Note & note) override;
+	void init(ChannelConfig &cfg) override;
+	SimpleDetunerKeyData * init(SimpleDetunerKeyData * data, const Note & note) override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(SimpleDetuner)
 	};
 }

@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 	AmpWithCC::AmpWithCC(NoteProcPtr a,const yzrilyzr_array::IntArray& cc) : AmpUnaryComposition(a){
 		this->cc=cc;
 	}
-	u_sample AmpWithCC::getAmp(Note & note){
+	u_sample AmpWithCC::getAmp(const Note & note){
 		return a->getAmp(note);
 	}
 	NoteProcPtr AmpWithCC::clone(){

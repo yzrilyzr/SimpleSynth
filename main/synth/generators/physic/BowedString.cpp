@@ -7,6 +7,12 @@
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
 namespace yzrilyzr_simplesynth{
+	void BowedString::onRegisterParam(){
+		RegisterUtil::registerParamFreq(*this, "boxCombFreq", &boxCombFreq);
+		RegisterUtil::registerParamFreq(*this, "boxBandFreq", &boxBandFreq);
+		RegisterUtil::registerParamFreq(*this, "boxNotchFreq", &boxNotchFreq);
+	}
+
 	BowedString::~BowedString(){
 		delete random;
 		delete boxReverb;
@@ -29,12 +35,11 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr BowedString::clone(){
 		return mksp<BowedString>(boxCombFreq, boxBandFreq, boxNotchFreq);
 	}
-	u_sample BowedString::getAmp(Note & note){
+	u_sample BowedString::getAmp(const Note & note){
 		BowedStringKeyData & data=*getData(note);
 		RingBufferSample & buffer=data.ringBuffer;
 		u_freq freq2=getSetFreq(note);
-		static thread_local u_index randomIndex=0;
-		u_sample input=random->next(&randomIndex) * 0.1;
+		u_sample input=random->next() * 0.1;
 		s_phase time=getPhase(note);//. % 1;
 		time=time - (int)time;
 		input+=(time * 2 - 1) * 0.4;
@@ -44,7 +49,7 @@ namespace yzrilyzr_simplesynth{
 		u_sample alpha=0.4 + 0.4 * note.velocitySynth;
 		return procKS(buffer, alpha, 0.95, input, freq2) * 0.2;
 	}
-	BowedStringKeyData * BowedString::init(BowedStringKeyData * data, Note & note){
+	BowedStringKeyData * BowedString::init(BowedStringKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new BowedStringKeyData();
 			data->filter=IIRUtil::newButterworthIIRFilter(sampleRate, FilterPassType::BANDPASS, 1, 20, 5000);
@@ -65,7 +70,7 @@ namespace yzrilyzr_simplesynth{
 		buffer.write(sum * feedback);
 		return sum;
 	}
-	u_freq BowedString::getSetFreq(Note & note){
+	u_freq BowedString::getSetFreq(const Note & note){
 		return note.freqSynth;
 	}
 }

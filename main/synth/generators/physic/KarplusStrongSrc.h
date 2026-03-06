@@ -39,16 +39,18 @@ namespace yzrilyzr_simplesynth{
 		burstSampleData(burstSampleData),
 		burst(burst),
 		constFreq(constFreq){}
-	KarplusStrongSrcKeyData * init(KarplusStrongSrcKeyData * buffer, Note & note) override;
+	KarplusStrongSrcKeyData * init(KarplusStrongSrcKeyData * buffer, const Note & note) override;
 	private:
-	u_freq getInitSetFreq(Note & note);
+	u_freq getInitSetFreq(const Note & note);
 	public:
 	void init(ChannelConfig & cfg) override;
 	NoteProcPtr clone() override;
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(KarplusStrongSrc);
 	private:
-	u_freq getSetFreq(Note & note);
+	u_freq getSetFreq(const Note & note);
 	};
 	EBCLASS(KarplusStrongBuilder){
 	private:
@@ -82,7 +84,7 @@ namespace yzrilyzr_simplesynth{
 		return *this;
 	}
 	NoteProcPtr build(){
-		return spdc<NoteProcessor>(ks);
+		return spsc<NoteProcessor>(ks);
 	}
 	};
 }

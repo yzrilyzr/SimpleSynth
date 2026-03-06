@@ -29,11 +29,7 @@ namespace yzrilyzr_simplesynth{
 	u_freq boxNotchFreq;
 	public:
 	~BowedString();
-	BowedString() :BowedString(100, 100, 100){
-		registerParamFreq("boxCombFreq", &boxCombFreq);
-		registerParamFreq("boxBandFreq", &boxBandFreq);
-		registerParamFreq("boxNotchFreq", &boxNotchFreq);
-	}
+	BowedString() :BowedString(100, 100, 100){}
 	BowedString(u_freq boxCombFreq, u_freq boxBandFreq, u_freq boxNotchFreq) :
 		boxCombFreq(boxCombFreq),
 		boxBandFreq(boxBandFreq),
@@ -42,10 +38,11 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg) override;
 	u_sample postProcess(u_sample output) override;
 	NoteProcPtr clone() override;
-	u_sample getAmp(Note & note) override;
-	BowedStringKeyData * init(BowedStringKeyData * data, Note & note) override;
+	u_sample getAmp(const Note & note) override;
+	BowedStringKeyData * init(BowedStringKeyData * data, const Note & note) override;
 	private:
 	u_sample procKS(yzrilyzr_dsp::RingBufferSample & buffer, u_sample alpha, u_sample feedback, u_sample input, u_freq freq2);
-	u_freq getSetFreq(Note & note);
+	u_freq getSetFreq(const Note & note);
+	void onRegisterParam() override;
 	};
 }

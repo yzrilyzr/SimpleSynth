@@ -1,11 +1,10 @@
 ﻿#pragma once
 #include "SimpleSynth.h"
 #include "interface/NoteProcessor.h"
-#include "AmpUnaryComposition.h"
-
+#include "NoteModulation.h"
 
 namespace yzrilyzr_simplesynth{
-	ECLASS(AutoMod, public AmpUnaryComposition){
+	ECLASS(AutoMod, public NoteModulation){
 	private:
 	bool isMod=false;
 	public:
@@ -15,17 +14,14 @@ namespace yzrilyzr_simplesynth{
 	u_time modDelay=0;
 	NoteProcPtr modShape=nullptr;
 	~AutoMod()=default;
-	AutoMod() :AmpUnaryComposition(nullptr){
-		registerParamFreq("Freq", &modRate);
-		registerParamNormal01("FreqDepth", &modFreqDepth);
-		registerParamNormal01("AmpDepth", &modAmpDepth);
-		registerParamTime("Delay", &modDelay);
-		registerParamSrc("Shape", &modShape);
-	}
-	AutoMod(NoteProcPtr a, u_normal_01 modFreqDepth,u_normal_01 modAmpDepth, u_freq modRate, u_time modDelay, NoteProcPtr modShape=nullptr);
-	u_sample getAmp(Note & note) override;
-	bool noMoreData(Note & note) override;
+	AutoMod() :NoteModulation(nullptr){}
+	AutoMod(NoteProcPtr a, u_normal_01 modFreqDepth, u_normal_01 modAmpDepth, u_freq modRate, u_time modDelay, NoteProcPtr modShape=nullptr);
+	void applyMod(Note & note)override;
+	//u_sample getAmp(const Note & note) override;
+	bool noMoreData(const Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(AutoMod)
 	};
 }

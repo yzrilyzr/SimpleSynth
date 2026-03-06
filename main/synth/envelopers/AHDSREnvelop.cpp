@@ -1,5 +1,6 @@
 ﻿#include "AHDSREnvelop.h"
 #include "EnvUtil.h"
+#include "dsp/DSP.h"
 #include "events/ChannelConfig.h"
 #include "events/ChannelEvent.h"
 #include "events/Note.h"
@@ -8,17 +9,26 @@
 #include "interpolator/Interpolator.h"
 #include "lang/StringFormat.hpp"
 #include "util/Util.h"
+#include "lang/Math.h"
 #include "yzrutil.h"
-#include <algorithm>
-#include <cmath>
-#include <memory>
-#include <string>
-#include <utility>
 using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
+	void AHDSREnvelop::onRegisterParam(){
+		RegisterUtil::registerParamTime(*this, "Delay", &delayTime);
+		RegisterUtil::registerParamTime(*this, "Attack", &attackTime);
+		RegisterUtil::registerParamTime(*this, "Hold", &holdTime);
+		RegisterUtil::registerParamTime(*this, "Decay", &decayTime);
+		RegisterUtil::registerParamNormal01(*this, "SustainVol", &sustainVolume);
+		registerParamBool("Sustainable", &canSustain);
+		RegisterUtil::registerParamTime(*this, "Release", &releaseTime);
+		RegisterUtil::registerParamTime(*this, "ForceRelease", &forceReleaseTime);
+		registerParamInterpolator("ACurve", &aCurve);
+		registerParamInterpolator("DCurve", &dCurve);
+		registerParamInterpolator("RCurve", &rCurve);
+	}
 	AHDSREnvelop::AHDSREnvelop(u_time_ms delayTime, u_time_ms attackTime, u_time_ms holdTime, u_time_ms decayTime, u_normal_01 sustainVolume, bool canSustain, u_time_ms releaseTime, u_time_ms forceReleaseTime,
 							   u_sp<Interpolator> aCurve, u_sp<Interpolator> dCurve, u_sp<Interpolator> rCurve){
 		this->delayTime=delayTime / 1000.0;
@@ -33,25 +43,13 @@ namespace yzrilyzr_simplesynth{
 		this->rCurve=std::move(rCurve);
 		this->canSustain=canSustain;
 	}
-	AHDSREnvelop::AHDSREnvelop(){
-		registerParamTime("Delay", &delayTime);
-		registerParamTime("Attack", &attackTime);
-		registerParamTime("Hold", &holdTime);
-		registerParamTime("Decay", &decayTime);
-		registerParamNormal01("SustainVol", &sustainVolume);
-		registerParamBool("Sustainable", &canSustain);
-		registerParamTime("Release", &releaseTime);
-		registerParamTime("ForceRelease", &forceReleaseTime);
-		registerParamInterpolator("ACurve", &aCurve);
-		registerParamInterpolator("DCurve", &dCurve);
-		registerParamInterpolator("RCurve", &rCurve);
-	}
+	AHDSREnvelop::AHDSREnvelop(){}
 	void AHDSREnvelop::init(ChannelConfig & cfg){
 		if(aCurve == nullptr) aCurve=EnvUtil::Line();
 		if(dCurve == nullptr) dCurve=EnvUtil::Line();
 		if(rCurve == nullptr) rCurve=EnvUtil::Line();
 	}
-	bool AHDSREnvelop::noMoreData(Note & note){
+	bool AHDSREnvelop::noMoreData(const Note & note){
 		AHDSREnvelopKeyData * n1=getData(note);
 		if(n1->releaseTime == -1) return false;
 		u_time time1=note.cfg->currentTime - n1->releaseTime;
@@ -62,7 +60,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr AHDSREnvelop::clone(){
 		return mksp<AHDSREnvelop>(delayTime * 1000.0, attackTime * 1000.0, holdTime * 1000.0, decayTime * 1000.0, sustainVolume, canSustain, releaseTime * 1000.0, forceReleaseTime * 1000.0, aCurve, dCurve, rCurve);
 	}
-	u_sample AHDSREnvelop::getAmp(Note & note){
+	u_sample AHDSREnvelop::getAmp(const Note & note){
 		u_time time=note.passedTime;
 		if(time < 0) return 0;
 		AHDSREnvelopKeyData & n1=*getData(note);
@@ -116,7 +114,7 @@ namespace yzrilyzr_simplesynth{
 										   dCurve,
 										   rCurve);
 	}
-	AHDSREnvelopKeyData * AHDSREnvelop::init(AHDSREnvelopKeyData * data, Note & note){
+	AHDSREnvelopKeyData * AHDSREnvelop::init(AHDSREnvelopKeyData * data, const Note & note){
 		if(data == nullptr) data=new AHDSREnvelopKeyData();
 		if(note.cfg->Legato){
 			data->attackTime=0.005;
@@ -127,7 +125,7 @@ namespace yzrilyzr_simplesynth{
 		data->releaseVolume=0;
 		return data;
 	}
-	bool AHDSREnvelop::isNoteNotReleased(Note & note) const{
+	bool AHDSREnvelop::isNoteNotReleased(const Note & note) const{
 		if(canSustain){
 			return !note.closed(*note.cfg);
 		}

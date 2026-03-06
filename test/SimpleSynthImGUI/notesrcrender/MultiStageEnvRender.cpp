@@ -9,7 +9,7 @@
 #include "interpolator/LineInterpolator.h"
 #include "synth/envelopers/MultiStageEnvelope.h"
 #include "tuning/EqualTemperament.h"
-#include "..\LangToEnum.h"
+#include "util/Lang.h"
 #include "lang/Exception.h"
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
@@ -19,7 +19,7 @@ using namespace yzrilyzr_lang;
 
 void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	bool changed=false;
-	u_sp<MultiStageEnvelope> paramRegPtr=std::dynamic_pointer_cast<MultiStageEnvelope, ParamRegister>(obj.paramRegPtr);
+	u_sp<MultiStageEnvelope> paramRegPtr=std::dynamic_pointer_cast<MultiStageEnvelope, ClassRegister>(obj.paramRegPtr);
 	auto & pts=paramRegPtr->points;
 	if(ImPlot::BeginPlot(ctx.LANG.getc("module.multi_stage_envelope.data"), ImVec2(500, 200))){
 		ImPlot::SetupAxis(ImAxis_Y1, "Value", ImPlotAxisFlags_NoLabel);
@@ -78,7 +78,9 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 		}
 		pts.insert(pts.begin() + currentEdit + 1, MSEPoint{x, 0.5, MSEPointType::DEFAULT, MSEPointMode::SINGLE_CURVE, 0});
 	}
+	ImGui::PushItemWidth(200);
 	ImGui::InputInt(ctx.LANG.getc("module.multi_stage_envelope.current_edit"), &currentEdit);
+	ImGui::PopItemWidth();
 	if(currentEdit < 0)currentEdit=0;
 	if(currentEdit >= pts.size())currentEdit=pts.size() - 1;
 	if(currentEdit >= 0 && currentEdit < pts.size()){
@@ -88,6 +90,7 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 			changed=true;
 			pts.erase(pts.begin() + currentEdit);
 		}
+		ImGui::PushItemWidth(400);
 		if(ImGui::DragFloat(ctx.LANG.getc("module.multi_stage_envelope.current_edit_x"), &oldX, 0.001, 0.0, 10.0)){
 			changed=true;
 			float deltaX=oldX - p.x;
@@ -117,6 +120,7 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 			changed=true;
 		}
 		changed=ImGui::DragFloat(ctx.LANG.getc("module.multi_stage_envelope.current_edit_modeValue"), &p.modeValue, 0.01, -1, 1) || changed;
+		ImGui::PopItemWidth();
 		ImGui::Text(ctx.LANG.getc("module.multi_stage_envelope.current_edit_type"));
 		int type=static_cast<int>(p.type);
 		bool changed1=false;

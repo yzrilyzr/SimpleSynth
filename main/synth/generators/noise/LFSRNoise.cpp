@@ -4,9 +4,12 @@
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	LFSRNoise::LFSRNoise(){
+	void LFSRNoise::onRegisterParam(){
 		static int32_t min=6, max=14;
 		registerParam("ShiftCount", ParamType::Int, &shiftCount, &min, &max);
+	}
+	LFSRNoise::LFSRNoise(){
+		
 		lfsr=0x4000;
 		shiftCount=6;
 	}
@@ -14,7 +17,7 @@ namespace yzrilyzr_simplesynth{
 		lfsr=0x4000;
 		this->shiftCount=shiftCount;
 	}
-	u_sample LFSRNoise::getAmp(Note & note){
+	u_sample LFSRNoise::getAmp(const Note & note){
 		if(shiftCount == 14){
 			lfsrCurrent=nextBit();
 		} else{

@@ -7,14 +7,18 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_util;
 namespace yzrilyzr_simplesynth{
-	BiquadEnvFilterGroup::BiquadEnvFilterGroup() :AmpUnaryComposition(nullptr){
+	void BiquadEnvFilterGroup::onRegisterParam(){
+		AmpUnaryComposition::onRegisterParam();
 		static const char * enums[2]={"Chain", "Parallel"};
 		registerParamEnum("Type", &type, enums, 2);
+	}
+	BiquadEnvFilterGroup::BiquadEnvFilterGroup() :AmpUnaryComposition(nullptr){
+		
 	}
 	BiquadEnvFilterGroup::BiquadEnvFilterGroup(NoteProcPtr src, int type, std::vector<BiquadEnvFilterGroupConfig> filtersCfg) :
 		AmpUnaryComposition(src), type(type), filtersCfg(filtersCfg){}
 
-	u_sample BiquadEnvFilterGroup::getAmp(Note & note){
+	u_sample BiquadEnvFilterGroup::getAmp(const Note & note){
 		BiquadEnvFilterGroupKeyData & data=*getData(note);
 		u_sample_rate sr=note.cfg->sampleRate;
 		for(u_index i=0, j=filtersCfg.size();i < j;i++){
@@ -45,7 +49,7 @@ namespace yzrilyzr_simplesynth{
 			bcfg.gainEnv->init(cfg);
 		}
 	}
-	BiquadEnvFilterGroupKeyData * BiquadEnvFilterGroup::init(BiquadEnvFilterGroupKeyData * data, Note & note){
+	BiquadEnvFilterGroupKeyData * BiquadEnvFilterGroup::init(BiquadEnvFilterGroupKeyData * data, const Note & note){
 		if(data == nullptr)data=new BiquadEnvFilterGroupKeyData();
 		if(data->filters == nullptr || data->filters->size() != filtersCfg.size()){
 			DSPGroupBuilder builder;

@@ -1,4 +1,4 @@
-#include "../LangToEnum.h"
+#include "util/Lang.h"
 #include "../SimpleSynthProject.h"
 #include "../SimpleSynthWindow.h"
 #include "interface/IChannel.h"
@@ -9,10 +9,84 @@
 #include "dsp/Chorus.h"
 #include "dsp/Freeverb.h"
 #include "dsp/RMSCompute.h"
+
 using namespace yzrilyzr_lang;
+using namespace yzrilyzr_util;
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
+using namespace yzrilyzr_interpolator;
+
+extern MenuRegister allNoteProcessor;
+extern MenuRegister allDSP;
+extern MenuRegister allInterpolator;
+extern MenuRegister allPhaseSrc;
+extern MenuRegister allSubModule;
+
+void buildProjectFromInstrument(CurrentProjectContext & ctx, u_sp<ClassRegister> np, int parType){
+	ProjectObject * obj=new ProjectObject();
+	obj->paramRegPtr=np;
+	np->registerParams();
+	MenuRegister::MenuRegisterObject * menuObj=nullptr;
+	String clzName=np->getClassName();
+	System::out.println(clzName);
+	if(clzName == "BaseObject"){
+		System::out.println();
+	}
+	if(parType == ParamType::NoteSrc || parType == ParamType::SampleData){
+		for(auto & reg : allNoteProcessor.allRegObjects){
+			if(reg.name == clzName){
+				menuObj=&reg;
+				break;
+			}
+		}
+	} else if(parType == ParamType::DSP){
+		for(auto & reg : allDSP.allRegObjects){
+			if(reg.name == clzName){
+				menuObj=&reg;
+				break;
+			}
+		}
+	} else if(parType == ParamType::Interpolator){
+		for(auto & reg : allInterpolator.allRegObjects){
+			if(reg.name == clzName){
+				menuObj=&reg;
+				break;
+			}
+		}
+	} else if(parType == ParamType::PhaseSrc){
+		for(auto & reg : allPhaseSrc.allRegObjects){
+			if(reg.name == clzName){
+				menuObj=&reg;
+				break;
+			}
+		}
+	}
+	if(menuObj){
+		obj->name=menuObj->name;
+		obj->category=menuObj->category;
+		obj->showName=menuObj->showName;
+		obj->renderFunc=menuObj->rfunc;
+		obj->enableOriginalRender=menuObj->enableOriginalRender;
+	}
+	ctx.objects.add(obj);
+	for(auto & par : obj->paramRegPtr->RegisteredParams){
+		if(!par.value)continue;
+		switch(par.type){
+			case ParamType::DSP:
+			case ParamType::NoteSrc:
+			case ParamType::Interpolator:
+			case ParamType::PhaseSrc:
+			case ParamType::SampleData:
+			{
+				u_sp<ClassRegister> nptr=*static_cast<u_sp<ClassRegister> *>(par.value);
+				if(nptr)buildProjectFromInstrument(ctx, spsc<ClassRegister>(nptr), par.type);
+				break;
+			}
+		}
+	}
+}
+
 void channelSettingWindow(CurrentProjectContext & ctx){
 	IMixer & mixer=*ctx.mixer;
 	ImGui::Begin(ctx.LANG.getc("window.channel.title"));
@@ -69,6 +143,13 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 	}
 	if(ImGui::Button(ctx.LANG.getc("window.channel.reset"))){
 		ch->reset();
+	}
+	ImGui::SameLine();
+	if(ImGui::Button(ctx.LANG.getc("window.channel.import_program_project"))){
+		ctx.objects.clear();
+		ctx.finalProcessor=ch->getConfig().instrument->get(0, program, mixer.getSampleRate());
+		buildProjectFromInstrument(ctx, ctx.finalProcessor, ParamType::NoteSrc);
+		//registerParams(*ctx.finalProcessor);
 	}
 	static LangToEnum disableNames;
 	if(disableNames.empty(ctx.LANG)){
@@ -146,7 +227,8 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 		else if(i == 7)fVal=&ch->getConfig().ChannelPitchBend;
 		else if(i == 8)fVal=&ch->getConfig().PitchBendRange;
 		else if(i == 9)fVal=&ch->getConfig().Expression;
-		ImGui::SliderFloat(ccControlNames2[i], fVal, fMin[i], fMax[i]);
+		if(ImGui::SliderFloat(ccControlNames2[i], fVal, fMin[i], fMax[i])){
+		};
 	}
 	ImGui::Text(ctx.LANG.getc("window.channel.dsp"));
 	ImGui::Text(ctx.LANG.getc("window.channel.chorus"));

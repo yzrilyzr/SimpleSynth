@@ -1,5 +1,5 @@
 #include "interface/PhaseSrc.h"
-#include "util/ParamRegister.h"
+#include "util/ClassRegister.h"
 #include "NoteProcessor.h"
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;

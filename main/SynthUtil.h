@@ -47,9 +47,10 @@ namespace yzrilyzr_simplesynth{
 	EBCLASS(FixedRandom){
 		private:
 		yzrilyzr_array::SampleArray * data=nullptr;
+		u_index index;
 		public:
 		FixedRandom(yzrilyzr_array::SampleArray * data);
 		FixedRandom();
-		u_sample next(u_index * index);
+		u_sample next();
 	};
 }

@@ -20,7 +20,7 @@ namespace yzrilyzr_simplesynth{
 	static constexpr int const TYPE_CONTROL=0;
 	static constexpr int const TYPE_ARGLEN=1;
 	static constexpr int const TYPE_ARG=2;
-	void pushStack(Note & id);
+	void pushStack(const Note & id);
 	void pushStack(uint8_t id);
 	bool isStackFull();
 	int32_t readShort();
@@ -37,10 +37,10 @@ namespace yzrilyzr_simplesynth{
 	u_sample postProcess(u_sample output)override{
 		return 0;
 	}
-	bool noMoreData(Note & note)override{
+	bool noMoreData(const Note & note)override{
 		return true;
 	}
-	u_sample getAmp(Note & note)override;
+	u_sample getAmp(const Note & note)override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	NoteProcPtr clone()override{
 		return mksp<AmpBuilderProcessor>();

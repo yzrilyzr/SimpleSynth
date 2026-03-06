@@ -11,6 +11,7 @@ namespace yzrilyzr_simplesynth{
 	public:
 	XMInstrument(u_sp<yzrilyzr_util::XMFile::Module> mod);
 	NoteProcPtr get(s_bank_id bank, s_program_id program, u_sample_rate sampleRate)override{
+		if(program >= insts.size())return nullptr;
 		return insts[program]->clone();
 	}
 	NoteProcPtr getDrumSet(s_bank_id bank, u_sample_rate sampleRate)override{

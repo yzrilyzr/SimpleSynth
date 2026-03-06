@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 	public:
 	TapeSaturationDistortion();
 	TapeSaturationDistortion(NoteProcPtr a, double inputGain, double drive, double bias, double outputGain);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
 	};

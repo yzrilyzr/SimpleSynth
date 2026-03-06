@@ -34,11 +34,13 @@ namespace yzrilyzr_simplesynth{
 	SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, int mode, u_sp<yzrilyzr_interpolator::Interpolator> curve);
 	SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, u_sp<yzrilyzr_interpolator::Interpolator> curve);
 	SimpleDrumAmp();
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	void init(ChannelConfig & cfg) override;
-	bool noMoreData(Note & note) override;
+	bool noMoreData(const Note & note) override;
 	NoteProcPtr clone() override;
-	SimpleDrumAmpKeyData * init(SimpleDrumAmpKeyData * data, Note & note) override;
+	SimpleDrumAmpKeyData * init(SimpleDrumAmpKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString()const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(SimpleDrumAmp);
 	};
 }

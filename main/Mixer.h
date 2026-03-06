@@ -38,6 +38,7 @@ namespace yzrilyzr_simplesynth{
 		protected:
 		Note * newInstance() override;
 		void onReuse(Note * note) override;
+		void onClear() override;
 		uint8_t uniqueID=0;
 	};
 	ECLASS(Channel, public IChannel){
@@ -74,7 +75,7 @@ namespace yzrilyzr_simplesynth{
 		void setAlwaysActive(bool v);
 
 		// ==================== 通道属性 ====================
-		s_midichannel_id getChannelId() const; // 获取通道ID
+		s_midichannel_id getChannelID() const; // 获取通道ID
 		void setChannelId(s_midichannel_id id); // 设置通道ID
 		u_sample_rate getSampleRate()const;     // 获取采样率
 		void setSampleRate(u_sample_rate sr)override; // 设置采样率
@@ -116,9 +117,7 @@ namespace yzrilyzr_simplesynth{
 		bool isSustain() const;           // 检查延音状态
 		bool isSoftPedal() const;         // 检查弱音状态
 		bool isSostenuto() const;         // 检查选择性延音状态
-		void setSustain(bool sustain);    // 设置延音状态
-		bool isDrumSetChannel() const;    // 检查是否为鼓组通道
-		void setDrumSetChannel(bool value); // 设置鼓组通道状态
+		void setSustain(bool sustain);    // 设置延音状态		
 
 		// ==================== 事件处理 ====================
 		void noteOn(s_note_id_i noteId, s_note_vel velocity); // 音符开启
@@ -151,8 +150,7 @@ namespace yzrilyzr_simplesynth{
 		u_sp<yzrilyzr_dsp::DSP> limiter[2];      // 限制器
 		s_midichannel_id channelID=-1;     // 通道ID
 		u_time_f processTime;            // 处理时间统计
-		bool commited=false;           // 提交状态
-		bool isDrumSet=false;          // 是否为鼓组通道
+		bool commited=false;           // 提交状态		
 		u_time_f eventProcessDeltaTime=0.001f; // 事件处理间隔时间
 		u_time_f eventTimeSum=0;       // 事件处理时间累计
 		bool lastSostenutoState=false; // 上次选择性延音状态

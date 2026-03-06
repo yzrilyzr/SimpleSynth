@@ -16,7 +16,7 @@ namespace yzrilyzr_simplesynth{
 		this->aa=freqAndAmp;
 		this->baseFreq=baseFreq;
 	}
-	u_sample SineWaveTable::getAmp(Note &note){
+	u_sample SineWaveTable::getAmp(const Note & note){
 		return a(getPhase(note)* Math::TAU, note.cfg->tuning->getFrequencyByID(note.id))*note.velocitySynth;
 	}
 	u_sample SineWaveTable::a(double x, u_freq notef){

@@ -11,7 +11,14 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	u_sample Pulse::getAmp(Note & note){
+	void Pulse::onRegisterParam(){
+		Osc::onRegisterParam();
+		RegisterUtil::registerParamNormal01(*this, "Width", &width);
+		RegisterUtil::registerParamNormal01(*this, "Rise", &rise);
+		RegisterUtil::registerParamNormal01(*this, "Fall", &fall);
+		RegisterUtil::registerParamNormal01(*this, "Delay", &delay);
+	}
+	u_sample Pulse::getAmp(const Note & note){
 		return PWM::pwm(getPhase(note), width, rise, fall, delay) * note.velocitySynth;
 	}
 	void Pulse::cc(ChannelConfig & cfg, ChannelControl & cc){

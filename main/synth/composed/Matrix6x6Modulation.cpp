@@ -1,10 +1,11 @@
 #include "Matrix6x6Modulation.h"
 #include "synth/generators/sine/SineWave.h"
+#include "dsp/DSP.h"
 using namespace yzrilyzr_util;
 
 namespace yzrilyzr_simplesynth{
-	FMOp::FMOp(){
-		registerParamSrc("Src", &src);
+	void FMOp::onRegisterParam(){
+		RegisterUtil::registerParamSrc(*this, "Src", &src);
 		static double minFreqMul=0, maxFreqMul=64;
 		static double minFreqOff=-10000.0, maxFreqOff=10000.0;
 		static double minInitPhase=0.0, maxInitPhase=1.0;
@@ -12,22 +13,22 @@ namespace yzrilyzr_simplesynth{
 		registerParam("FreqMul", ParamType::Double, &freqMul, &minFreqMul, &maxFreqMul);
 		registerParam("FreqOff", ParamType::Double, &freqOff, &minFreqOff, &maxFreqOff);
 		registerParam("InitPhase", ParamType::Double, &initPhase, &minInitPhase, &maxInitPhase);
-		registerParam("Input", ParamType::Double, &input, &minOutput, &maxOutput);
-		registerParam("Output", ParamType::Double, &output, &minOutput, &maxOutput);
+		RegisterUtil::registerParamGain(*this, "Input", &input);
+		RegisterUtil::registerParamGain(*this, "Output", &output);
 	}
 	void FMOp::init(ChannelConfig & cfg){
 		if(src == nullptr)src=mksp<SineWave>();
 		if(src != nullptr)src->init(cfg);
 	}
-	u_sample FMOp::getAmp(Note & note){
+	u_sample FMOp::getAmp(const Note & note){
 		if(src == nullptr)return 0;
 		return src->getAmp(note);
 	}
-	bool FMOp::noMoreData(Note & note){
+	bool FMOp::noMoreData(const Note & note){
 		if(src == nullptr)return true;
 		return src->noMoreData(note);
 	}
-	MatrixOpKeyData * FMOp::init(MatrixOpKeyData * data, Note & note){
+	MatrixOpKeyData * FMOp::init(MatrixOpKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new MatrixOpKeyData();
 		}
@@ -37,41 +38,43 @@ namespace yzrilyzr_simplesynth{
 		data->oscFreq=0;
 		return data;
 	}
-	Matrix6x6Modulation::Matrix6x6Modulation(){
+	void Matrix6x6Modulation::onRegisterParam(){
 		for(u_index i=0;i < MATRIX_SIZE;i++){
 			registerSub("OP" + std::to_string(i + 1), &op[i]);
 		}
 	}
+	Matrix6x6Modulation::Matrix6x6Modulation(){}
 	void Matrix6x6Modulation::init(ChannelConfig & cfg){
 		for(u_index i=0;i < MATRIX_SIZE;i++){
 			op[i].init(cfg);
 		}
 	}
-	u_sample Matrix6x6Modulation::getAmp(Note & note){
+	u_sample Matrix6x6Modulation::getAmp(const Note & note){
 		u_freq origFreq=note.freqSynth;
 		s_phase origPhas=note.phaseSynth;
 		u_sample sum=0;
+		auto & mut_note=const_cast<Note &>(note);
 		for(u_index to=0;to < MATRIX_SIZE;to++){
 			u_sample fmDepth=0;
 			u_sample rmDepth=1;
 			FMOp & top=op[to];
-			MatrixOpKeyData & data=*top.getData(note);
+			MatrixOpKeyData & data=*top.getData(mut_note);
 			data.oscFreq=origFreq * top.freqMul + top.freqOff;
 			for(u_index from=0;from < MATRIX_SIZE;from++){
 				FMOp & fop=op[from];
-				MatrixOpKeyData & data1=*fop.getData(note);
+				MatrixOpKeyData & data1=*fop.getData(mut_note);
 				fmDepth+=data1.oscFreq * data1.lastOutput * fmMatrix[from][to];
 				rmDepth*=1 + data1.lastOutput * rmMatrix[from][to] - std::abs(rmMatrix[from][to]);
 			}
-			note.freqSynth=data.oscFreq + fmDepth;
-			data.phaseSynth+=note.freqSynth * note.cfg->deltaTime;
-			note.phaseSynth=data.phaseSynth;
-			u_sample out=top.getAmp(note) * rmDepth;
+			mut_note.freqSynth=data.oscFreq + fmDepth;
+			data.phaseSynth+=mut_note.freqSynth * mut_note.cfg->deltaTime;
+			mut_note.phaseSynth=data.phaseSynth;
+			u_sample out=top.getAmp(mut_note) * rmDepth;
 			data.lastOutput=out;
 			sum+=out * top.output;
 		}
-		note.freqSynth=origFreq;
-		note.phaseSynth=origPhas;
+		mut_note.freqSynth=origFreq;
+		mut_note.phaseSynth=origPhas;
 		return sum;
 	}
 }

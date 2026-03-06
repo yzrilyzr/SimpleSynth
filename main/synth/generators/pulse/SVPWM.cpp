@@ -1,7 +1,7 @@
 #include "SVPWM.h"
 #include "events/Note.h"
-#include <cmath>
 #include "lang/StringFormat.hpp"
+#include "lang/Math.h"
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
@@ -17,7 +17,7 @@ namespace yzrilyzr_simplesynth{
 		cornerModulation=false;
 	}
 
-	u_sample SVPWM::getAmp(Note & note){
+	u_sample SVPWM::getAmp(const Note & note){
 		// 获取当前时间（秒）
 		float t=getPhase(note);
 

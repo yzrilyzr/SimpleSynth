@@ -138,7 +138,7 @@ namespace yzrilyzr_simplesynth{
 			// 添加音轨结束事件
 			auto endMeta=mksp<MIDIFile::FFMessage>(0);
 			endMeta->type=0x2F;
-			endMeta->b=ByteArray(0);
+			endMeta->b=ByteArray((u_index)0);
 			track->events.add(endMeta);
 
 			// 只添加有事件的音轨
@@ -191,7 +191,7 @@ namespace yzrilyzr_simplesynth{
 					}
 					MIDIFile::EventType et=e->getType();
 					if(et == MIDIFile::EventType::Note){
-						auto mnote=spdc<MIDIFile::MIDINote>(e);
+						auto mnote=spsc<MIDIFile::MIDINote>(e);
 						int channel=mnote->channel;
 						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
 							channel=mapToDrumDst;
@@ -208,7 +208,7 @@ namespace yzrilyzr_simplesynth{
 							mixerSequence->postToSequence(channel, n1, delay);
 						}
 					} else if(et == MIDIFile::EventType::ChannelPitchBend){
-						auto pitchBend=spdc<MIDIFile::MIDIPitchBend>(e);
+						auto pitchBend=spsc<MIDIFile::MIDIPitchBend>(e);
 						int channel=pitchBend->channel;
 						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
 							channel=mapToDrumDst;
@@ -217,7 +217,7 @@ namespace yzrilyzr_simplesynth{
 						ChannelEvent * n1=new ChannelPitchBend((pitchBend->value - 8192.0f) / 8192.0f);
 						mixerSequence->postToSequence(channel, n1, delay);
 					} else if(et == MIDIFile::EventType::ChannelPressure){
-						auto pressure=spdc<MIDIFile::MIDIChannelPressure>(e);
+						auto pressure=spsc<MIDIFile::MIDIChannelPressure>(e);
 						int channel=pressure->channel;
 						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
 							channel=mapToDrumDst;
@@ -226,7 +226,7 @@ namespace yzrilyzr_simplesynth{
 						ChannelEvent * n1=new ChannelPressure(pressure->value / 127.0f);
 						mixerSequence->postToSequence(channel, n1, delay);
 					} else if(et == MIDIFile::EventType::ChannelControl){
-						auto control=spdc<MIDIFile::MIDIChannelControl>(e);
+						auto control=spsc<MIDIFile::MIDIChannelControl>(e);
 						int channel=control->channel;
 						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
 							channel=mapToDrumDst;
@@ -235,7 +235,7 @@ namespace yzrilyzr_simplesynth{
 						ChannelEvent * n1=new ChannelControl(control->control, control->value);
 						mixerSequence->postToSequence(channel, n1, delay);
 					} else if(et == MIDIFile::EventType::ProgramChange){
-						auto setInstrument=spdc<MIDIFile::MIDIProgramChange>(e);
+						auto setInstrument=spsc<MIDIFile::MIDIProgramChange>(e);
 						int channel=setInstrument->channel;
 						if(mapToDrumSrc == channel && IMixer::isDrumSetChannel(mapToDrumDst)){
 							channel=mapToDrumDst;
@@ -244,22 +244,21 @@ namespace yzrilyzr_simplesynth{
 						ChannelEvent * n1=new ProgramChange(setInstrument->num);
 						mixerSequence->postToSequence(channel, n1, delay);
 					} else if(et == MIDIFile::EventType::Sysex){
-						auto sys=spdc<MIDIFile::SysexMessage>(e);
+						auto sys=spsc<MIDIFile::SysexMessage>(e);
 						auto & b=sys->b;
 						if(isGS){
 							static ByteArray toDrum=ByteArray({0x41, 0x10, 0x42, 0x12, 0x40, 0x1A, 0x15, 0x02, 0x0f, (int8_t)0xf7});
-							if(Arrays::equals(toDrum,b)){
+							if(Arrays::equals(toDrum, b)){
 								mapToDrumSrc=10;
-								mapToDrumDst=256+9;
+								mapToDrumDst=256 + 9;
 								System::out.println("GS: Mapped Ch 11 To DrumSet");
-							}
-							else if(b[2] == 0x42&&(b[3]&0x10)==0x10){
+							} else if(b[2] == 0x42 && (b[3] & 0x10) == 0x10){
 								int32_t channel=b[3] - 0x10;
 							}
-							
+
 						}
 					} else if(et == MIDIFile::EventType::FF){
-						auto ffMessage=spdc<MIDIFile::FFMessage>(e);						
+						auto ffMessage=spsc<MIDIFile::FFMessage>(e);
 						if(ffMessage->type == 0x51){
 							float newTick=ffMessage->quarterNoteDurationMicroSeconds / (float)midiSequence->ticksForQuarterNote / 1000000.0f;
 							ChannelEvent * ce=new TickChange(delayTicks, newTick);
@@ -269,7 +268,7 @@ namespace yzrilyzr_simplesynth{
 							midiPort=ffMessage->b[0];
 							System::out.printf("MIDI File Port: %d\n", midiPort);
 						}
-					} 
+					}
 				}
 			}
 			mixerSequence->sortPosted();
@@ -289,14 +288,14 @@ namespace yzrilyzr_simplesynth{
 	//}
 	//u_sp<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, const String & groupName, s_midichannel_id channelID){
 	//	if(auto m1=dynamic_cast<Mixer *>(mixer)){
-	//		u_sp<Channel> channel=spdc<Channel>(m1->getMIDIChannel(groupName, channelID));
+	//		u_sp<Channel> channel=spsc<Channel>(m1->getMIDIChannel(groupName, channelID));
 	//		if(channel == nullptr){
 	//			channel=mksp<Channel>();
 	//			channel->setName(groupName + " #" + std::to_string(channelID));
 	//			m1->setMIDIChannel(groupName, channelID, channel);
 	//		}
 	//		if(channelID == 9) channel->setSustain(true);
-	//		return spdc<IChannel>(channel);
+	//		return spsc<IChannel>(channel);
 	//	}
 	//	return nullptr;
 	//}
@@ -388,15 +387,15 @@ namespace yzrilyzr_simplesynth{
 	}
 	FixedRandom::FixedRandom(SampleArray * data){
 		this->data=data;
-		//this->index=0;
+		this->index=0;
 	}
 	FixedRandom::FixedRandom(){
 		this->data=SynthUtil::NOISE;
-		//this->index=0;
+		this->index=0;
 	}
-	u_sample FixedRandom::next(u_index * index){
-		u_sample d=(*data)[*index];
-		*index=(*index + 1) % data->length;
+	u_sample FixedRandom::next(){
+		u_sample d=(*data)[index];
+		index=(index + 1) % data->length;
 		return d;
 	}
 	SampleArray * SynthUtil::noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2){
@@ -420,111 +419,76 @@ namespace yzrilyzr_simplesynth{
 		double time=0;
 		double ticksPerSecond=module1.bpm * 0.4;
 		double rowsPerSecond=ticksPerSecond / module1.tempo;
-		double rowDeltaTime=1.0 / rowsPerSecond;
-		int channelMap=32;
-		std::cout << rowDeltaTime * 64 << std::endl;
 		for(u_index i=0;i < module1.num_channels;i++){
 			ChannelEvent * event=new ChannelControl(MIDIFile::CC::MONO_MODE, 127);
-			mixerSequence->postToSequence(i + channelMap, event, 0);
+			mixerSequence->postToSequence(i, event, 0);
+			event=new DrumChannel(false);
+			mixerSequence->postToSequence(i, event, 0);
 		}
 		IntArray notePrevInstrument(module1.num_channels);
-		for(u_index patternTableIndex=0;patternTableIndex < 19;patternTableIndex++){
-			int patternIndex=module1.pattern_table[patternTableIndex];
+		//在模式索引表查找
+		int nextPatternBreak=-1;//模式跳出，-1禁用，>=0执行跳转
+		for(u_index patternTableIndex=0;patternTableIndex < module1.song_length;patternTableIndex++){
+			int patternIndex=module1.pattern_table[patternTableIndex];//模式索引
 			if(patternIndex >= module1.patterns.size())throw IndexOutOfBoundsException();
-			XMFile::Pattern & pattern=module1.patterns[patternIndex];
-			bool portamentoState=false;
-			for(u_index row=0;row < pattern.num_rows;row++){
-				time+=rowDeltaTime;
+			XMFile::Pattern & pattern=module1.patterns[patternIndex];//根据模式索引获取模式
+			u_index row;
+			if(nextPatternBreak == -1){
+				row=0;
+			} else{
+				row=nextPatternBreak;
+				nextPatternBreak=-1;
+			}
+			//该模式的行
+			for(;row < pattern.num_rows;row++){
+				if(nextPatternBreak >= 0){
+					break;
+				}
+				time+=1.0 / rowsPerSecond;
+				//模块的通道数
 				for(u_index channelI=0;channelI < module1.num_channels;channelI++){
-					int slotIndex=row * module1.num_channels + channelI;
-					int channel=channelI + channelMap;
-					XMFile::PatternSlot & s=pattern.slots[slotIndex];
-					if(s.instrument > 0 && notePrevInstrument[channelI] == s.instrument){
-						ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::RESET_ALL_CONTROLLERS, 0);
-						mixerSequence->postToSequence(channel, channelEvent, time);
-						channelEvent=new ChannelControl(MIDIFile::CC::MONO_MODE, 127);
-						mixerSequence->postToSequence(channel, channelEvent, time);
-					} else if(s.instrument > 0 && notePrevInstrument[channelI] != s.instrument){
+					int slotIndex=row * module1.num_channels + channelI;//槽位索引=模块通道数*行索引+当前通道
+					int channel=channelI;
+					XMFile::PatternSlot & s=pattern.slots[slotIndex];//从模式获取槽位
+					if(s.instrument > 0 && notePrevInstrument[channelI] != s.instrument){
 						ChannelEvent * channelEvent=new ProgramChange(s.instrument - 1);
 						mixerSequence->postToSequence(channel, channelEvent, time);
-						channelEvent=new ChannelControl(MIDIFile::CC::RESET_MUTE_ALL_NOTES, 127);
-						mixerSequence->postToSequence(channel, channelEvent, time);
+						//channelEvent=new ChannelControl(MIDIFile::CC::RESET_MUTE_ALL_NOTES, 127);
+						//mixerSequence->postToSequence(channel, channelEvent, time);
 						notePrevInstrument[channelI]=s.instrument;
 					}
-					switch(s.volume_column >> 4){
-						case 0x5:
-							if(s.volume_column > 0x50) break;
-							[[fallthrough]];
-						case 0x1: [[fallthrough]];
-						case 0x2: [[fallthrough]];
-						case 0x3: [[fallthrough]];
-						case 0x4:
-						{/* Set volume */
-							float volume=(float)(s.volume_column - 0x10) / (float)0x40;
-							ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::VOLUME, (int)(volume * 127));
-							mixerSequence->postToSequence(channel, channelEvent, time);
-						}
-						break;
-						case 0xC: /* Set panning */
-						{
-							float panning=(float)(((s.volume_column & 0x0F) << 4) | (s.volume_column & 0x0F)) / (float)0xFF;
-							ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::PAN, (int)(panning * 127));
-							mixerSequence->postToSequence(channel, channelEvent, time);
-						}
-						break;
-						default:
+					uint32_t vv=s.volume_column << 16;
+					vv|=s.effect_type << 8;
+					vv|=s.effect_param;
+					ChannelEvent * channelEvent=new ChannelControl(256, vv);
+					mixerSequence->postToSequence(channel, channelEvent, time);					
+
+					if(s.effect_type != 0 || s.effect_param != 0){
+						switch(s.effect_type){
+							case XMFile::EffectType::VIBRATO:
+							{
+								ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::MODULATION, s.effect_param);
+								mixerSequence->postToSequence(channel, channelEvent, time);
+							}
 							break;
+							case XMFile::EffectType::TREMOLO:
+							{
+								ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::MODULATION, s.effect_param);
+								mixerSequence->postToSequence(channel, channelEvent, time);
+							}
+							break;
+							case XMFile::EffectType::PATTERN_BREAK:
+							{
+								nextPatternBreak=s.effect_param & 0x3F;
+							}
+							break;
+						}
 					}
-					if(s.effect_param == 0 && s.effect_type == 0){
-					}
-					switch(s.effect_type){
-						case XMFile::EffectType::PORTAMENTO_UP:
-						{
-							portamentoState=true;
-							ChannelEvent * channelEvent=new ChannelControl(XMFile::CC::PORTAMENTO_UP, s.effect_param * 127 / 0xff);
-							mixerSequence->postToSequence(channel, channelEvent, time);
-						}
-						break;
-						case XMFile::EffectType::PORTAMENTO_DOWN:
-						{
-							portamentoState=true;
-							ChannelEvent * channelEvent=new ChannelControl(XMFile::CC::PORTAMENTO_DOWN, s.effect_param * 127 / 0xf);
-							mixerSequence->postToSequence(channel, channelEvent, time);
-						}
-						break;
-						case XMFile::EffectType::TONE_PORTAMENTO:
-						{
-							portamentoState=true;
-							ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::PORTAMENTO_SWITCH, 127);
-							mixerSequence->postToSequence(channel, channelEvent, time);
-							channelEvent=new ChannelControl(MIDIFile::CC::PORTAMENTO_TIME, (0xff - s.effect_param) * 32 / 0xff);
-							mixerSequence->postToSequence(channel, channelEvent, time);
-						}
-						break;
-						case XMFile::EffectType::SET_PANNING: /* 8xx: Set panning */
-						{
-							float panning=(float)s.effect_param / (float)0xFF;
-							ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::VOLUME, (int)(panning * 127));
-							mixerSequence->postToSequence(channel, channelEvent, time);
-						}
-						break;
-						case XMFile::EffectType::SET_VOLUME: /* Cxx: Set volume */
-						{
-							float volume=(float)(Math::min(s.effect_param, 0x40)) / (float)0x40;
-							ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::VOLUME, (int)(volume * 127));
-							//mixerSequence->postToSequence(channel, channelEvent, time);
-						}
-						break;
+					if(s.effect_type == XMFile::EffectType::SET_SPEED){
+						if(s.effect_param >= 32)ticksPerSecond=s.effect_param * 0.4;
+						else rowsPerSecond=ticksPerSecond / s.effect_param;
 					}
 					if(s.note > 0 && s.note < 97){
-						if(s.effect_type != XMFile::EffectType::TONE_PORTAMENTO &&
-						   s.effect_type != XMFile::EffectType::PORTAMENTO_DOWN &&
-						   s.effect_type != XMFile::EffectType::PORTAMENTO_UP &&
-						   portamentoState){
-							ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::PORTAMENTO_SWITCH, 0);
-							mixerSequence->postToSequence(channel, channelEvent, time);
-							portamentoState=false;
-						}
 						if(s.instrument > 0){
 							ChannelEvent * channelEvent=new NoteOn(s.note - 1, 1);
 							mixerSequence->postToSequence(channel, channelEvent, time);
@@ -536,9 +500,9 @@ namespace yzrilyzr_simplesynth{
 				}
 			}
 		}
-		time+=rowDeltaTime;
+		time+=1.0 / rowsPerSecond;
 		for(u_index channelI=0;channelI < module1.num_channels;channelI++){
-			int channel=channelI + channelMap;
+			int channel=channelI;
 			ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::ALL_NOTES_OFF, 127);
 			mixerSequence->postToSequence(channel, channelEvent, time);
 		}

@@ -2,6 +2,7 @@
 #include "interface/IMixer.h"
 #include "ImGuiFileDialog.h"
 #include "ParamHelper.h"
+#include "util/ClassRegister.h"
 #include "SimpleSynthProject.h"
 #include "SynthUtil.h"
 #include "synth/source/AmplitudeSources.h"
@@ -40,7 +41,7 @@ void CurrentProjectContext::openFile(const std::string & filePath){
 		json2obj(j, objects);
 		for(ProjectObject * obj : objects){
 			if(obj->fromJSON.value("finalProcessor", false)){
-				finalProcessor=std::static_pointer_cast<NoteProcessor>(obj->paramRegPtr);
+				finalProcessor=spsc<NoteProcessor>(obj->paramRegPtr);
 			}
 			obj->fromJSON=nullptr;
 		}
@@ -89,14 +90,23 @@ ProjectObject * CurrentProjectContext::findNode(int nodeId){
 	return nullptr;
 }
 
-ParamReg * CurrentProjectContext::findParam(ProjectObject & obj, int attrId){
+ParamReg * CurrentProjectContext::findParam(ClassRegister & params, int attrId){
 	//查找哪个被连接了
-	for(ParamReg & param : obj.paramRegPtr->RegisteredParams){
+	for(ParamReg & param : params.RegisteredParams){
+		if(param.value != nullptr && param.type == ParamType::Sub){
+			auto val=static_cast<ClassRegister *>(param.value);
+			ParamReg * par=findParam(*val, attrId);
+			if(par != nullptr)return par;
+		}
 		int paramId=reinterpret_cast<int>(param.value);
 		if(attrId == paramId){
 			return &param;
 		}
 	}
+	return nullptr;
+}
+ParamReg * CurrentProjectContext::findParam(ProjectObject & obj, int attrId){
+	return findParam(*obj.paramRegPtr, attrId);
 }
 
 ParamReg * CurrentProjectContext::findParam(int nodeId, int attrId){
@@ -182,7 +192,7 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 			ImNodes::SetNodeGridSpacePos(nodeId, obj->windowPos);
 		} else{
 			obj->windowPos=oldWindowPos;
-		}		
+		}
 
 		if(obj->paramRegPtr == finalProcessor){
 			int started_at_attribute_id=reinterpret_cast<int>(obj->paramRegPtr.get());
@@ -251,7 +261,7 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 	ImGui::End();
 	//ImGui::SetWindowFontScale(1.0);
 }
-void CurrentProjectContext::buildLinks(ProjectObject & obj, ParamRegister & params){
+void CurrentProjectContext::buildLinks(ProjectObject & obj, ClassRegister & params){
 	for(auto & param : params.RegisteredParams){
 		switch(param.type){
 			case ParamType::Float:
@@ -268,7 +278,7 @@ void CurrentProjectContext::buildLinks(ProjectObject & obj, ParamRegister & para
 				break;
 			case ParamType::Sub:
 			{
-				ParamRegister * val=static_cast<ParamRegister *>(param.value);
+				ClassRegister * val=static_cast<ClassRegister *>(param.value);
 				buildLinks(obj, *val);
 			}
 			break;

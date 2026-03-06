@@ -15,13 +15,13 @@ namespace yzrilyzr_simplesynth{
 		this->dsp->init(cfg.sampleRate);
 		this->dsp->resetMemory();
 	}
-	u_sample NoteDSP::getAmp(Note & note){
+	u_sample NoteDSP::getAmp(const Note & note){
 		return getData(note)->dsp->procDsp(a->getAmp(note));
 	}
 	NoteProcPtr NoteDSP::clone(){
 		return mksp<NoteDSP>(a->clone(), dsp);
 	}
-	NoteDSPKeyData * NoteDSP::init(NoteDSPKeyData * data, Note & note){
+	NoteDSPKeyData * NoteDSP::init(NoteDSPKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new NoteDSPKeyData();
 			data->dsp=dsp->cloneDSP();
@@ -33,6 +33,12 @@ namespace yzrilyzr_simplesynth{
 		return data;
 	}
 	String NoteDSP::toString() const{
-		return StringFormat::object2string("DSP", a, dsp);
+		return StringFormat::object2string("NoteDSP", a, dsp);
+	}
+	
+	//STATIC_REGISTER_CLASS(NoteDSP, ParamType::DSP);
+	void NoteDSP::onRegisterParam(){
+		AmpUnaryComposition::onRegisterParam();
+		RegisterUtil::registerParamDSP(*this,"DSP", &dsp);
 	}
 }

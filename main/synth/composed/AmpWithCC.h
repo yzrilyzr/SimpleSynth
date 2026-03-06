@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 	~AmpWithCC();
 	AmpWithCC();
 	AmpWithCC(NoteProcPtr a, const yzrilyzr_array::IntArray & cc);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
 	void init(ChannelConfig & cfg) override;
 	yzrilyzr_lang::String toString() const override;

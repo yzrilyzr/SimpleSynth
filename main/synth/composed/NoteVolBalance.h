@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 	std::vector<u_sample> val;
 	public:
 	NoteVolBalance(NoteProcPtr a, std::vector<u_sample> val) :AmpUnaryComposition(a), val(val){}
-	u_sample getAmp(Note & note)override{
+	u_sample getAmp(const Note & note)override{
 		if(val.size() != CHANNEL_MAX_NOTE_ID)return a->getAmp(note);
 		return val[note.id] * a->getAmp(note);
 	}

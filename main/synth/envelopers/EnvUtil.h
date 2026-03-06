@@ -8,6 +8,6 @@ namespace yzrilyzr_simplesynth{
 	static u_sp<yzrilyzr_interpolator::Interpolator> Pow(float p);
 	static u_sp<yzrilyzr_interpolator::Interpolator> Line();
 	};
-	u_sp<yzrilyzr_interpolator::Interpolator> Pow(float p);
-	u_sp<yzrilyzr_interpolator::Interpolator> Line();
+	U_EXPORT_API u_sp<yzrilyzr_interpolator::Interpolator> Pow(float p);
+	U_EXPORT_API u_sp<yzrilyzr_interpolator::Interpolator> Line();
 }

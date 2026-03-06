@@ -130,7 +130,6 @@ int main(int argc, char * argv[]){
 		return -1;
 	}
 	SDL_PauseAudio(0);
-	std::string a;
 	playData();
 	SDL_CloseAudio();
 	SynthUtil::deleteStatic();

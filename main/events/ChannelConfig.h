@@ -39,6 +39,7 @@ namespace yzrilyzr_simplesynth{
 		bool Legato=false;               // 连奏模式
 		bool Sostenuto=false;            // 选择性延音
 		bool SoftPedal=false;            // 弱音开关
+		bool DrumChannelDisable=false;            // 鼓组强制关闭
 		float PortamentoTime=0.3f;    // 滑音时间(秒)
 		float Modulation=0.0f;      // 调制轮总效果[0,1]
 		float ModRate=5.0f;              // 调制轮速率[0,+)

@@ -7,7 +7,9 @@ namespace yzrilyzr_simplesynth{
 	public:
 	SineWave() : SineWave(nullptr){}
 	SineWave(u_sp<PhaseSrc> freq) : Osc(freq){}
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	yzrilyzr_lang::String toString()const override;
+	U_GET_CLASS_NAME(SineWave)
+
 	};
 }

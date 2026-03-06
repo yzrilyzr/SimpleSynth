@@ -43,9 +43,12 @@ namespace yzrilyzr_simplesynth{
 		BiquadEnvFilterGroup();
 		BiquadEnvFilterGroup(NoteProcPtr src, int type, std::vector<BiquadEnvFilterGroupConfig> filtersCfg);
 		void init(ChannelConfig & cfg)override;
-		u_sample getAmp(Note & note) override;
+		u_sample getAmp(const Note & note) override;
 		NoteProcPtr clone() override;
-		BiquadEnvFilterGroupKeyData * init(BiquadEnvFilterGroupKeyData * data, Note & note) override;
+		BiquadEnvFilterGroupKeyData * init(BiquadEnvFilterGroupKeyData * data, const Note & note) override;
 		yzrilyzr_lang::String toString() const override;
+		void onRegisterParam() override;
+		U_GET_CLASS_NAME(BiquadEnvFilterGroup);
+
 	};
 }

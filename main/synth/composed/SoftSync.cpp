@@ -19,7 +19,7 @@ namespace yzrilyzr_simplesynth{
 		syncInterp=interp?interp:mksp<LineInterpolator>();
 	}
 
-	u_sample SoftSync::getAmp(Note & note){
+	u_sample SoftSync::getAmp(const Note & note){
 		SoftSyncKeyData * data=getData(note);
 
 		// 归一化主振荡器相位
@@ -45,9 +45,10 @@ namespace yzrilyzr_simplesynth{
 
 		// 传递相位到从振荡器
 		float originalPhase=note.phaseSynth;
-		note.phaseSynth=RingBufferUtil::mod1(data->slavePhase);
-		u_sample output=a->getAmp(note);
-		note.phaseSynth=originalPhase;
+		auto & mut_note=const_cast<Note &>(note);
+		mut_note.phaseSynth=RingBufferUtil::mod1(data->slavePhase);
+		u_sample output=a->getAmp(mut_note);
+		mut_note.phaseSynth=originalPhase;
 
 		return output;
 	}
@@ -61,7 +62,7 @@ namespace yzrilyzr_simplesynth{
 		return mksp<SoftSync>(a->clone(), slaveFreqRatio, syncInterp);
 	}
 
-	SoftSyncKeyData * SoftSync::init(SoftSyncKeyData * data, Note & note){
+	SoftSyncKeyData * SoftSync::init(SoftSyncKeyData * data, const Note & note){
 		if(!data) data=new SoftSyncKeyData();
 		data->lastMasterPhase=0.0f;
 		data->slavePhase=0.0f;

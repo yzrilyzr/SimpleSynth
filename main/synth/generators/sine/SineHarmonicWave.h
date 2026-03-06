@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 	~SineHarmonicWave();
 	SineHarmonicWave(const yzrilyzr_array::DoubleArray& freqAndAmp);
 	SineHarmonicWave(u_sp<PhaseSrc> freq, const yzrilyzr_array::DoubleArray & freqAndAmp);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	private:
 	u_sample a(double x);
 	};

@@ -3,15 +3,17 @@
 #include "dsp/BufferDelayer.h"
 #include "dsp/IIRUtil.h"
 #include "util/Util.h"
-#include "util/ParamRegister.h"
+#include "util/ClassRegister.h"
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
 namespace yzrilyzr_simplesynth{
-	SakuraExciter::SakuraExciter() :Osc(nullptr){
+	void SakuraExciter::onRegisterParam(){
+		Osc::onRegisterParam();
 		static float min=0, max=1;
 		registerParam("NoiseMix", ParamType::Float, &noiseMixRatio, &min, &max);
 		registerParam("NoiseRate", ParamType::Float, &noiseRate, &min, &max);
 	}
+	SakuraExciter::SakuraExciter() :Osc(nullptr){}
 	u_sample SakuraExciter::exciteClickFunc(s_phase mod){
 		if(mod > 1)return 0;
 		mod=RingBufferUtil::mod1(mod);
@@ -25,22 +27,21 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr SakuraExciter::clone(){
 		return mksp<SakuraExciter>();
 	}
-	u_sample SakuraExciter::getAmp(Note & note){
+	u_sample SakuraExciter::getAmp(const Note & note){
 		SakuraExciterKeyData * data=getData(note);
 		u_sample sumExcite=0;
 		sumExcite=exciteClickFunc(note.phaseSynth);
 		u_sample_rate sampleRate=note.cfg->sampleRate;
 		data->noiseRateCounter+=noiseRate * sampleRate;
-		static thread_local u_index randomIndex=0;
 		if(data->noiseRateCounter > sampleRate){
 			data->noiseRateCounter=0;
-			data->lastNoiseValue=random.next(&randomIndex);
+			data->lastNoiseValue=random.next();
 		}
 		sumExcite+=(u_sample)noiseMixRatio * data->lastNoiseValue;
 		return sumExcite * note.velocitySynth;
 	}
 
-	SakuraExciterKeyData * SakuraExciter::init(SakuraExciterKeyData * data, Note & note){
+	SakuraExciterKeyData * SakuraExciter::init(SakuraExciterKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new SakuraExciterKeyData();
 		}

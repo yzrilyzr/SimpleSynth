@@ -13,7 +13,7 @@ namespace yzrilyzr_simplesynth{
 	}
 	HardSync::HardSync(NoteProcPtr slave, float slaveFreqRatio) : AmpUnaryComposition(slave), slaveFreqRatio(slaveFreqRatio){}
 
-	u_sample HardSync::getAmp(Note & note){
+	u_sample HardSync::getAmp(const Note & note){
 		HardSyncKeyData * data=getData(note);
 		// 归一化主振荡器相位到[0,1)范围
 		float masterPhase=RingBufferUtil::mod1(note.phaseSynth);
@@ -28,18 +28,19 @@ namespace yzrilyzr_simplesynth{
 		}
 		// 临时保存原始相位并替换
 		float originalPhase=note.phaseSynth;
-		note.phaseSynth=data->phaseSynth;
+		auto & mut_note=const_cast<Note &>(note);
+		mut_note.phaseSynth=data->phaseSynth;
 		// 获取从振荡器输出
-		u_sample output=a->getAmp(note);
+		u_sample output=a->getAmp(mut_note);
 		// 恢复原始相位
-		note.phaseSynth=originalPhase;
+		mut_note.phaseSynth=originalPhase;
 		return output;
 	}
 	NoteProcPtr HardSync::clone(){
 		return mksp<HardSync>(a->clone(), slaveFreqRatio);
 	}
 
-	HardSyncKeyData * HardSync::init(HardSyncKeyData * data, Note & note){
+	HardSyncKeyData * HardSync::init(HardSyncKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new HardSyncKeyData();
 		}

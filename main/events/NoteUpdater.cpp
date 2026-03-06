@@ -60,9 +60,7 @@ namespace yzrilyzr_simplesynth{
 		note.lastPortamentoID=note.id;
 		note.portamentoDeltaID=0;
 		note.pitchBend=0;
-		if(cfg.Portamento){
-			if(cfg.lastNote != nullptr) note.lastPortamentoID=cfg.lastNote->id;
-		}
+		if(cfg.lastNote != nullptr) note.lastPortamentoID=cfg.lastNote->id;
 		cfg.lastNote=&note;
 		cfg.noteHoldMap[id]=true;
 	}

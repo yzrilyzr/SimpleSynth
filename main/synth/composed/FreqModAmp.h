@@ -15,9 +15,9 @@ namespace yzrilyzr_simplesynth{
 	u_sample depth=0;
 	FreqModAmp();
 	FreqModAmp(NoteProcPtr dst, NoteProcPtr src, u_sample depth);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
-	FreqModKeyData * init(FreqModKeyData * data, Note & note) override;
+	FreqModKeyData * init(FreqModKeyData * data, const Note & note) override;
 	};
 }

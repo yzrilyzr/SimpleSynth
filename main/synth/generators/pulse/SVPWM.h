@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 	public:
 	SVPWM();
 
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 
 	// 参数设置方法
 	void setSyncModulation(bool enable);
@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 	void setThirdHarmonicInjection(bool enable);
 	void setCornerModulation(bool enable);
 
-	private:
+	
 	bool syncModulation;        // 是否同步调制
 	float syncRatio;            // 同步调制比
 	float asyncCarrierFreq;     // 异步载波频率(Hz)
@@ -31,6 +31,8 @@ namespace yzrilyzr_simplesynth{
 	float modulationPhase;      // 调制波初始相位(0-1)
 	bool thirdHarmonicInjection; // 是否使用三次谐波注入
 	bool cornerModulation;       // 是否使用折角调制
+
 	yzrilyzr_lang::String toString() const override;
+	U_GET_CLASS_NAME(SVPWM)
 	};
 }

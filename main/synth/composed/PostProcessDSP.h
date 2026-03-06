@@ -14,7 +14,7 @@ namespace yzrilyzr_simplesynth{
 	PostProcessDSP();
 	PostProcessDSP(NoteProcPtr a, yzrilyzr_dsp::DSPPtr dsp);
 	void init(ChannelConfig & cfg) override;
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	u_sample postProcess(u_sample output) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;

@@ -12,10 +12,12 @@ namespace yzrilyzr_simplesynth{
 	public:
 	LFSRNoise();
 	LFSRNoise(int shiftCount);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	int nextBit();
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(LFSRNoise)
 	};
 }

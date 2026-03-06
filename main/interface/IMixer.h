@@ -60,6 +60,7 @@ namespace yzrilyzr_simplesynth{
 		virtual bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)=0;
 		u_sp<IChannel> getMIDIChannel(s_midichannel_id id);
 		virtual u_sp<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)=0;
+		static bool isDrumSetChannel(ChannelConfig & cfg, s_midichannel_id id);
 		static bool isDrumSetChannel(s_midichannel_id id);
 
 		int8_t getSynthMode() const;

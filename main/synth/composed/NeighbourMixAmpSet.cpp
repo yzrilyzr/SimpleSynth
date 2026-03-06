@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 	String NeighbourMixAmpSet::toString()const{
 		return StringFormat::format("InterpolateAmpSet(%s)", getPhaseSource());
 	}
-	bool NeighbourMixAmpSet::noMoreData(Note & note){
+	bool NeighbourMixAmpSet::noMoreData(const Note & note){
 		int id=note.id;
 		auto d=notes[id];
 		if(d[0] == nullptr || d[1] == nullptr) return true;
@@ -55,7 +55,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		return this;
 	}
-	u_sample NeighbourMixAmpSet::getAmp(Note & note){
+	u_sample NeighbourMixAmpSet::getAmp(const Note & note){
 		uint8_t id=note.id;
 		auto d=notes[id];
 		if(d[0] == nullptr || d[1] == nullptr) return true;

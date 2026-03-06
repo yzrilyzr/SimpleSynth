@@ -34,6 +34,5 @@ namespace yzrilyzr_simplesynth{
 		virtual yzrilyzr_lang::String toString()const override;
 		s_midichannel_id getChannelID()const;
 		yzrilyzr_lang::String getGroupName()const;
-		bool isDrumSetChannel()const;
 	};
 }

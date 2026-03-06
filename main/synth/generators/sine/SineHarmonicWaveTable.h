@@ -26,10 +26,10 @@ namespace yzrilyzr_simplesynth{
 	 * line[i]为分贝数（相对于1）
 	 */
 	static yzrilyzr_array::DoubleArray dBToAmp(double gain,const yzrilyzr_array::DoubleArray &line);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	private:
-	u_sample a(Note & note, double x);
-	double getInterpolation(Note & note,const yzrilyzr_array::DoubleArray & ampLine);
+	u_sample a(const Note & note, double x);
+	double getInterpolation(const Note & note,const yzrilyzr_array::DoubleArray & ampLine);
 	yzrilyzr_lang::String toString() const override{
 		return yzrilyzr_lang::StringFormat::format("SineHarmonicWaveTable(%s)", getPhaseSource());
 	}

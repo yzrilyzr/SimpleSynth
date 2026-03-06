@@ -1,5 +1,6 @@
 ﻿#include "ParamHelper.h"
 #include "ProjectObject.h"
+#include "dsp/DSP.h"
 #include "SimpleSynthProject.h"
 #include "imnodes.h"
 #include "lang/Boxing.h"
@@ -13,7 +14,7 @@ using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
 
-void ProjectObject::paramToJSON(json & a, const ParamRegister & paramReg){
+void ProjectObject::paramToJSON(json & a, const ClassRegister & paramReg){
 	for(auto & p : paramReg.RegisteredParams){
 		//a[(p->name + "type").c_str()]=p->type;
 		switch(p.type){
@@ -62,7 +63,7 @@ void ProjectObject::paramToJSON(json & a, const ParamRegister & paramReg){
 			case ParamType::Sub:
 			{
 				json b=json::object();
-				paramToJSON(b, *static_cast<ParamRegister *>(p.value));
+				paramToJSON(b, *static_cast<ClassRegister *>(p.value));
 				a[p.name.c_str()]=b;
 			}
 			break;
@@ -81,6 +82,7 @@ json ProjectObject::to_json() const{
 		{"category", category.tostring()},
 		{"id", reinterpret_cast<uint64_t>(paramRegPtr.get())},
 		{"showWindow", showWindow},
+		{"lockLayout", lockLayout},
 		{"windowPosX", windowPos.x},
 		{"windowPosY", windowPos.y},
 		{"windowSizeX", windowSize.x},
@@ -117,7 +119,7 @@ json ProjectObject::to_json() const{
 	a["StoredData"]=storedDataJSON;
 	return a;
 }
-void ProjectObject::JSONToParam(const json & j, ParamRegister & paramReg){
+void ProjectObject::JSONToParam(const json & j, ClassRegister & paramReg){
 	for(auto & param : paramReg.RegisteredParams){
 		const char * key=param.name.c_str();
 		if(!j.contains(key))continue;
@@ -165,7 +167,7 @@ void ProjectObject::JSONToParam(const json & j, ParamRegister & paramReg){
 				*static_cast<u_sample *>(param.value)=j.value(key, static_cast<u_sample>(0));
 				break;
 			case ParamType::Sub:
-				JSONToParam(j[key], *static_cast<ParamRegister *>(param.value));
+				JSONToParam(j[key], *static_cast<ClassRegister *>(param.value));
 				break;
 		}
 	}
@@ -176,6 +178,7 @@ void ProjectObject::from_json(const json & j){
 	showWindow=j.value("showWindow", true);
 	windowPos.x=j.value("windowPosX", 100.0f);
 	windowPos.y=j.value("windowPosY", 100.0f);
+	lockLayout=j.value("lockLayout", false);
 	windowSize.x=j.value("windowSizeX", 300.0f);
 	windowSize.y=j.value("windowSizeY", 200.0f);
 	name2obj(category, name, &name, &category, &showName, &paramRegPtr, &renderFunc, &enableOriginalRender);
@@ -227,8 +230,13 @@ void ProjectObject::renderWindow(CurrentProjectContext & ctx){
 	int nodeId=reinterpret_cast<int>(this);
 	auto color=getPinColor(paramRegPtr);
 	ImNodes::PushColorStyle(ImNodesCol_TitleBar, color);
+	if(lockLayout){
+		// 锁定节点
+		ImNodes::PushColorStyle(ImNodesCol_NodeOutline, IM_COL32(255, 128, 0, 255));
+	}
 	ImNodes::BeginNode(nodeId);
-	
+	ImNodes::SetNodeDraggable(nodeId, !lockLayout);
+
 	ImNodes::BeginNodeTitleBar();
 	ImGui::TextUnformatted(showName.c_str(UTF8));
 	ImNodes::EndNodeTitleBar();
@@ -237,133 +245,25 @@ void ProjectObject::renderWindow(CurrentProjectContext & ctx){
 	ImNodes::PushColorStyle(ImNodesCol_Pin, color);
 
 	ImNodes::BeginOutputAttribute(paramId, ImNodesPinShape_TriangleFilled);
+	//ImGui::Indent(200);
 	ImGui::Text(ctx.LANG.getc("window.project_object.output"));
 	ImNodes::EndOutputAttribute();
 
 	ImNodes::PopColorStyle();
 
-	if(paramRegPtr->RegisteredParams.empty()){
+	/*if(paramRegPtr->RegisteredParams.empty()){
 		ImNodes::BeginStaticAttribute(paramId);
 		ImNodes::EndStaticAttribute();
-	} else{
-		//ImGui::Text(ctx.LANG.getc("window.project_object.params"));
-		if(enableOriginalRender){
-			ctx.paramChange=renderParams(ctx, paramRegPtr->RegisteredParams) || ctx.paramChange;
-		}
-		if(renderFunc != nullptr)renderFunc(ctx, *this);
+	} else{*/
+	if(enableOriginalRender){
+		ctx.paramChange=renderParams(ctx, paramRegPtr->RegisteredParams) || ctx.paramChange;
 	}
+	if(renderFunc != nullptr){
+		renderFunc(ctx, *this);
+	}
+//}
 	ImNodes::EndNode();
+	if(lockLayout)ImNodes::PopColorStyle();
 	ImNodes::PopColorStyle();
 }
-
-bool ProjectObject::renderParams(CurrentProjectContext & ctx, std::vector<ParamReg> & paramReg){
-	bool change=false;
-	for(auto & param : paramReg){
-		String guiName=param.name;
-		if(param.aliasName != ""){
-			guiName=param.aliasName + "(" + guiName + ")";
-		}
-		const char * cstrName=guiName.c_str(UTF8);
-		bool localChange=false;
-		switch(param.type){
-			case ParamType::Bool:
-				localChange=ImGui::Checkbox(cstrName, static_cast<bool *>(param.value));
-				break;
-			case ParamType::Double:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Float:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Float, param.value, param.valueMin, param.valueMax);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Freq:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax, "%.3f Hz", ImGuiSliderFlags_Logarithmic);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Time:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax, "%.3f s", ImGuiSliderFlags_Logarithmic);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::TimeMs:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_Double, param.value, param.valueMin, param.valueMax, "%.3f ms", ImGuiSliderFlags_Logarithmic);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Int:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_S32, param.value, param.valueMin, param.valueMax);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::UInt:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_U32, param.value, param.valueMin, param.valueMax);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Long:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_S64, param.value, param.valueMin, param.valueMax);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::ULong:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, ImGuiDataType_U64, param.value, param.valueMin, param.valueMax);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Size:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, sizeof(u_index) == 8?ImGuiDataType_U64:ImGuiDataType_U32, param.value, param.valueMin, param.valueMax);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Gain:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, sizeof(u_sample) == 8?ImGuiDataType_Double:ImGuiDataType_Float, param.value, param.valueMin, param.valueMax, "%.3f mul", ImGuiSliderFlags_Logarithmic);
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Sample:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::SliderScalar(cstrName, sizeof(u_sample) == 8?ImGuiDataType_Double:ImGuiDataType_Float, param.value, param.valueMin, param.valueMax, "%.3f");
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Enum:
-				ImGui::PushItemWidth(150.0f);
-				localChange=ImGui::Combo(cstrName, static_cast<int *>(param.value), static_cast<const char **>(param.valueMin), *static_cast<int *>(param.valueMax));
-				ImGui::PopItemWidth();
-				break;
-			case ParamType::Sub:
-				ImGui::Text(cstrName);
-				localChange=renderParams(ctx, static_cast<ParamRegister *>(param.value)->RegisteredParams);
-				break;
-			case ParamType::NoteSrc:
-				renderObjectParamInput(ctx, param, cstrName);
-				break;
-			case ParamType::PhaseSrc:
-				renderObjectParamInput(ctx, param, cstrName);
-				break;
-			case ParamType::OscSrc:
-				renderObjectParamInput(ctx, param, cstrName);
-				break;
-			case ParamType::SampleData:
-				renderObjectParamInput(ctx, param, cstrName);
-				break;
-			case ParamType::Interpolator:
-				renderObjectParamInput(ctx, param, cstrName);
-				break;
-			case ParamType::DSP:
-				renderObjectParamInput(ctx, param, cstrName);
-				break;
-			default:
-				std::cout << "ImGui Type " << param.type << std::endl;
-				break;
-		}
-		change=change || localChange;
-	}
-	return change;
-}
-
-
 

@@ -14,9 +14,9 @@ namespace yzrilyzr_simplesynth{
 			delete data[i];
 		}
 	}
-	virtual T * init(T * data, Note & note)=0;
-	T * getData(Note & note){
-		if(note.uniqueID >= CHANNEL_MAX_VOICE)throw yzrilyzr_lang::IndexOutOfBoundsException("Note Unique ID >= 128");
+	virtual T * init(T * data, const Note & note)=0;
+	T * getData(const Note & note){
+		if(note.uniqueID >= CHANNEL_MAX_VOICE)throw yzrilyzr_lang::IndexOutOfBoundsException(yzrilyzr_lang::String("Note Unique ID >= ") + CHANNEL_MAX_VOICE);
 		T * t=data[note.uniqueID];
 		if(t == nullptr){
 			t=this->init(nullptr, note);

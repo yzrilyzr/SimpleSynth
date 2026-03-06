@@ -48,6 +48,7 @@
 #include "synth/composed/HardSync.h"
 //
 #include "synth/filters/BiquadFilterSrc.h"
+#include "synth/filters/BiquadEnvFilterGroup.h"
 #include "synth/filters/MeanFilterSrc.h"
 //
 #include "synth/generators/drum/SimpleDrumAmp.h"
@@ -76,6 +77,7 @@
 #include "synth/envelopers/AHDSREnvelop.h"
 #include "synth/envelopers/TimeEnvelop.h"
 #include "synth/envelopers/GraphEnvelop.h"
+#include "synth/envelopers/FadeOutEnvelop.h"
 #include "synth/envelopers/EnvelopMultiplier.h"
 #include "synth/envelopers/MultiStageEnvelope.h"
 //
@@ -126,6 +128,7 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	String filtersn=lang.get("register_module.category.notesrc.filter");
 	String filter="Filter";
 	reg.registerModule(lang, filter, filtersn, "BiquadFilterSrc", "register_module.notesrc.name.biquad", [](){return mksp<BiquadFilterSrc>();});
+	reg.registerModule(lang, filter, filtersn, "BiquadEnvFilterGroup", "register_module.notesrc.name.biquad_env_filter_group", [](){return mksp<BiquadEnvFilterGroup>();});
 	reg.registerModule(lang, filter, filtersn, "MeanFilterSrc", "register_module.notesrc.name.mean", [](){return mksp<MeanFilterSrc>();});
 
 	// 鼓点（Drum）分类 - 补充 lang 参数和翻译键
@@ -160,7 +163,7 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, physic, physicsn, "KarplusStrongSrc", "register_module.notesrc.name.karplus_strong", [](){return mksp<KarplusStrongSrc>();});
 	reg.registerModule(lang, physic, physicsn, "BowedString", "register_module.notesrc.name.bowed_string", [](){return mksp<BowedString>();});
 	reg.registerModule(lang, physic, physicsn, "Sitar", "register_module.notesrc.name.sitar", [](){return mksp<Sitar>();});
-	reg.registerModule(lang, physic, physicsn, "Sakura", "register_module.notesrc.name.sakura", [](){return mksp<Sakura>();}, sakuraRenderFunc);
+	reg.registerModule(lang, physic, physicsn, "Sakura", "register_module.notesrc.name.sakura", [](){return mksp<Sakura>();}, sakuraRenderFunc,false);
 	reg.registerModule(lang, physic, physicsn, "SakuraExciter", "register_module.notesrc.name.sakura_exciter", [](){return mksp<SakuraExciter>();});
 	reg.registerModule(lang, physic, physicsn, "PianoSrc", "register_module.notesrc.name.piano_src", [](){return mksp<PianoSrc>();}, pianoRenderFunc);
 
@@ -175,7 +178,8 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	String envelop="Envelop";
 	reg.registerModule(lang, envelop, envelopsn, "EnvelopMultiplier", "register_module.notesrc.name.envelop_multiplier", [](){return mksp<EnvelopMultiplier>();});
 	reg.registerModule(lang, envelop, envelopsn, "AHDSREnvelop", "register_module.notesrc.name.ahdsr", [](){return mksp<AHDSREnvelop>();});
-	reg.registerModule(lang, envelop, envelopsn, "GraphEnvelop", "register_module.notesrc.name.graph", [](){return mksp<GraphEnvelop>();});
+	reg.registerModule(lang, envelop, envelopsn, "GraphEnvelop", "register_module.notesrc.name.graph", [](){return mksp<GraphEnvelop>();}, GraphEnvRenderFunc);
+	reg.registerModule(lang, envelop, envelopsn, "FadeOutEnvelop", "register_module.notesrc.name.fadeout", [](){return mksp<FadeOutEnvelop>();});
 	reg.registerModule(lang, envelop, envelopsn, "TimeEnvelop", "register_module.notesrc.name.time", [](){return mksp<TimeEnvelop>();});
 	reg.registerModule(lang, envelop, envelopsn, "MultiStageEnvelope", "register_module.notesrc.name.multi_stage_envelope", [](){return mksp<MultiStageEnvelope>();}, MultiStageEnvRenderFunc);
 
@@ -204,6 +208,8 @@ void registerAllDSP(Lang & lang, MenuRegister & reg){
 	String delay="Delay";
 	String dynamicsn=lang.get("register_module.category.dsp.dynamic");
 	String dynamic="Dynamic";
+	String oscsn=lang.get("register_module.category.dsp.osc");
+	String osc="Osc";
 	String cate="";
 
 	reg.registerModule(lang, filter, filtersn, "AllPassFilter", "register_module.dsp.name.all_pass_filter", [](){return mksp<AllPassFilter>();});
@@ -229,6 +235,10 @@ void registerAllDSP(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, delay, delaysn, "Phaser", "register_module.dsp.name.phaser", [](){return mksp<Phaser>();});
 	reg.registerModule(lang, delay, delaysn, "SchroederReverb", "register_module.dsp.name.schroeder_reverb", [](){return mksp<SchroederReverb>();});
 	reg.registerModule(lang, delay, delaysn, "UnitDelay", "register_module.dsp.name.unit_delay", [](){return mksp<UnitDelay>();});
+	reg.registerModule(lang, osc, oscsn, "SineOscillator", "register_module.dsp.name.sine_osc", [](){return mksp<SineOscillator>();});
+	reg.registerModule(lang, osc, oscsn, "TriOscillator", "register_module.dsp.name.tri_osc", [](){return mksp<TriOscillator>();});
+	reg.registerModule(lang, osc, oscsn, "SawOscillator", "register_module.dsp.name.saw_osc", [](){return mksp<SawOscillator>();});
+	reg.registerModule(lang, osc, oscsn, "SquareOscillator", "register_module.dsp.name.square_osc", [](){return mksp<SquareOscillator>();});
 }
 void registerAllInterpolator(Lang & lang, MenuRegister & reg){
 	String cate="";

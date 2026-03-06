@@ -44,14 +44,17 @@ namespace yzrilyzr_simplesynth{
 				 u_sp<yzrilyzr_interpolator::Interpolator> aCurve,
 				 u_sp<yzrilyzr_interpolator::Interpolator> dCurve,
 				 u_sp<yzrilyzr_interpolator::Interpolator> rCurve);
-	bool noMoreData(Note & note) override;
+	bool noMoreData(const Note & note) override;
 	NoteProcPtr clone() override;
 	void init(ChannelConfig & cfg) override;
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc)override;
-	AHDSREnvelopKeyData * init(AHDSREnvelopKeyData * data, Note & note) override;
+	AHDSREnvelopKeyData * init(AHDSREnvelopKeyData * data, const Note & note) override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(AHDSREnvelop);
+
 	private:
-	bool isNoteNotReleased(Note & n) const;
+	bool isNoteNotReleased(const Note & n) const;
 	};
 }

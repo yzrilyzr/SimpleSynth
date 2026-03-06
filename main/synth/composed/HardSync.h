@@ -18,9 +18,9 @@ namespace yzrilyzr_simplesynth{
 	public:
 	HardSync();
 	HardSync(NoteProcPtr slave, float slaveFreqRatio);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
-	HardSyncKeyData * init(HardSyncKeyData * data, Note & note) override;
+	HardSyncKeyData * init(HardSyncKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
 	};
 }

@@ -28,9 +28,9 @@ namespace yzrilyzr_simplesynth{
 	~MultiKeyTrigger();
 	MultiKeyTrigger();
 	MultiKeyTrigger(NoteProcPtr a, const yzrilyzr_array::IntArray & noteShift, const yzrilyzr_array::DoubleArray & velocityMul);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
-	MultiKeyTriggerKeyData * init(MultiKeyTriggerKeyData * data, Note & note) override;
+	MultiKeyTriggerKeyData * init(MultiKeyTriggerKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
 	};
 }

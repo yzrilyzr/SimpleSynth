@@ -3,6 +3,7 @@
 #include "lang/Exception.h"
 #include "SimpleSynthProject.h"
 #include "interface/NoteProcessor.h"
+#include "dsp/DSP.h"
 using json=nlohmann::json;
 using namespace yzrilyzr_collection;
 using namespace yzrilyzr_util;

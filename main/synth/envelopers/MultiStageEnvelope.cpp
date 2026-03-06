@@ -62,7 +62,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	bool MultiStageEnvelope::noMoreData(Note & note){
+	bool MultiStageEnvelope::noMoreData(const Note & note){
 		MultiStageEnvelopeKeyData & data=*getData(note);
 		return data.end == nullptr;
 	}
@@ -72,7 +72,7 @@ namespace yzrilyzr_simplesynth{
 		return cloned;
 	}
 
-	u_sample MultiStageEnvelope::getAmp(Note & note){
+	u_sample MultiStageEnvelope::getAmp(const Note & note){
 		u_time currentTime=note.passedTime;
 		if(currentTime < 0) return 0;
 		MultiStageEnvelopeKeyData & data=*getData(note);
@@ -122,7 +122,7 @@ namespace yzrilyzr_simplesynth{
 		return StringFormat::object2string("MultiStageEnvelope", points);
 	}
 
-	MultiStageEnvelopeKeyData * MultiStageEnvelope::init(MultiStageEnvelopeKeyData * data, Note & note){
+	MultiStageEnvelopeKeyData * MultiStageEnvelope::init(MultiStageEnvelopeKeyData * data, const Note & note){
 		if(data == nullptr) data=new MultiStageEnvelopeKeyData();
 		data->start=&points[0];
 		data->end=&points[1];

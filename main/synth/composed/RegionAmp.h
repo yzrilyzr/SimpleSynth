@@ -30,7 +30,7 @@ namespace yzrilyzr_simplesynth{
 			if(p != nullptr)p->init(cfg);
 		}
 	}
-	bool noMoreData(Note & note) override{
+	bool noMoreData(const Note & note) override{
 		u_index noteid=(u_index)note.id;
 		u_index vel=yzrilyzr_util::Util::clamp((int)(note.velocity * 127.0), 0, 127);
 		auto & reg1=buildRegion[noteid * CHANNEL_MAX_NOTE_ID + vel];
@@ -60,7 +60,7 @@ namespace yzrilyzr_simplesynth{
 			ptr->noteOff(cfg, id, fvel);
 		}
 	}
-	u_sample getAmp(Note & note) override{
+	u_sample getAmp(const Note & note) override{
 		u_index noteid=(u_index)note.id;
 		u_index vel=yzrilyzr_util::Util::clamp((int)(note.velocity * 127.0), 0, 127);
 		u_sample sum=0;
@@ -89,5 +89,7 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override{
 		return "RegionAmp";
 	}
+	U_GET_CLASS_NAME(RegionAmp)
+
 	};
 }

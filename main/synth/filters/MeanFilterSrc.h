@@ -21,10 +21,10 @@ namespace yzrilyzr_simplesynth{
 	public:
 	MeanFilterSrc();
 	MeanFilterSrc(NoteProcPtr src, NoteProcPtr env, double envMulti);
-	u_sample getAmp(Note & note) override;
-	bool noMoreData(Note & note) override;
+	u_sample getAmp(const Note & note) override;
+	bool noMoreData(const Note & note) override;
 	NoteProcPtr clone() override;
-	MeanFilterSrcKeyData * init(MeanFilterSrcKeyData * data, Note & note) override;
+	MeanFilterSrcKeyData * init(MeanFilterSrcKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
 	};
 }

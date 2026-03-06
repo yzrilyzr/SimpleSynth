@@ -26,10 +26,10 @@ namespace yzrilyzr_simplesynth{
 		}
 		return ampArr;
 	}
-	u_sample SineHarmonicWaveTable::getAmp(Note & note){
+	u_sample SineHarmonicWaveTable::getAmp(const Note & note){
 		return a(note, getPhase(note) *  Math::TAU) * note.velocitySynth;
 	}
-	u_sample SineHarmonicWaveTable::a(Note & note, double x){
+	u_sample SineHarmonicWaveTable::a(const Note & note, double x){
 		u_sample y=0;
 		for(u_index harmonicOrder=0;harmonicOrder < aa.length;harmonicOrder++){
 			auto & ampLine=aa[harmonicOrder];
@@ -37,7 +37,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		return y;
 	}
-	double SineHarmonicWaveTable::getInterpolation(Note & note,const DoubleArray & ampLine){
+	double SineHarmonicWaveTable::getInterpolation(const Note & note,const DoubleArray & ampLine){
 		if(ampLine.length == 1) return ampLine[0];
 		if(ampLine.length < 5) throw Exception("WaveTable err");
 		u_index points=ampLine.length - 3;

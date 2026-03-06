@@ -17,7 +17,7 @@ namespace yzrilyzr_simplesynth{
 	public:
 	Osc(u_sp<PhaseSrc> freq);
 	Osc();
-	s_phase getPhase(Note & note){
+	s_phase getPhase(const Note & note){
 		s_phase t=_freq->getPhase(note);
 		if(_pm != nullptr){
 			t+=(s_phase)(_pm->getAmp(note) * pmAmp);
@@ -49,5 +49,7 @@ namespace yzrilyzr_simplesynth{
 	void lpm(u_sp<Osc> lpmSrc, double lpmAmp, u_freq lpmHz);
 	void lpm(NoteProcPtr lpmSrc, double lpmAmp);
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(Osc);
 	};
 }

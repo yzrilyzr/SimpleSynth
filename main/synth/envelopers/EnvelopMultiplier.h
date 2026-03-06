@@ -9,18 +9,18 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(EnvelopMultiplier, public AmpMultiplier), public Enveloper{
 	public:
 	EnvelopMultiplier(){
-		registerParamAlias("A", "Env");
 		registerParamAlias("B", "Src");
+		registerParamAlias("A", "Env");
 	}
 	EnvelopMultiplier(NoteProcPtr env, NoteProcPtr src) : AmpMultiplier(std::move(env), std::move(src)){}
-	u_sample getAmp(Note & note)override{
+	u_sample getAmp(const Note & note)override{
 		return a->getAmp(note) * b->getAmp(note);
 	}
-	bool noMoreData(Note & note)override{
+	bool noMoreData(const Note & note)override{
 		bool nmd=a->noMoreData(note);
 		if(nmd){
 			b->noMoreData(note);
-			note.requestClose(*note.cfg);
+			const_cast<Note&>(note).requestClose(*note.cfg);
 		}
 		return nmd;
 	}
@@ -33,5 +33,6 @@ namespace yzrilyzr_simplesynth{
 	u_sample postProcess(u_sample output)override{
 		return b->postProcess(output);
 	}
+	U_GET_CLASS_NAME(EnvelopMultiplier)
 	};
 }

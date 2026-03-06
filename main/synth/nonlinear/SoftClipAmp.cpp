@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 		registerParam("OutputGain", ParamType::Double, &outputGain, &gainMin, &gainMax);
 	}
 
-	u_sample SoftClipAmp::getAmp(Note & note){
+	u_sample SoftClipAmp::getAmp(const Note & note){
 		u_sample input=inputGain * a->getAmp(note);
 		double in=static_cast<double>(input);
 		double softClipped;

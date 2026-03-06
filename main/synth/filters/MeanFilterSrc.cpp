@@ -9,11 +9,11 @@ namespace yzrilyzr_simplesynth{
 	}
 	MeanFilterSrc::MeanFilterSrc() :MeanFilterSrc(nullptr, nullptr, 0){
 		static double gainMin=0, gainMax=500;
-		registerParamSrc("Src", &src);
-		registerParamSrc("Env", &env);
+		RegisterUtil::registerParamSrc(*this,"Src", &src);
+		RegisterUtil::registerParamSrc(*this,"Env", &env);
 		registerParam("Multi", ParamType::Double, &envMulti, &gainMin, &gainMax);
 	}
-	u_sample MeanFilterSrc::getAmp(Note & note){
+	u_sample MeanFilterSrc::getAmp(const Note & note){
 		u_sample src=this->src->getAmp(note);
 		u_sample env=this->env->getAmp(note);
 		MeanFilterSrcKeyData * data=getData(note);
@@ -23,7 +23,7 @@ namespace yzrilyzr_simplesynth{
 		data->last=out;
 		return out;
 	}
-	bool MeanFilterSrc::noMoreData(Note & note){
+	bool MeanFilterSrc::noMoreData(const Note & note){
 		bool nmd=this->src->noMoreData(note);
 		if(nmd){
 			this->env->noMoreData(note);
@@ -33,7 +33,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr MeanFilterSrc::clone(){
 		return mksp<MeanFilterSrc>(src->clone(), env->clone(), envMulti);
 	}
-	MeanFilterSrcKeyData * MeanFilterSrc::init(MeanFilterSrcKeyData * data, Note & note){
+	MeanFilterSrcKeyData * MeanFilterSrc::init(MeanFilterSrcKeyData * data, const Note & note){
 		if(data == nullptr) data=new MeanFilterSrcKeyData();
 		data->last=0;
 		return data;

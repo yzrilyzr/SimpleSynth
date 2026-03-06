@@ -25,12 +25,13 @@ namespace yzrilyzr_simplesynth{
 	s_phase initPhase=0.0;
 	u_sample input=1.0;//[-1,1]
 	u_sample output=0.0;//[-1,1]
-	FMOp();
+	FMOp()=default;
 	~FMOp()=default;
 	void init(ChannelConfig & cfg)override;
-	u_sample getAmp(Note & note)override;
-	bool noMoreData(Note & note)override;
-	MatrixOpKeyData * init(MatrixOpKeyData * data, Note & note)override;
+	u_sample getAmp(const Note & note)override;
+	bool noMoreData(const Note & note)override;
+	MatrixOpKeyData * init(MatrixOpKeyData * data, const Note & note)override;
+	void onRegisterParam() override;
 	};
 	ECLASS(Matrix6x6Modulation, public NoteProcessor){
 	public:
@@ -41,8 +42,9 @@ namespace yzrilyzr_simplesynth{
 	Matrix6x6Modulation();
 	~Matrix6x6Modulation()=default;
 	void init(ChannelConfig & cfg)override;
-	u_sample getAmp(Note & note)override;
-	
+	u_sample getAmp(const Note & note)override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(Matrix6x6Modulation);
 	};
 	EBCLASS(Matrix6x6ModulationBuilder){
 		private:

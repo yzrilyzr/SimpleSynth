@@ -11,8 +11,9 @@ namespace yzrilyzr_simplesynth{
 	public:
 	ArctanDistortion();
 	ArctanDistortion(NoteProcPtr a, u_sample inputGain, double alpha, u_sample outputGain);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
 	};
 }

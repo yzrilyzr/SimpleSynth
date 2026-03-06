@@ -242,10 +242,10 @@ namespace yzrilyzr_simplesynth{
 			120, 2//
 											 }));
 		GraphInterpolator detune(DoubleArray({//
-			0, 0.0015,  // 低音区更小的detune
-			36, 0.0015, // 低音区
-			48, 0.0020, // 低音到中音过渡
-			60, 0.0040, // 中音区
+			0, 0.003,  // 低音区更小的detune
+			36, 0.003, // 低音区
+			48, 0.0040, // 低音到中音过渡
+			60, 0.0050, // 中音区
 			72, 0.0080, // 中音到高音过渡
 			84, 0.0120, // 高音区
 			96, 0.0180, // 高音区
@@ -440,8 +440,8 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder()
 					.src(mksp<SineBasePowHarmonicWave>(DoubleArray({
 					0.9, 0.9, 1.0, 0.7, 0.6
-																			   })))
-					.detune(2, 0.1)
+																   })))
+					.detune(2, 0.2)
 					.biquad(sampleRate, HIGHSHELF, 2000.0, 0.5, -12.0)
 					.mul(0.4)
 					.ADSR(10, 1, 0.7, true, 200, Pow(-5), Pow(5), Pow(5)).build();
@@ -876,12 +876,12 @@ namespace yzrilyzr_simplesynth{
 					AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.03, 0.0))
 					.biquadEnvGroup(DSPGroupBuilder::TYPE_CHAIN, {
 						{FilterPassType::BELL, NoteFreqAmp, 0.7, 10},
-						{FilterPassType::LOWPASS, NoteFreqAmp*40, 0.5, 0}
-						}
+									{FilterPassType::LOWPASS, NoteFreqAmp * 40, 0.5, 0}
+									}
 					)
 					.biquad(sampleRate, LOWPASS, 17000, 0.20, 0)
 					.biquad(sampleRate, HIGHPASS, 250, 0.20, 0)
-					.autoMod(0.5, 0.3, 5.0, 0.1,
+					.autoMod(0.7, 0.3, 5.0, 0.1,
 							 AmpBuilder().src(
 								 mksp<Pulse>(0.2, 0.3, 0.35, 0))
 							 .DAHDSR(100, 300, 10, 1, 1, true, 100, 100, Line(), Line(), Line()).build())
@@ -911,9 +911,9 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::BRASS_FRENCH_HORN:
 				return AmpBuilder().src(SawW())
+					.autoMod(0.1, 0.1, 5.3, 0.5)
 					.detune(3, 0.05)
 					.biquad(sampleRate, BANDPASS, 500, 0.30, 0)
-					.autoMod(0.1, 0.1, 5.3, 0.5)
 					.ADSR(50, 762, 0.6, true, 100, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::BRASS_BRASS_SECTION:
@@ -1084,8 +1084,8 @@ namespace yzrilyzr_simplesynth{
 										.add(60, mksp<Pulse>(0.25, 0, 0, 0))
 										.add(72, mksp<Pulse>(0.5, 0, 0, 0))
 										.build())
+					//.autoMod(0.2, 0.2, 7, 0.75)
 					.detune(3, 0.15)
-					.autoMod(0.3, 0.3, 5.3, 0.75)
 					.mul(0.707)
 					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
 					.biquadEnvVel(90, 127, 1, LOWPASS)
@@ -1093,8 +1093,8 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::LEAD_SAWTOOTH:
 				return AmpBuilder().src(mksp<SawWave>())
+					//.autoMod(0.2, 0.2, 7.5, 0.75)
 					.detune(3, 0.15)
-					.autoMod(0.3, 0.3, 5.4, 0.75)
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.AHDSR(5, 30, 300, 0.75, true, 300, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -1132,9 +1132,9 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::LEAD_FIFTHS:
 				return AmpBuilder().src(mksp<SawWave>())
 					.add(mksp<SawWave>(MulPhase(NotePhase, 3.0 / 2.0)))
+					.autoMod(0.3, 0.3, 5.4, 0.75)
 					.mul(0.5)
 					.detune(3, 0.15)
-					.autoMod(0.3, 0.3, 5.4, 0.75)
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.AHDSR(5, 30, 300, 0.75, true, 300, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -1296,8 +1296,8 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::FX_ECHOES:
 				return AmpBuilder().src(mksp<AHarmonicWave>())
-					.detune(3, 0.2)
 					.autoMod(0.2, 0.3, 5.5, 0.75)
+					.detune(3, 0.2)
 					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::FX_SCI_FI:
@@ -1305,7 +1305,7 @@ namespace yzrilyzr_simplesynth{
 					.biquadEnv(NoteIDAmp + ConstAmp(25), ConstAmp(1), LOWPASS)
 					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
-			
+
 			//=====================================
 
 			case MIDIFile::Instruments::ETHNIC_SITAR:
@@ -1401,7 +1401,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder()
 					.src(mksp<SineWaveTable>(269.53125, DoubleArray({
 					269.53125, 1.0, 363.28125, 0.07235363857701663, 398.4375, 0.12799743578985023, 433.59375, 0.08737175770435823, 515.625, 0.6206402594994691, 539.0625, 0.3597885911495093, 597.65625, 0.08264700342927812, 656.25, 0.7188440200746729, 785.15625, 0.3795586131241527, 855.46875, 0.011978267525183701, 914.0625, 0.07184674145688824, 1054.6875, 0.22712185759377435, 1171.875, 0.051998250533269966, 1312.5, 0.030940107100424292, 4464.84375, 0.012544763401347499
-																				})))
+																	})))
 					.biquadEnv(AmpBuilder().src(ConstAmp(60))
 							   .ADSR(30, 1, 1, true, 100, Line(), Line(), Line())
 							   .add(ConstAmp(60))
@@ -1438,7 +1438,7 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(5, 7, 1, false, 500, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::PERCUSSIVE_REVERSE_CYMBAL:
-				return AmpBuilder(mksp<CymbalOsc>(NoteFreqAmp * (1 / 800.0)))
+				return AmpBuilder(mksp<CymbalOsc>(NoteFreqAmp * (1 / 800.0), 0.12, IntArray{305, 444, 558, 630, 794, 824, 1136}))
 					.ADSR(2000, 5, 1, false, 2000, Pow(2), Pow(2), Pow(2)).build();
 			case MIDIFile::Instruments::EFFECTS_SEASHORE:
 				return AmpBuilder().src(mksp<NoiseSrc>())

@@ -102,7 +102,7 @@ MenuRegister::MenuRegisterObject findObjectAt(const String & category, const Str
 	notfound.name="##/NOT_FOUND/##";
 	return notfound;
 }
-void name2obj(const String & category, const String & name, String * name1, String * category1, String * showName, u_sp<ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender){
+void name2obj(const String & category, const String & name, String * name1, String * category1, String * showName, u_sp<ClassRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender){
 	auto mobj=findObjectAt(category, name, allNoteProcessor);
 	if(mobj.name == notfound.name)mobj=findObjectAt(category, name, allDSP);
 	if(mobj.name == notfound.name)mobj=findObjectAt(category, name, allInterpolator);
@@ -113,6 +113,7 @@ void name2obj(const String & category, const String & name, String * name1, Stri
 		*category1=mobj.category;
 		*showName=mobj.showName;
 		*obj=mobj.cfunc();
+		(*obj)->registerParams();
 		*rfunc=mobj.rfunc;
 		*enableOriginalRender=mobj.enableOriginalRender;
 	}
@@ -252,7 +253,7 @@ int main(int argc, char * argv[]){
 	SDL_PauseAudio(0);
 	openMIDIDevice();
 	mixer->setUseLimiter(false);
-	for(File & f : File("lang").listFiles()){
+	for(File & f : File(File("lang"),"SimpleSynth").listFiles()){
 		String name=f.getName();
 		if(!name.endsWith(".properties"))continue;
 		name=name.substring(0, name.length() - 11);
@@ -482,7 +483,6 @@ int main(int argc, char * argv[]){
 		if(showEQWindow)eqWindow(ctx);
 		if(showToSourceWindow)objectToStringWindow(ctx);
 		if(showDemoWindow)ImGui::ShowDemoWindow(&showDemoWindow);
-		ctx.HandleShortcuts();
 		ctx.notificationManager.Draw();
 		ImGui::Render();
 		glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);

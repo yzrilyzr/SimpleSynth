@@ -30,17 +30,17 @@ namespace yzrilyzr_simplesynth{
 		public:
 		Note note;
 		yzrilyzr_array::SampleArray output;
+		//yzrilyzr_array::Array<Note> noteSnapshots;
 		ChannelData * data; 
 		NoteTask(uint8_t uniqueID);
 	};
 	ECLASS(NoteTaskPool, public yzrilyzr_util::Pool2<NoteTask, CHANNEL_MAX_VOICE>){
 		private:
 		uint8_t uniqueID=0;
-		public:
-		void reset();
 		protected:
 		NoteTask * newInstance() override;
 		void onReuse(NoteTask * note) override;
+		void onClear() override;
 	};
 	ECLASS(ChannelData, public IChannel){
 		public:

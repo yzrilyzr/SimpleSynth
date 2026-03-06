@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 	String NearestAmpSet::toString()const{
 		return StringFormat::format("NearestAmpSet(%s)", getPhaseSource());
 	}
-	bool NearestAmpSet::noMoreData(Note & note){
+	bool NearestAmpSet::noMoreData(const Note & note){
 		int id=note.id;
 		NoteProcPtr processor=notes[id];
 		if(processor == nullptr) return true;
@@ -45,7 +45,7 @@ namespace yzrilyzr_simplesynth{
 
 		// 如果没有找到任何处理器，直接返回
 		if(firstNote == -1){
-			return spdc<NoteProcessor>(objptr);
+			return spsc<NoteProcessor>(objptr);
 		}
 
 		// 填充第一个有数据音符之前的部分
@@ -78,9 +78,9 @@ namespace yzrilyzr_simplesynth{
 			objptr->notes[i]=lastProcessor;
 		}
 
-		return spdc<NoteProcessor>(objptr);
+		return spsc<NoteProcessor>(objptr);
 	}
-	u_sample NearestAmpSet::getAmp(Note & note){
+	u_sample NearestAmpSet::getAmp(const Note & note){
 		uint8_t id=note.id;
 		NoteProcPtr processor=notes[id];
 		if(processor == nullptr) return 0; // 返回0而不是true

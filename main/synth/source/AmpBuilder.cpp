@@ -103,7 +103,7 @@ namespace yzrilyzr_simplesynth{
 	AmpBuilder & AmpBuilder::freqSrc(u_sp<PhaseSrc> src){
 		if(!(spdc<Osc>(this->_src)))
 			throw Exception("this->_src not FreqBasedGenerator");
-		spdc<Osc>(this->_src)->setPhaseSource(src);
+		spsc<Osc>(this->_src)->setPhaseSource(src);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::cc(const yzrilyzr_array::IntArray & cc){
@@ -258,19 +258,19 @@ namespace yzrilyzr_simplesynth{
 		return mul(mksp<MultiStageEnvelope>(points));
 	}
 	AmpBuilder & AmpBuilder::pm(u_sp<Osc> pmSrc, double amp, double noteRatio){
-		spdc<Osc>(this->_src)->pm(pmSrc, amp, noteRatio);
+		spsc<Osc>(this->_src)->pm(pmSrc, amp, noteRatio);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::pm(NoteProcPtr pmSrc, double amp){
-		spdc<Osc>(this->_src)->pm(pmSrc, amp);
+		spsc<Osc>(this->_src)->pm(pmSrc, amp);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::lpm(u_sp<Osc> pmSrc, double amp, u_freq lpmHz){
-		spdc<Osc>(this->_src)->lpm(pmSrc, amp, lpmHz);
+		spsc<Osc>(this->_src)->lpm(pmSrc, amp, lpmHz);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::lpm(NoteProcPtr lpmSrc, double amp){
-		spdc<Osc>(this->_src)->lpm(lpmSrc, amp);
+		spsc<Osc>(this->_src)->lpm(lpmSrc, amp);
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::ks(u_normal_01 alpha){

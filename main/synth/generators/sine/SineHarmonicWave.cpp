@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 	SineHarmonicWave::SineHarmonicWave(u_sp<PhaseSrc> freq, const DoubleArray & freqAndAmp): Osc(freq){
 		this->aa=freqAndAmp;
 	}
-	u_sample SineHarmonicWave::getAmp(Note &note){
+	u_sample SineHarmonicWave::getAmp(const Note & note){
 		return a(getPhase(note)* Math::TAU)*note.velocitySynth;
 	}
 	u_sample SineHarmonicWave::a(double x){

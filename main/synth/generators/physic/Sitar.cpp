@@ -20,9 +20,8 @@ namespace yzrilyzr_simplesynth{
 		Osc::init(cfg);
 		int initI=Note::C4;
 		int * ids=new int[14]{initI, initI + 2, initI + 4, initI + 5, initI + 7, initI + 9, initI + 11, initI + 12, initI + 14, initI + 16, initI + 17, initI + 19, initI + 21, initI + 23};
-		static thread_local u_index randomIndex=0;
 		for(u_index i=0;i < resonanceStringsCount;i++){
-			(*resonanceStringFreq)[i]=cfg.tuning->getFrequency(ids[i] + random.next(&randomIndex) * 0.01 / 12.0);
+			(*resonanceStringFreq)[i]=cfg.tuning->getFrequency(ids[i] + random.next() * 0.01 / 12.0);
 		}
 		delete[] ids;
 		boxFilter=IIRUtil::newButterworthIIRFilter(cfg.sampleRate, FilterPassType::BANDPASS, 1, 100, 500);
@@ -51,7 +50,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr Sitar::clone(){
 		return mksp<Sitar>();
 	}
-	u_sample Sitar::getAmp(Note & note){
+	u_sample Sitar::getAmp(const Note & note){
 		RingBufferSample & buffer=*getData(note);
 		u_freq freq2=getSetFreq(note);
 		u_sample len=RingBufferUtil::freq2delayIndex(freq2, note.cfg->sampleRate);
@@ -59,12 +58,12 @@ namespace yzrilyzr_simplesynth{
 		string1=Util::clamp(string1 * 2, static_cast<u_sample>(-1.0), static_cast<u_sample>(1.0));
 		return string1;
 	}
-	RingBufferSample * Sitar::init(RingBufferSample * buffer, Note & note){
+	RingBufferSample * Sitar::init(RingBufferSample * buffer, const Note & note){
 		if(buffer == nullptr) buffer=new RingBufferSample();
 		initBuffer(*buffer, note);
 		return buffer;
 	}
-	u_freq Sitar::getSetFreq(Note & note){
+	u_freq Sitar::getSetFreq(const Note & note){
 		return note.freqSynth;
 	}
 	u_sample Sitar::procKS(RingBufferSample & buffer, u_sample alpha, u_sample feedback, u_sample input, u_sample delayLen){
@@ -77,20 +76,19 @@ namespace yzrilyzr_simplesynth{
 		buffer.write(sum * feedback);
 		return sum;
 	}
-	void Sitar::initBuffer(RingBufferSample & buffer, Note & note){
+	void Sitar::initBuffer(RingBufferSample & buffer, const Note & note){
 		buffer.reset();
 		u_freq freq=note.cfg->tuning->getFrequencyByID(note.id);
 		u_sample len=RingBufferUtil::freq2delayIndex(freq, note.cfg->sampleRate);
 		buffer.ensureCapacity(len);
 		initBurstRandom(buffer, note, len);
 	}
-	void Sitar::initBurstRandom(RingBufferSample & buffer, Note & note, u_sample delayIndex){
-		static thread_local u_index randomIndex=0;
+	void Sitar::initBurstRandom(RingBufferSample & buffer, const Note & note, u_sample delayIndex){
 		for(u_index i=0, j=delayIndex + 3;i < j;i++){
 			u_sample x=(u_sample)i / delayIndex;
 			u_sample r1=(x * 2 - 1) / 4;
 			//r1+=(pwm(x,0.4,0.3,0.3,0)+1)/8;
-			r1+=random.next(&randomIndex);
+			r1+=random.next();
 			buffer.write(r1 * note.velocitySynth);
 		}
 	}

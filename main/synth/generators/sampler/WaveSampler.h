@@ -32,13 +32,16 @@ namespace yzrilyzr_simplesynth{
 	WaveSampler();
 	WaveSampler(u_sp<PhaseSrc> freq, s_phase phaseMul, u_sp<yzrilyzr_array::SampleProvider> sampleData, u_index sampleOffset, u_index sampleLength,
 				int32_t startLoopIndex, int32_t endLoopIndex, int loopType);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	u_sample getSample(yzrilyzr_array::SampleProvider & sample, int32_t index);
-	bool noMoreData(Note & note) override;
+	bool noMoreData(const Note & note) override;
 	private:
 	u_sample reSampleCubicSpline(yzrilyzr_array::SampleProvider & src, s_phase index);
 	int32_t clampToLoop(int32_t index) const;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(WaveSampler)
+
 	};
 	EBCLASS(WaveSamplerBuilder){
 		u_sp<PhaseSrc> freq=nullptr;

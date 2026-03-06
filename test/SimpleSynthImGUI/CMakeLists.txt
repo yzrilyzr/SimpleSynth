@@ -18,15 +18,17 @@ endif()
 
 
 add_executable (${PROJECT_NAME} "main.cpp"
+ "${IMGUI_BACKENDS_DIR}/imgui_impl_sdl2.cpp"
+ "${IMGUI_BACKENDS_DIR}/imgui_impl_opengl3.cpp"
  "SimpleSynthWindow.cpp"
  "ProjectObject.cpp"
  "CurrentProjectContext.cpp"
  "ProjectWindowSelect.cpp"
  "NotificationManager.cpp"
  "RegisterAllModules.cpp"
- "Shortcuts.cpp"
+ "NodeAutoLayout.cpp" 
  "Serialize.cpp"
- "RightContextMenu.cpp"
+ "NodeRightContextMenu.cpp"
  "sakura/SakuraRender.h"
  "sakura/SakuraRender.cpp"
  "piano/PianoRender.h"
@@ -40,13 +42,14 @@ add_executable (${PROJECT_NAME} "main.cpp"
  "dsprender/EnvelopDetectorRender.cpp"
  "ProjectObject.h"
  "sswindow/EQWindow.cpp"
- "LangToEnum.h"
  "ParamHelper.h"
  "sswindow/OscilloscopeWindow.cpp"
  "sswindow/ChannelSettingWindow.cpp"
  "sswindow/MixerSettingWindow.cpp"
-"notesrcrender/FM6x6Render.cpp"
- "notesrcrender/NoteSrcRender.h" "notesrcrender/MultiStageEnvRender.cpp" "ParamHelper.cpp")
+ "notesrcrender/FM6x6Render.cpp"
+ "notesrcrender/NoteSrcRender.h" 
+ "notesrcrender/MultiStageEnvRender.cpp"
+ "ParamHelper.cpp" "notesrcrender/GraphEnvRender.cpp")
 
 #find_package(nlohmann_json REQUIRED)
 find_package(OpenGL REQUIRED)

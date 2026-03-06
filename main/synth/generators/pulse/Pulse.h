@@ -11,12 +11,7 @@ namespace yzrilyzr_simplesynth{
 	u_normal_01 fall;
 	u_normal_01 delay;
 	public:
-	Pulse() : Pulse(.3f, 0.2f, 0.2f, 0){
-		registerParamNormal01("Width", &width);
-		registerParamNormal01("Rise", &rise);
-		registerParamNormal01("Fall", &fall);
-		registerParamNormal01("Delay", &delay);
-	}
+	Pulse() : Pulse(.3f, 0.2f, 0.2f, 0){}
 	Pulse(u_normal_01 width, u_normal_01 rise, u_normal_01 fall, u_normal_01 delay) : Pulse(nullptr, width, rise, fall, delay){}
 	Pulse(u_sp<PhaseSrc> freqSrc, u_normal_01 width, u_normal_01 rise, u_normal_01 fall, u_normal_01 delay) : Osc(freqSrc){
 		this->width=width;
@@ -24,9 +19,11 @@ namespace yzrilyzr_simplesynth{
 		this->fall=fall;
 		this->delay=delay;
 	}
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(Pulse)
 	};
 }

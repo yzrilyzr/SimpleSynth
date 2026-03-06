@@ -25,7 +25,7 @@ namespace yzrilyzr_simplesynth{
 		registerParam("OutputGain", ParamType::Double, &outputGain, &gainMin, &gainMax);
 	}
 
-	u_sample TapeSaturationDistortion::getAmp(Note & note){
+	u_sample TapeSaturationDistortion::getAmp(const Note & note){
 		u_sample input=inputGain * a->getAmp(note);
 		double in=static_cast<double>(input);
 

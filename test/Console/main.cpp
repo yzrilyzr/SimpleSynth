@@ -11,6 +11,7 @@
 #include "instrument/SF2FormatInstrument.h"
 #include "instrument/SimpleDrumSet.h"
 #include "instrument/SimpleMIDIInstrument.h"
+#include "instrument/ChipInstrument.h"
 #include "instrument/TR808DrumSet.h"
 #include "lang/Runtime.h"
 #include "array/Array.hpp"
@@ -383,10 +384,10 @@ int main(int argc, char * argv[]){
 				String fileName=File(str).getName();
 				if(seq == nullptr)throw Exception("File read error");
 				if(exportMode || exportTrackMode){
-					System::out.printf("导出: %s\n", fileName);
+					System::out.printf(L"导出: %s\n", fileName);
 					exportWAV(fileName, seq);
 				} else{
-					System::out.printf("播放: %s\n", fileName);
+					System::out.printf(L"播放: %s\n", fileName);
 					seq->postToMixer(mixer2.get(), 1, "Console_XM");
 				}
 			} else if(str.endsWith(".mid")){
@@ -395,13 +396,13 @@ int main(int argc, char * argv[]){
 				static int inc=0;
 				String fileName=File(str).getName();
 				if(convertMIDIMode){
-					System::out.printf("转换: %s\n", fileName);
+					System::out.printf(L"转换: %s\n", fileName);
 					SynthUtil::sequenceToMIDI(seq, FileOutputStream(fileName + "_convert.mid"));					
 				} else if(exportMode || exportTrackMode){
-					System::out.printf("导出: %s\n", fileName);
+					System::out.printf(L"导出: %s\n", fileName);
 					exportWAV(fileName, seq);
 				} else{
-					System::out.printf("播放: %s\n", fileName);
+					System::out.printf(L"播放: %s\n", fileName);
 					seq->postToMixer(mixer2.get(), 1, "Console_MIDI" + std::to_string(inc++));
 				}
 			} else if(str.endsWith(".hrir")){
@@ -424,33 +425,35 @@ int main(int argc, char * argv[]){
 				mixer2->getGlobalConfig().setInstrumentProvider(rin);
 			} else if(str == "808"){
 				rin->setDrumSet(mksp<TR808DrumSet>());
+			} else if(str == "8bit"){
+				mixer2->getGlobalConfig().setInstrumentProvider(mksp<ChipInstrument>());
 			} else if(str == "export"){
 				exportMode=!exportMode;
-				System::out.printf("导出模式开关: %b\n", exportMode);
+				System::out.printf(L"导出模式开关: %b\n", exportMode);
 			} else if(str == "convertMIDI"){
 				convertMIDIMode=!convertMIDIMode;
-				System::out.printf("转换MIDI: %b\n", convertMIDIMode);
+				System::out.printf(L"转换MIDI: %b\n", convertMIDIMode);
 			} else if(str == "exporttrack"){
 				exportTrackMode=!exportTrackMode;
-				System::out.printf("分轨导出: %b\n", exportTrackMode);
+				System::out.printf(L"分轨导出: %b\n", exportTrackMode);
 			} else if(str == "exportsamplerate"){
-				System::out.println("输入新采样率");
+				System::out.println(L"输入新采样率");
 				str=Util::readLine(System::in);
 				exportSampleRate=parseInt(str);
-				System::out.printf("导出采样率: %d\n", (int)exportSampleRate);
+				System::out.printf(L"导出采样率: %d\n", (int)exportSampleRate);
 			} else if(str == "limiter"){
 				exportLimiter=!exportLimiter;
-				System::out.printf("导出限制器: %b\n", exportLimiter);
+				System::out.printf(L"导出限制器: %b\n", exportLimiter);
 			} else if(str == "channeldsp"){
 				exportChannelDSP=!exportChannelDSP;
-				System::out.printf("导出通道使用DSP:  %b\n", exportChannelDSP);
+				System::out.printf(L"导出通道使用DSP:  %b\n", exportChannelDSP);
 			} else if(str == "exit"){
 				break;
 			} else if(str == "exportinfo"){
-				System::out.printf("导出模式开关: %b\n", exportMode);
-				System::out.printf("分轨导出: %b\n", exportTrackMode);
-				System::out.printf("导出限制器: %b\n", exportLimiter);
-				System::out.printf("导出采样率: %d\n", (int)exportSampleRate);
+				System::out.printf(L"导出模式开关: %b\n", exportMode);
+				System::out.printf(L"分轨导出: %b\n", exportTrackMode);
+				System::out.printf(L"导出限制器: %b\n", exportLimiter);
+				System::out.printf(L"导出采样率: %d\n", (int)exportSampleRate);
 			} else if(str.startsWith("midi ")){
 				auto & split=str.split(" ");
 				uint8_t ty=parseInt(split[1].tostring(), 16);

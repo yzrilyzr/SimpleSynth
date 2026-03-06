@@ -13,7 +13,7 @@ namespace yzrilyzr_simplesynth{
 		this->idShift=noteShift;
 		this->velocityMul=velocityMul;
 	}
-	u_sample MultiKeyTrigger::getAmp(Note & note){
+	u_sample MultiKeyTrigger::getAmp(const Note & note){
 		u_sample sum=0;
 		MultiKeyTriggerKeyData * data=getData(note);
 		Note ** notes=data->notes;
@@ -29,7 +29,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr MultiKeyTrigger::clone(){
 		return mksp<MultiKeyTrigger>(a, idShift, velocityMul);
 	}
-	MultiKeyTriggerKeyData * MultiKeyTrigger::init(MultiKeyTriggerKeyData * data, Note & note){
+	MultiKeyTriggerKeyData * MultiKeyTrigger::init(MultiKeyTriggerKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new MultiKeyTriggerKeyData();
 			data->notes=new Note * [notesCount];

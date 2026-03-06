@@ -84,7 +84,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	u_sample PianoSrc2::getAmp(Note & note){
+	u_sample PianoSrc2::getAmp(const Note & note){
 		int id=note.id;
 		if(id < 21 || id>108)return 0;
 		PianoKey & pianoKey=pianoKeys[id];
@@ -142,7 +142,7 @@ namespace yzrilyzr_simplesynth{
 		memset(isInSynth, false, siz);
 		return output;
 	}
-	bool PianoSrc2::noMoreData(Note & note){
+	bool PianoSrc2::noMoreData(const Note & note){
 		int id=note.id;
 		if(id < 21 || id>108)return true;
 		PianoKey & pianoKey=pianoKeys[id];

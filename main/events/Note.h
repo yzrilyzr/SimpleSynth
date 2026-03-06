@@ -38,7 +38,7 @@ namespace yzrilyzr_simplesynth{
 
 	// 时间状态
 	u_time startAtTime=0;               ///< NoteOn触发时间(秒)
-	u_time passedTime=0;                ///< NoteOn后经过时间(秒)
+	u_time passedTime=0;                ///< NoteOn后经过时间(秒)，noteoff不影响此时间计数
 	u_time closedAtTime=0;              ///< NoteOff触发时间(秒)
 	u_time closedPassedTime=0;          ///< NoteOff后经过时间(秒)
 	u_time forceCloseAtTime=0;         ///< 强制NoteOff触发时间(秒)
@@ -57,6 +57,7 @@ namespace yzrilyzr_simplesynth{
 	 * @brief 构造函数
 	 * @param uniqueID 音符唯一标识符
 	 */
+	Note() : uniqueID(0){}
 	Note(uint8_t uniqueID) : uniqueID(uniqueID){}
 
 	/**

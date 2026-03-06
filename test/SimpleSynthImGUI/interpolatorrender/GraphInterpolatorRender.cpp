@@ -11,17 +11,18 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
 void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	u_sp<GraphInterpolator> paramRegPtr=std::dynamic_pointer_cast<GraphInterpolator, ParamRegister>(obj.paramRegPtr);
+	u_sp<GraphInterpolator> paramRegPtr=std::dynamic_pointer_cast<GraphInterpolator, ClassRegister>(obj.paramRegPtr);
 	auto & data=obj.storeData;
-	/*if(data.find("PointSize") == data.end()){
+	if(data.find("PointSize") == data.end()){
 		data["PointSize"]=mksp<Integer>(3);
-	}*/
-	// TODO fix
-	/*Integer & PointSize=*spdc<Integer>(data["PointSize"]);
+	}
+	Integer & PointSize=*spdc<Integer>(data["PointSize"]);
+	ImGui::PushItemWidth(200);
 	ImGui::InputInt(ctx.LANG.getc("module.interpolator.graph.points"), &PointSize.value);
+	ImGui::PopItemWidth();
 	if(PointSize.value < 1)PointSize.value=1;
 	if(data.find("Points") != data.end()){
-		paramRegPtr->xys=spdc<DoubleArray>(data["Points"]);
+		paramRegPtr->xys=*spsc<DoubleArray>(data["Points"]);
 	}
 	if(ImGui::Button(ctx.LANG.getc("module.interpolator.graph.init"))){
 		paramRegPtr->xys=DoubleArray(PointSize.value * 2);
@@ -29,8 +30,8 @@ void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 			paramRegPtr->xys[i * 2]=(float)i / (j - 1);
 			paramRegPtr->xys[i * 2 + 1]=(float)i / (j - 1);
 		}
-		data["Points"]=paramRegPtr->xys;
-	}*/
+		data["Points"]=mksp<DoubleArray>(paramRegPtr->xys);
+	}
 	if(paramRegPtr->xys.empty())return;
 	if(ImPlot::BeginPlot(ctx.LANG.getc("module.interpolator.graph.plot.title"), ImVec2(500, 500))){
 		ImPlot::SetupAxis(ImAxis_Y1, "Y", ImPlotAxisFlags_NoLabel);

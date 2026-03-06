@@ -16,6 +16,7 @@ namespace yzrilyzr_simplesynth{
 		static constexpr uint8_t const CHANNEL_PROGRAM_CHANGE=7;
 		static constexpr uint8_t const CHANNEL_PRESSURE=8;
 		static constexpr uint8_t const TUNING_CHANGE=9;
+		static constexpr uint8_t const DRUM_CHANNEL=10;
 	}
 
 	typedef u_sp<NoteProcessor> NoteProcPtr;
@@ -99,11 +100,11 @@ namespace yzrilyzr_simplesynth{
 
 	ECLASS(ChannelControl, public ChannelEvent){
 		public:
-		uint8_t control;
-		uint8_t value;
+		uint32_t control;
+		uint32_t value;
 
-		ChannelControl(s_midichannel_id channelID, uint8_t control, uint8_t value);
-		ChannelControl(uint8_t control, uint8_t value);
+		ChannelControl(s_midichannel_id channelID, uint32_t control, uint32_t value);
+		ChannelControl(uint32_t control, uint32_t value);
 
 		bool isMSB();
 		bool isLSB();
@@ -137,6 +138,8 @@ namespace yzrilyzr_simplesynth{
 		ProgramChange();
 		ProgramChange(s_midichannel_id channelID, s_program_id value);
 		ProgramChange(s_program_id value);
+		ProgramChange(NoteProcPtr np);
+		ProgramChange(s_midichannel_id channelID, NoteProcPtr np);
 
 		ChannelEvent * clone() override;
 		uint8_t getType() override;
@@ -162,13 +165,28 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(TuningChange, public ChannelEvent){
 		public:
 		u_sp<NoteTuning> value=nullptr;
-
-		TuningChange();
+		TuningChange(u_sp<NoteTuning> value);
+		TuningChange(s_midichannel_id channelID, u_sp<NoteTuning> value);
 
 		ChannelEvent * clone() override;
 		uint8_t getType() override;
 
 		protected:
 		TuningChange(const TuningChange * clone);
+	};
+
+	ECLASS(DrumChannel, public ChannelEvent){
+		public:
+		bool enable;
+
+		DrumChannel();
+		DrumChannel(s_midichannel_id channelID, bool enable);
+		DrumChannel(bool enable);
+
+		ChannelEvent * clone() override;
+		uint8_t getType() override;
+
+		protected:
+		DrumChannel(const DrumChannel * clone);
 	};
 }

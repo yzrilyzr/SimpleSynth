@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 	public:
 	FoldbackDistortion();
 	FoldbackDistortion(NoteProcPtr a, double inputGain, double threshold, double foldRatio, double outputGain);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
 	};

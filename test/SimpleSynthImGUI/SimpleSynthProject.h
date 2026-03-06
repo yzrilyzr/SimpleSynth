@@ -7,13 +7,19 @@
 #include "interface/IMixer.h"
 #include "nlohmann/json.hpp"
 #include "util/Lang.h"
-#include "util/ParamRegister.h"
+#include "util/ClassRegister.h"
 #include "yzrutil.h"
 #include <string>
 #include <vector>
 
 #define OUTPUT_NODE_ID 44948
 #define OUTPUT_ATTR_ID 18447
+#ifdef DSP_SINGLE_PRECISION
+#define ImGuiDataType_Sample ImGuiDataType_Float
+#elif DSP_DOUBLE_PRECISION
+#define ImGuiDataType_Sample ImGuiDataType_Double
+#endif
+
 
 using json=nlohmann::json;
 
@@ -51,15 +57,17 @@ class CurrentProjectContext{
 	void openFile(const std::string & filePath);
 	void newProject();
 	void saveFile();
-	void HandleShortcuts();
+	void computeSelectedNodes();
 	void ShowContextMenu();
 	void renderCurrentProjectWindow();
-	void buildLinks(ProjectObject & obj, yzrilyzr_util::ParamRegister & params);
+	void buildLinks(ProjectObject & obj, yzrilyzr_util::ClassRegister & params);
 	ProjectObject * findNode(int nodeId);
 	yzrilyzr_util::ParamReg * findParam(ProjectObject & obj, int attrId);
+	yzrilyzr_util::ParamReg * findParam(yzrilyzr_util::ClassRegister & params, int attrId);
 	yzrilyzr_util::ParamReg * findParam(int nodeId, int attrId);
 
-	void autoLayout();
+	void lockLayoutSelected(bool lock);
+	void deleteSelectedLinks();
 	void deleteSelected();
 	void copySelected();
 	void pasteSelected();
@@ -67,6 +75,6 @@ class CurrentProjectContext{
 	void saveAsSub(bool selectedOnly);
 };
 
-void name2obj(const yzrilyzr_lang::String & category, const yzrilyzr_lang::String & name, yzrilyzr_lang::String * name1, yzrilyzr_lang::String * category1, yzrilyzr_lang::String * showName, u_sp<yzrilyzr_util::ParamRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender);
+void name2obj(const yzrilyzr_lang::String & category, const yzrilyzr_lang::String & name, yzrilyzr_lang::String * name1, yzrilyzr_lang::String * category1, yzrilyzr_lang::String * showName, u_sp<yzrilyzr_util::ClassRegister> * obj, MenuRegister::RenderFunc * rfunc, bool * enableOriginalRender);
 json obj2json(yzrilyzr_collection::ArrayList<ProjectObject *> & arr, yzrilyzr_simplesynth::NoteProcPtr finalProcessor);
 void json2obj(json & j, yzrilyzr_collection::ArrayList<ProjectObject *> & arr);

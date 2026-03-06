@@ -6,7 +6,9 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(NoiseSrc, public NoteProcessor){
 	public:
 	NoiseSrc(){}
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
+	U_GET_CLASS_NAME(NoiseSrc)
+
 	};
 }

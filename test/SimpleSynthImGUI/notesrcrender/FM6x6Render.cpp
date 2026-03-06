@@ -1,10 +1,11 @@
-#include "NoteSrcRender.h"
+#include "../ParamHelper.h"
 #include "../ProjectObject.h"
 #include "../SimpleSynthProject.h"
-#include "synth/composed/Matrix6x6Modulation.h"
+#include "NoteSrcRender.h"
 #include "array/Array.hpp"
-#include "imgui.h"
 #include "imgui-knobs.h"
+#include "imgui.h"
+#include "synth/composed/Matrix6x6Modulation.h"
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_array;
@@ -15,6 +16,7 @@ bool renderMatrix(u_sp<Matrix6x6Modulation> paramRegPtr, int type){
 	u_index cols=MTX_SIZE + 2;
 	ImGuiKnobFlags knobFlags=ImGuiKnobFlags_NoTitle | ImGuiKnobFlags_NoInput;
 	ImGuiKnobVariant knobvariant=ImGuiKnobVariant_Tick;
+
 	if(ImGui::BeginTable("Matrix", cols)){
 		ImGui::TableNextRow();
 		for(u_index col=0; col < cols; col++){
@@ -76,7 +78,7 @@ bool renderMatrix(u_sp<Matrix6x6Modulation> paramRegPtr, int type){
 	return change;
 }
 void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	u_sp<Matrix6x6Modulation> paramRegPtr=std::dynamic_pointer_cast<Matrix6x6Modulation, ParamRegister>(obj.paramRegPtr);
+	u_sp<Matrix6x6Modulation> paramRegPtr=std::dynamic_pointer_cast<Matrix6x6Modulation, ClassRegister>(obj.paramRegPtr);
 	u_index MTX_SIZE=Matrix6x6Modulation::MATRIX_SIZE;
 	auto & data=obj.storeData;
 	if(obj.loadStoredData){
@@ -102,19 +104,23 @@ void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & 
 			}
 		}
 	}
+	ImGui::BeginChild("TabBarContainer", ImVec2(350, 220), false,
+					  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	if(ImGui::BeginTabBar("OpTab", ImGuiTabBarFlags_None)){
 		for(u_index i=0;i < MTX_SIZE;i++){
 			String tabstr=String("OP ") + std::to_string(i + 1);
 			FMOp & op=paramRegPtr->op[i];
 			if(ImGui::BeginTabItem(tabstr.c_str(UTF8))){
-				ProjectObject::renderParams(ctx, static_cast<ParamRegister &>(op).RegisteredParams);
+				renderParams(ctx, static_cast<ClassRegister &>(op).RegisteredParams);
 				ImGui::EndTabItem();
 			}
 		}
 		ImGui::EndTabBar();
 	}
-	ImGui::Separator();
+	ImGui::EndChild();
 	bool change=false;
+	ImGui::BeginChild("TabBarContainer2", ImVec2(350, 320), false,
+					  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 	if(ImGui::BeginTabBar("MatrixTab", ImGuiTabBarFlags_None)){
 		if(ImGui::BeginTabItem(ctx.LANG.getc("module.matrix_6x6_modulation.fm"))){
 			change=renderMatrix(paramRegPtr, 0) || change;
@@ -126,6 +132,7 @@ void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & 
 		}
 		ImGui::EndTabBar();
 	}
+	ImGui::EndChild();
 	if(change){
 		u_sp<SampleArray> fmArr=mksp<SampleArray>(MTX_SIZE * MTX_SIZE);
 		u_index k=0;

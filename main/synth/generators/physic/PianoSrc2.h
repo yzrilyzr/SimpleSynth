@@ -22,10 +22,10 @@ namespace yzrilyzr_simplesynth{
 	bool onState[CHANNEL_MAX_NOTE_ID];
 	public:
 	PianoSrc2();
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	void init(ChannelConfig & cfg) override;
 	u_sample postProcess(u_sample output) override;
-	bool noMoreData(Note & note) override;
+	bool noMoreData(const Note & note) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	NoteProcPtr clone() override;
 	void noteOn(ChannelConfig & cfg, s_note_id_i id, s_note_vel vel)override;

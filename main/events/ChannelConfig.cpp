@@ -20,6 +20,7 @@ namespace yzrilyzr_simplesynth{
 		Legato=other.Legato;
 		Sostenuto=other.Sostenuto;
 		SoftPedal=other.SoftPedal;
+		DrumChannelDisable=other.DrumChannelDisable;
 		Modulation=other.Modulation;
 		ModRate=other.ModRate;
 		ModDelay=other.ModDelay;
@@ -93,6 +94,7 @@ namespace yzrilyzr_simplesynth{
 		Sustain=false;
 		Legato=false;
 		SoftPedal=false;
+		DrumChannelDisable=false;
 		MonoMode=false;
 		Sostenuto=false;
 		Portamento=false;

@@ -15,8 +15,8 @@ namespace yzrilyzr_simplesynth{
 		NeighbourMixAmpSet();
 		NeighbourMixAmpSet *add(int note, NoteProcPtr noteProcessor);
 		yzrilyzr_lang::String toString() const override;
-		bool noMoreData(Note &note) override;
+		bool noMoreData(const Note & note) override;
 		NeighbourMixAmpSet *build();
-		u_sample getAmp(Note &note) override;
+		u_sample getAmp(const Note & note) override;
 	};
 }

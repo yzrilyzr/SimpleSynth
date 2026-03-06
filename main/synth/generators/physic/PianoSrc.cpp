@@ -84,7 +84,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	u_sample PianoSrc::getAmp(Note & note){
+	u_sample PianoSrc::getAmp(const Note & note){
 		int id=note.id;
 		if(id < 21 || id>108)return 0;
 		PianoKey & pianoKey=*getData(note);
@@ -116,7 +116,7 @@ namespace yzrilyzr_simplesynth{
 		output=soundboard.procDsp(output);
 		return output;
 	}
-	bool PianoSrc::noMoreData(Note & note){
+	bool PianoSrc::noMoreData(const Note & note){
 		int id=note.id;
 		if(id < 21 || id>108)return true;
 		PianoKey & pianoKey=*getData(note);
@@ -129,7 +129,7 @@ namespace yzrilyzr_simplesynth{
 		return mksp<PianoSrc>();
 	}
 	void PianoSrc::cc(ChannelConfig & cfg, ChannelControl & cc){}
-	PianoKey * PianoSrc::init(PianoKey * data, Note & note){
+	PianoKey * PianoSrc::init(PianoKey * data, const Note & note){
 		if(data == nullptr){
 			data=new PianoKey();
 		}

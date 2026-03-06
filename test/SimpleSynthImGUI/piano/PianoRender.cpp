@@ -10,18 +10,19 @@
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
 void pianoRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	u_sp<PianoSrc> paramRegPtr=std::static_pointer_cast<PianoSrc, ParamRegister>(obj.paramRegPtr);
+	u_sp<PianoSrc> paramRegPtr=spsc<PianoSrc, ClassRegister>(obj.paramRegPtr);
 	PianoSoundBoardParameters & sb=paramRegPtr->soundboardParameters;
 	ImGui::Text("Soundboard");
 	static double FREQ_MIN=10, FREQ_MAX=20000;
 	bool c=false;
-	c=ImGui::SliderScalar("ReverbLP", ImGuiDataType_Double, &sb.c1, &FREQ_MIN, &FREQ_MAX) || c;
-	c=ImGui::SliderScalar("ReverbHP", ImGuiDataType_Double, &sb.c3, &FREQ_MIN, &FREQ_MAX) || c;
-	c=ImGui::SliderScalar("LOW", ImGuiDataType_Double, &sb.eq1, &FREQ_MIN, &FREQ_MAX) || c;
-	c=ImGui::SliderScalar("MID", ImGuiDataType_Double, &sb.eq2, &FREQ_MIN, &FREQ_MAX) || c;
-	c=ImGui::SliderScalar("HIGH", ImGuiDataType_Double, &sb.eq3, &FREQ_MIN, &FREQ_MAX) || c;
-	c=ImGui::SliderScalar("Hi-Decay", ImGuiDataType_Double, &sb.eq4, &FREQ_MIN, &FREQ_MAX) || c;
-	c=ImGui::SliderScalar("LowPass", ImGuiDataType_Double, &sb.eq5, &FREQ_MIN, &FREQ_MAX) || c;
+	ImGui::PushItemWidth(200);
+	c=ImGui::SliderScalar("ReverbLP", ImGuiDataType_Sample, &sb.c1, &FREQ_MIN, &FREQ_MAX) || c;
+	c=ImGui::SliderScalar("ReverbHP", ImGuiDataType_Sample, &sb.c3, &FREQ_MIN, &FREQ_MAX) || c;
+	c=ImGui::SliderScalar("LOW", ImGuiDataType_Sample, &sb.eq1, &FREQ_MIN, &FREQ_MAX) || c;
+	c=ImGui::SliderScalar("MID", ImGuiDataType_Sample, &sb.eq2, &FREQ_MIN, &FREQ_MAX) || c;
+	c=ImGui::SliderScalar("HIGH", ImGuiDataType_Sample, &sb.eq3, &FREQ_MIN, &FREQ_MAX) || c;
+	c=ImGui::SliderScalar("Hi-Decay", ImGuiDataType_Sample, &sb.eq4, &FREQ_MIN, &FREQ_MAX) || c;
+	c=ImGui::SliderScalar("LowPass", ImGuiDataType_Sample, &sb.eq5, &FREQ_MIN, &FREQ_MAX) || c;
 	ctx.paramChange=ctx.paramChange || c;
 	bool d=false;
 	ImGui::Text("String");
@@ -86,4 +87,6 @@ void pianoRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 		}
 	}
 	ctx.paramChange=ctx.paramChange || d;
+	ImGui::PopItemWidth();
+
 }

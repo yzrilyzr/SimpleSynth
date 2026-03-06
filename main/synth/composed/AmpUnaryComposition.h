@@ -13,9 +13,10 @@ namespace yzrilyzr_simplesynth{
 	inline u_sample postProcess(u_sample output) override{
 		return a->postProcess(output);
 	}
-	inline bool noMoreData(Note & note) override{
+	inline bool noMoreData(const Note & note) override{
 		return a->noMoreData(note);
 	}
 	void cc(ChannelConfig & cfg, ChannelControl & cc)override;
+	void onRegisterParam() override;
 	};
 }

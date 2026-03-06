@@ -15,7 +15,7 @@ namespace yzrilyzr_simplesynth{
 	NoteVelocityMix();
 	NoteVelocityMix(NoteProcPtr a, u_normal_01 mix);
 	NoteVelocityMix(NoteProcPtr a, s_note_vel ovrd,u_normal_01 mix);
-	u_sample getAmp(Note & note)override;
+	u_sample getAmp(const Note & note)override;
 	yzrilyzr_lang::String toString() const override;
 	};
 }

@@ -54,12 +54,13 @@ namespace yzrilyzr_simplesynth{
 		std::vector<MSEPoint> points;
 		MultiStageEnvelope();
 		MultiStageEnvelope(const std::vector<MSEPoint> &points);
-		bool noMoreData(Note & note) override;
+		bool noMoreData(const Note & note) override;
 		NoteProcPtr clone() override;
 		void init(ChannelConfig & cfg) override;
-		u_sample getAmp(Note & note) override;
+		u_sample getAmp(const Note & note) override;
 		yzrilyzr_lang::String toString() const override;
-		MultiStageEnvelopeKeyData * init(MultiStageEnvelopeKeyData * data, Note & note) override;
+		MultiStageEnvelopeKeyData * init(MultiStageEnvelopeKeyData * data, const Note & note) override;
+		U_GET_CLASS_NAME(MultiStageEnvelope)
 
 		private:
 		u_time calcLoopTime(u_time curTime);

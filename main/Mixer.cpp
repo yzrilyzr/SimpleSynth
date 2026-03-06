@@ -138,7 +138,7 @@ namespace yzrilyzr_simplesynth{
 				mix->lastActiveTime=now;
 			}
 			if(!mix->alwaysActive && now - mix->lastActiveTime > idleChannelLiveTime){
-				std::cout << "Removed Idle Channel:" << mix->getChannelId() << std::endl;
+				std::cout << "Removed Idle Channel:" << mix->getChannelID() << std::endl;
 				channelItr->remove();
 			}
 		}
@@ -147,7 +147,7 @@ namespace yzrilyzr_simplesynth{
 			memset(thisOutput, 0, blen * sizeof(u_sample));
 			for(auto & c : channels){
 				u_sample * channelOutput=c->output[ch]._array;
-				bool isDrumSet=c->isDrumSetChannel();
+				bool isDrumSet=IMixer::isDrumSetChannel(c->getConfig(), c->getChannelID());
 				if(isDrumSet)continue;
 				for(u_index sample=0;sample < blen;sample++){
 					thisOutput[sample]+=channelOutput[sample];
@@ -156,7 +156,7 @@ namespace yzrilyzr_simplesynth{
 			if(tUseLimiter) tLimiter[ch]->procBlock(thisOutput, blen);
 			for(auto & c : channels){
 				u_sample * channelOutput=c->output[ch]._array;
-				bool isDrumSet=c->isDrumSetChannel();
+				bool isDrumSet=IMixer::isDrumSetChannel(c->getConfig(), c->getChannelID());
 				if(!isDrumSet)continue;
 				for(u_index sample=0;sample < blen;sample++){
 					thisOutput[sample]+=channelOutput[sample];
@@ -199,7 +199,7 @@ namespace yzrilyzr_simplesynth{
 	std::vector<u_sp<IChannel>> Mixer::getAllChannels()const{
 		std::vector<u_sp<IChannel>> chann;
 		for(auto & i : channels){
-			chann.emplace_back(spdc<IChannel>(i));
+			chann.emplace_back(spsc<IChannel>(i));
 		}
 		return chann;
 	}
@@ -220,11 +220,11 @@ namespace yzrilyzr_simplesynth{
 		if(res == midiChannelMap.end()){
 			auto channel=mksp<Channel>();
 			channel->setName(name + " #" + std::to_string(channelID));
-			if(IMixer::isDrumSetChannel(channelID)) channel->setSustain(true);
+			if(IMixer::isDrumSetChannel(channel->getConfig(), channelID)) channel->setSustain(true);
 			setMIDIChannel(name, channelID, channel);
-			return spdc<IChannel>(channel);
+			return spsc<IChannel>(channel);
 		}
-		return spdc<IChannel>(res->second);
+		return spsc<IChannel>(res->second);
 	}
 	u_sp<yzrilyzr_dsp::DSPChain> * Mixer::getEQ(){
 		return finalEQ;
@@ -319,11 +319,11 @@ namespace yzrilyzr_simplesynth{
 	}
 	void Mixer::sendInstantEvent(ChannelEvent * event){
 		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
-		u_sp<Channel> ch=spdc<Channel>(getMIDIChannel(event->groupName, event->channelID));
+		u_sp<Channel> ch=spsc<Channel>(getMIDIChannel(event->groupName, event->channelID));
 		ch->sendInstantEvent(event);
 	}
 	void Mixer::postEvent(ChannelEvent * event, u_time startAt){
-		u_sp<Channel> ch=spdc<Channel>(getMIDIChannel(event->groupName, event->channelID));
+		u_sp<Channel> ch=spsc<Channel>(getMIDIChannel(event->groupName, event->channelID));
 		ch->sendPostEvent(event, startAt);
 	}
 	bool Mixer::hasMIDIChannel(const String & groupName, s_midichannel_id channelID){
@@ -338,10 +338,10 @@ namespace yzrilyzr_simplesynth{
 		uniqueID=0;
 	}
 	void NotePool::onReuse(Note * note){}
+	void NotePool::onClear(){ uniqueID=0; }
 	void Channel::setChannelId(s_midichannel_id id){
 		this->channelID=id;
-		if(IMixer::isDrumSetChannel(id)){
-			setDrumSetChannel(true);
+		if(IMixer::isDrumSetChannel(getConfig(), id)){
 			channelConfig.setNoteProcessor(channelConfig.instrument->getDrumSet(channelConfig.Bank, getSampleRate()));
 		}
 	}
@@ -523,14 +523,14 @@ namespace yzrilyzr_simplesynth{
 			p->setChannel(1);
 			p->procBlock(s_outputR, blen);
 		} else{
-			spdc<AmpMultiply>(panner[0])->setValue(Util::clamp01(1 - channelConfig.Pan));
-			spdc<AmpMultiply>(panner[1])->setValue(Util::clamp01(1 + channelConfig.Pan));
-			spdc<DSP>(dspChain[0])->procBlock(s_outputL, blen);
-			spdc<DSP>(dspChain[1])->procBlock(s_outputR, blen);
+			spsc<AmpMultiply>(panner[0])->setValue(Util::clamp01(1 - channelConfig.Pan));
+			spsc<AmpMultiply>(panner[1])->setValue(Util::clamp01(1 + channelConfig.Pan));
+			spsc<DSP>(dspChain[0])->procBlock(s_outputL, blen);
+			spsc<DSP>(dspChain[1])->procBlock(s_outputR, blen);
 		}
 		if(channelConfig.mixer->isUseLimiter()){
-			spdc<DSP>(limiter[0])->procBlock(s_outputL, blen);
-			spdc<DSP>(limiter[1])->procBlock(s_outputR, blen);
+			spsc<DSP>(limiter[0])->procBlock(s_outputL, blen);
+			spsc<DSP>(limiter[1])->procBlock(s_outputR, blen);
 		}
 		if(isnan(s_outputL[0]) || isnan(s_outputL[1])){
 			std::cout << "Output NaN" << std::endl;
@@ -663,7 +663,7 @@ namespace yzrilyzr_simplesynth{
 		if(Note::idInvalid(note.id)) return;
 		channelConfig.noteHoldMap[note.id]=false;
 		//延音或选择延音状态，忽略关闭
-		if(channelConfig.Sustain || channelConfig.sostenutoLock[note.id] || isDrumSet){
+		if(channelConfig.Sustain || channelConfig.sostenutoLock[note.id]){
 			return;
 		}
 		if(channelConfig.noteProcessor != nullptr)channelConfig.noteProcessor->noteOff(channelConfig, note.id, note.velocity);
@@ -913,9 +913,8 @@ namespace yzrilyzr_simplesynth{
 		} else if(instr == nullptr){
 			std::cout << "Midi Instrument not set" << std::endl;
 			src=SynthUtil::getDefault();
-		} else if(IMixer::isDrumSetChannel(channelID)){
-			src=instr->getDrumSet(channelConfig.Bank, getSampleRate());
-			setDrumSetChannel(true);
+		} else if(IMixer::isDrumSetChannel(getConfig(), channelID)){
+			src=instr->getDrumSet(channelConfig.Bank, getSampleRate());			
 		} else{
 			src=instr->get(channelConfig.Bank, event.id, getSampleRate());
 			if(src == nullptr){
@@ -980,13 +979,13 @@ namespace yzrilyzr_simplesynth{
 		this->channelConfig.NoteShift=noteShift;
 	}
 	Chorus & Channel::getChorus(u_index ch)const{
-		return *(spdc<Chorus>(choruser[ch]));
+		return *(spsc<Chorus>(choruser[ch]));
 	}
 	Phaser & Channel::getPhaser(u_index ch)const{
-		return *(spdc<Phaser>(phaser[ch]));
+		return *(spsc<Phaser>(phaser[ch]));
 	}
 	Freeverb & Channel::getReverb(u_index ch)const{
-		return *(spdc<Freeverb>(reverber[ch]));
+		return *(spsc<Freeverb>(reverber[ch]));
 	}
 	void Channel::setSostenuto(bool sostenuto){
 		this->channelConfig.Sostenuto=sostenuto;
@@ -1055,7 +1054,7 @@ namespace yzrilyzr_simplesynth{
 	u_normal_01_f Channel::getBreath() const{
 		return channelConfig.Breath;
 	}
-	s_midichannel_id Channel::getChannelId() const{
+	s_midichannel_id Channel::getChannelID() const{
 		return channelID;
 	}
 	u_normal_01_f Channel::getPan() const{
@@ -1075,12 +1074,6 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_normal_01_f Channel::getDetune() const{
 		return channelConfig.Detune;
-	}
-	bool Channel::isDrumSetChannel()const{
-		return isDrumSet;
-	}
-	void Channel::setDrumSetChannel(bool value){
-		isDrumSet=value;
 	}
 	void Channel::checkSostenuto(){
 		// 检查选择性延音状态变化

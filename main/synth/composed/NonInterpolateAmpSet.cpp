@@ -10,7 +10,7 @@ namespace yzrilyzr_simplesynth{
 	bool NonInterpolateAmpSet::has(int note)const{
 		return set[note] != nullptr;
 	}
-	u_sample NonInterpolateAmpSet::getAmp(Note & note){
+	u_sample NonInterpolateAmpSet::getAmp(const Note & note){
 		NoteProcPtr src=set[note.id];
 		if(src == nullptr) return 0;
 		return src->getAmp(note);
@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 			src->init(cfg);
 		}
 	}
-	bool NonInterpolateAmpSet::noMoreData(Note & note){
+	bool NonInterpolateAmpSet::noMoreData(const Note & note){
 		NoteProcPtr src=set[note.id];
 		if(src == nullptr) return true;
 		return src->noMoreData(note);

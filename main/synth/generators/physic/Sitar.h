@@ -23,12 +23,12 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg) override;
 	u_sample postProcess(u_sample output) override;
 	NoteProcPtr clone() override;
-	u_sample getAmp(Note & note) override;
-	yzrilyzr_dsp::RingBufferSample * init(yzrilyzr_dsp::RingBufferSample * buffer, Note & note) override;
+	u_sample getAmp(const Note & note) override;
+	yzrilyzr_dsp::RingBufferSample * init(yzrilyzr_dsp::RingBufferSample * buffer, const Note & note) override;
 	private:
-	u_freq getSetFreq(Note & note);
+	u_freq getSetFreq(const Note & note);
 	u_sample procKS(yzrilyzr_dsp::RingBufferSample & buffer, u_sample alpha, u_sample feedback, u_sample input, u_sample delayLen);
-	void initBuffer(yzrilyzr_dsp::RingBufferSample & buffer, Note & note);
-	void initBurstRandom(yzrilyzr_dsp::RingBufferSample & buffer, Note & note, u_sample len1);
+	void initBuffer(yzrilyzr_dsp::RingBufferSample & buffer, const Note & note);
+	void initBurstRandom(yzrilyzr_dsp::RingBufferSample & buffer, const Note & note, u_sample len1);
 	};
 }

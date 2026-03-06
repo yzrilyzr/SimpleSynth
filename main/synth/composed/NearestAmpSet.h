@@ -17,8 +17,8 @@ namespace yzrilyzr_simplesynth{
 	NearestAmpSet(u_sp<PhaseSrc> freq);
 	NearestAmpSet();
 	yzrilyzr_lang::String toString() const override;
-	bool noMoreData(Note & note) override;
-	u_sample getAmp(Note & note) override;
+	bool noMoreData(const Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	};
 	EBCLASS(NearestAmpSetBuilder){
 	private:

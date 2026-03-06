@@ -4,3 +4,4 @@
 
 void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj);
 void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj);
+void GraphEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj);

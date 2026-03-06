@@ -18,6 +18,14 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
+	void BiquadFilterSrc::onRegisterParam(){
+		RegisterUtil::registerParamSrc(*this, "Src", &src);
+		RegisterUtil::registerParamSrc(*this, "FreqEnv", &freqEnv);
+		RegisterUtil::registerParamSrc(*this, "Q Env", &qEnv);
+		RegisterUtil::registerParamSrc(*this, "Gain Env", &gainEnv);
+		static const char * type_to_name[9]={"LOWPASS", "HIGHPASS", "BANDPASS", "BANDSTOP", "NOTCH", "LOWSHELF", "HIGHSHELF", "BELL", "ALLPASS"};
+		registerParamEnum("Type", (int *)&type, type_to_name, 9);
+	}
 	BiquadFilterSrc::BiquadFilterSrc(NoteProcPtr src, NoteProcPtr freqEnv, NoteProcPtr qEnv, FilterPassType type) : src(src),
 		freqEnv(freqEnv),
 		qEnv(qEnv),
@@ -28,12 +36,7 @@ namespace yzrilyzr_simplesynth{
 		gainEnv(gainEnv),
 		type(type){}
 	BiquadFilterSrc::BiquadFilterSrc() :BiquadFilterSrc(nullptr, nullptr, nullptr, FilterPassType::LOWPASS){
-		registerParamSrc("Src", &src);
-		registerParamSrc("FreqEnv", &freqEnv);
-		registerParamSrc("Q Env", &qEnv);
-		registerParamSrc("Gain Env", &gainEnv);
-		static const char * type_to_name[9]={"LOWPASS", "HIGHPASS", "BANDPASS", "BANDSTOP", "NOTCH", "LOWSHELF", "HIGHSHELF", "BELL", "ALLPASS"};
-		registerParamEnum("Type", (int *)&type, type_to_name, 9);
+		
 	}
 	void BiquadFilterSrc::init(ChannelConfig & cfg){
 		this->cfg=&cfg;
@@ -55,7 +58,7 @@ namespace yzrilyzr_simplesynth{
 		qEnv->cc(cfg, cc);
 		if(gainEnv != nullptr)gainEnv->cc(cfg,cc);
 	}
-	u_sample BiquadFilterSrc::getAmp(Note & note){
+	u_sample BiquadFilterSrc::getAmp(const Note & note){
 		s_note_id freqID=static_cast<s_note_id>(freqEnv->getAmp(note));
 		u_freq freqValue=cfg->tuning->getFrequencyByID(freqID);
 		freqValue=Util::clamp(freqValue, static_cast<u_freq>(0.0), static_cast<u_freq>(sampleRate / 2.1));
@@ -69,13 +72,13 @@ namespace yzrilyzr_simplesynth{
 		y=iir.procDsp(y);
 		return y;
 	}
-	bool BiquadFilterSrc::noMoreData(Note & note){
+	bool BiquadFilterSrc::noMoreData(const Note & note){
 		return src->noMoreData(note);
 	}
 	NoteProcPtr BiquadFilterSrc::clone(){
 		return mksp<BiquadFilterSrc>(src->clone(), freqEnv->clone(), qEnv->clone(), type);
 	}
-	BiquadFilterSrcKeyData * BiquadFilterSrc::init(BiquadFilterSrcKeyData * data, Note & note){
+	BiquadFilterSrcKeyData * BiquadFilterSrc::init(BiquadFilterSrcKeyData * data, const Note & note){
 		if(data == nullptr){
 			data=new BiquadFilterSrcKeyData();
 		}

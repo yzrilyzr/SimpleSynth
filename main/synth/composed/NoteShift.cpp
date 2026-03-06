@@ -11,20 +11,21 @@ namespace yzrilyzr_simplesynth{
 		static int32_t min=-128, max=128;
 		registerParam("Shift", ParamType::Double, &shift, &min, &max);
 	}
-	u_sample NoteShift::getAmp(Note & note){
+	u_sample NoteShift::getAmp(const Note & note){
 		s_phase t=note.phaseSynth;
 		u_freq freq=note.cfg->tuning->getFrequencyByID(note.id + shift);
 		NoteShiftKeyData * data=getData(note);
 		data->freqTimeSynth+=freq * note.cfg->deltaTime;
-		note.phaseSynth=data->freqTimeSynth;
-		u_sample y=a->getAmp(note);
-		note.phaseSynth=t;
+		auto & mut_note=const_cast<Note &>(note);
+		mut_note.phaseSynth=data->freqTimeSynth;
+		u_sample y=a->getAmp(mut_note);
+		mut_note.phaseSynth=t;
 		return y;
 	}
 	NoteProcPtr NoteShift::clone(){
 		return mksp<NoteShift>(a, shift);
 	}
-	NoteShiftKeyData * NoteShift::init(NoteShiftKeyData * data, Note & note){
+	NoteShiftKeyData * NoteShift::init(NoteShiftKeyData * data, const Note & note){
 		if(data == nullptr) data=new NoteShiftKeyData();
 		data->freqTimeSynth=0;
 		return data;

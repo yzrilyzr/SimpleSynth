@@ -11,5 +11,7 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override;
 	void init(ChannelConfig & cfg) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(AmpBinaryComposition);
 	};
 }

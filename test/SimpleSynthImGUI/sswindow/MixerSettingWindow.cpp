@@ -1,4 +1,4 @@
-#include "../LangToEnum.h"
+#include "util/Lang.h"
 #include "../SimpleSynthProject.h"
 #include "../SimpleSynthWindow.h"
 #include "interface/IChannel.h"
@@ -21,6 +21,7 @@ using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
+using namespace yzrilyzr_util;
 void mixerSettingWindow(CurrentProjectContext & ctx){
 	ImGui::Begin(ctx.LANG.getc("window.mixer.title"));
 	IMixer & mixer=*ctx.mixer;
@@ -59,8 +60,7 @@ void mixerSettingWindow(CurrentProjectContext & ctx){
 		else if(tuningType == 7)t=mksp<Young>();
 		mixer.getGlobalConfig().setNoteTuning(t);
 		for(auto channel : mixer.getAllChannels()){
-			TuningChange * event=new TuningChange();
-			event->value=t;
+			TuningChange * event=new TuningChange(t);
 			event->channelID=channel->getChannelID();
 			event->groupName=channel->getGroupName();
 			mixer.sendInstantEvent(event);

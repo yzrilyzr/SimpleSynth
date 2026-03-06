@@ -39,8 +39,8 @@ namespace yzrilyzr_simplesynth{
 	}
 	void MixerSequence::postToMixer(IMixer * mixer, u_time startDelay, u_time sequenceOffset, const yzrilyzr_lang::String & groupName)const{
 		if(instrument != nullptr) mixer->getGlobalConfig().setInstrumentProvider(instrument);
-		u_time t1=mixer->getCurrentTime() + startDelay - sequenceOffset;
 		if(auto m1=dynamic_cast<Mixer *>(mixer)){
+			u_time t1=mixer->getCurrentTime() + startDelay - sequenceOffset;
 			for(auto & entry : channelEvents){
 				s_midichannel_id index=entry.first;
 				auto & events=entry.second;
@@ -63,16 +63,19 @@ namespace yzrilyzr_simplesynth{
 				}
 			}
 			std::sort(eventsv.begin(), eventsv.end(), compareMixerEvents);
+			u_time firstNoteAppearTime=0;
 			for(auto & entry : eventsv){
 				auto ev=entry.event;
 				if(ev->getType() == EventType::NOTE_ON){
-					t1-=ev->startAtTime;
+					firstNoteAppearTime=ev->startAtTime;
 					break;
 				}
 			}
+			u_time curTime=mixer->getCurrentTime();
+			u_time postAtTime=startDelay - sequenceOffset - firstNoteAppearTime;
 			for(auto & entry : eventsv){
 				auto ev=entry.event;
-				if(ev->startAtTime < sequenceOffset){
+				if(ev->startAtTime + postAtTime < 0){
 					auto et=ev->getType();
 					switch(et){
 						case EventType::NOTE_ON:
@@ -82,7 +85,7 @@ namespace yzrilyzr_simplesynth{
 							continue;
 					}
 				}
-				m2->postEvent(ev, ev->startAtTime + t1);
+				m2->postEvent(ev, ev->startAtTime + curTime + postAtTime);
 			}
 		}
 	}

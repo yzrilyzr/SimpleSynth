@@ -1,4 +1,4 @@
-﻿#include "LangToEnum.h"
+﻿#include "util/Lang.h"
 #include "MenuRegister.hpp"
 #include "MixerSequence.h"
 #include "ProjectObject.h"
@@ -30,7 +30,7 @@
 #include "tuning/Vallotti.h"
 #include "tuning/Werckmeister.h"
 #include "tuning/Young.h"
-#include "util/ParamRegister.h"
+#include "util/ClassRegister.h"
 #include "yzrutil.h"
 #include <cfloat>
 #include <cstdint>
@@ -97,7 +97,8 @@ void mainMenuBar(const char * name, MenuRegister & np, CurrentProjectContext & c
 						proj->name=entry.name;
 						proj->showName=entry.showName;
 						proj->category=entry.category;
-						proj->paramRegPtr=std::static_pointer_cast<ParamRegister>(entry.cfunc());
+						proj->paramRegPtr=spsc<ClassRegister>(entry.cfunc());
+						proj->paramRegPtr->registerParams();
 						proj->renderFunc=entry.rfunc;
 						proj->enableOriginalRender=entry.enableOriginalRender;
 						ctx.objects.add(proj);
@@ -113,15 +114,16 @@ void mainMenuBar(const char * name, MenuRegister & np, CurrentProjectContext & c
 void instrumentSourceWindow(CurrentProjectContext & ctx){
 	IMixer & mixer=*ctx.mixer;
 	static File folderPath("instrument");
-	static std::vector<File> fileList;
+	static Array<File> fileList;
 	static bool initRefresh=true;
 	static int select=-1;
 	ImGui::Begin(ctx.LANG.getc("window.instrument.title"));
 	if(ImGui::Button(ctx.LANG.getc("window.instrument.refresh")) || initRefresh){
 		initRefresh=false;
 		fileList=folderPath.listFiles();
-		fileList.emplace_back(File(ctx.LANG.get("window.instrument.default")));
-		fileList.emplace_back(File(ctx.LANG.get("window.instrument.chip")));
+		fileList=Arrays::copyOf(fileList, fileList.length+2);
+		fileList[fileList.length-2]=(File(ctx.LANG.get("window.instrument.default")));
+		fileList[fileList.length-1]=(File(ctx.LANG.get("window.instrument.chip")));
 	}
 	if(ImGui::BeginListBox(ctx.LANG.getc("window.instrument.list_title"))){
 		int i=0;

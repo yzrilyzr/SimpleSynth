@@ -1,7 +1,7 @@
 #include "LuaNoteProcessor.h"
 #include "yzrutil.h"
 #include "SimpleSynth.h"
-#include "util/ParamRegister.h"
+#include "util/ClassRegister.h"
 #include "events/ChannelConfig.h"
 #include "lang/Exception.h"
 #include "events/Note.h"
@@ -179,7 +179,7 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	u_sample LuaNoteProcessor::getAmp(Note & note){
+	u_sample LuaNoteProcessor::getAmp(const Note & note){
 		if(!luaInitialized || luaGetAmpRef == LUA_NOREF){
 			return 0.0;
 		}
@@ -215,7 +215,7 @@ namespace yzrilyzr_simplesynth{
 		return result;
 	}
 
-	bool LuaNoteProcessor::noMoreData(Note & note){
+	bool LuaNoteProcessor::noMoreData(const Note & note){
 		if(!luaInitialized || luaNoMoreDataRef == LUA_NOREF){
 			return NoteProcessor::noMoreData(note);
 		}
@@ -276,7 +276,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	// Lua绑定辅助方法实现
-	void LuaNoteProcessor::pushNoteToLua(Note & note){
+	void LuaNoteProcessor::pushNoteToLua(const Note & note){
 		lua_newtable(L);
 		// 这里添加Note对象的属性到Lua表
 		// 例如：频率、音量、相位等

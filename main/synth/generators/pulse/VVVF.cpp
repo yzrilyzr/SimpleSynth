@@ -8,9 +8,9 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	VVVF::VVVF() : VVVF(nullptr){
-		registerParamFreq("fTri", &fTri);
-		registerParamFreq("fSin", &fSin);
-		registerParamNormal01("vSine", &vSine);
+		RegisterUtil::registerParamFreq(*this,"fTri", &fTri);
+		RegisterUtil::registerParamFreq(*this,"fSin", &fSin);
+		RegisterUtil::registerParamNormal01(*this,"vSine", &vSine);
 		static int32_t min=0, max=128;
 		registerParam("sync", ParamType::Int, &sync, &min, &max);
 	}
@@ -37,7 +37,7 @@ namespace yzrilyzr_simplesynth{
 			}
 		}
 	}
-	u_sample VVVF::getAmp(Note & note){
+	u_sample VVVF::getAmp(const Note & note){
 		VVVFKeyData * data=getData(note);
 		u_time deltaTime=note.cfg->deltaTime;
 		u_freq fTri1=fTri;
@@ -68,7 +68,7 @@ namespace yzrilyzr_simplesynth{
 		int v2=vSinN > vTri?1:-1;
 		return (v1 - v2) * note.velocitySynth;
 	}
-	VVVFKeyData * VVVF::init(VVVFKeyData * data, Note & note){
+	VVVFKeyData * VVVF::init(VVVFKeyData * data, const Note & note){
 		if(data == nullptr) data=new VVVFKeyData();
 		data->pSin=0;
 		data->pTri=0;

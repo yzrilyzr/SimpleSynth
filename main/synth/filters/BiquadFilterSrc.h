@@ -33,10 +33,13 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg) override;
 	u_sample postProcess(u_sample output) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
-	u_sample getAmp(Note & note) override;
-	bool noMoreData(Note & note) override;
+	u_sample getAmp(const Note & note) override;
+	bool noMoreData(const Note & note) override;
 	NoteProcPtr clone() override;
-	BiquadFilterSrcKeyData * init(BiquadFilterSrcKeyData * data, Note & note) override;
+	BiquadFilterSrcKeyData * init(BiquadFilterSrcKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(BiquadFilterSrc);
+
 	};
 }

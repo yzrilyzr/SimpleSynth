@@ -9,6 +9,15 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
+	void SimpleDrumAmp::onRegisterParam(){
+		RegisterUtil::registerParamFreq(*this, "StartFreq", &startFreq);
+		RegisterUtil::registerParamFreq(*this, "EndFreq", &endFreq);
+		RegisterUtil::registerParamTime(*this, "Duration", &duration);
+		static int min=0, max=1;
+		registerParam("Mode", ParamType::Int, &mode, &min, &max);
+		RegisterUtil::registerParamSrc(*this, "Src", &src);
+		registerParamInterpolator("Curve", &curve);
+	}
 	SimpleDrumAmp::SimpleDrumAmp(u_freq startFreq, u_freq endFreq, u_time duration) : SimpleDrumAmp(mksp<SineWave>(), startFreq, endFreq, duration){}
 	SimpleDrumAmp::SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration) : SimpleDrumAmp(osc, startFreq, endFreq, duration, MODE_FIXED, Pow(-5)){}
 	SimpleDrumAmp::SimpleDrumAmp(NoteProcPtr osc, u_freq startFreq, u_freq endFreq, u_time duration, int mode, u_sp<Interpolator> curve){
@@ -25,16 +34,8 @@ namespace yzrilyzr_simplesynth{
 																																						  duration,
 																																						  MODE_FIXED,
 																																						  curve){}
-	SimpleDrumAmp::SimpleDrumAmp() : SimpleDrumAmp(mksp<SineWave>(), 200, 50, 0.3){
-		registerParamFreq("StartFreq", &startFreq);
-		registerParamFreq("EndFreq", &endFreq);
-		registerParamTime("Duration", &duration);
-		static int min=0, max=1;
-		registerParam("Mode", ParamType::Int, &mode, &min, &max);
-		registerParamSrc("Src", &src);
-		registerParamInterpolator("Curve", &curve);
-	}
-	u_sample SimpleDrumAmp::getAmp(Note & note){
+	SimpleDrumAmp::SimpleDrumAmp() : SimpleDrumAmp(mksp<SineWave>(), 200, 50, 0.3){}
+	u_sample SimpleDrumAmp::getAmp(const Note & note){
 		u_time timePassed=note.passedTime;
 		if(note.passedTime > duration) return 0;
 		u_time x=Util::clamp01(timePassed / duration);
@@ -51,27 +52,28 @@ namespace yzrilyzr_simplesynth{
 		s_phase origP=note.phaseSynth;
 		u_freq origF=note.freqSynth;
 		//
-		note.freqSynth=freq;
-		note.phaseSynth=data->freqTimeSynth;
+		auto & mut_note=const_cast<Note &>(note);
+		mut_note.freqSynth=freq;
+		mut_note.phaseSynth=data->freqTimeSynth;
 		//
-		u_sample s=src->getAmp(note);
+		u_sample s=src->getAmp(mut_note);
 		//
-		note.freqSynth=origF;
-		note.phaseSynth=origP;
-		return s * note.velocitySynth;
+		mut_note.freqSynth=origF;
+		mut_note.phaseSynth=origP;
+		return s * mut_note.velocitySynth;
 	}
 	void SimpleDrumAmp::init(ChannelConfig & cfg){
 		NoteProcessor::init(cfg);
 		if(src == nullptr)throw NullPointerException("src == null");
 		src->init(cfg);
 	}
-	bool SimpleDrumAmp::noMoreData(Note & note){
+	bool SimpleDrumAmp::noMoreData(const Note & note){
 		return note.passedTime > duration || note.closed(*note.cfg);
 	}
 	NoteProcPtr SimpleDrumAmp::clone(){
 		return mksp<SimpleDrumAmp>(src->clone(), startFreq, endFreq, duration, mode, curve);
 	}
-	SimpleDrumAmpKeyData * SimpleDrumAmp::init(SimpleDrumAmpKeyData * data, Note & note){
+	SimpleDrumAmpKeyData * SimpleDrumAmp::init(SimpleDrumAmpKeyData * data, const Note & note){
 		if(data == nullptr) data=new SimpleDrumAmpKeyData();
 		data->freqTimeSynth=0;
 		return data;

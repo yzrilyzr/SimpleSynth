@@ -18,13 +18,14 @@ namespace yzrilyzr_simplesynth{
 	public:
 	~NoteDSP()=default;
 	NoteDSP() :AmpUnaryComposition(nullptr){
-		registerParamDSP("DSP", &dsp);
 	}
 	NoteDSP(NoteProcPtr a, u_sp<yzrilyzr_dsp::DSP> dsp);
 	void init(ChannelConfig & cfg) override;
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	NoteProcPtr clone() override;
+	void onRegisterParam()override;
 	yzrilyzr_lang::String toString() const override;
-	NoteDSPKeyData * init(NoteDSPKeyData * data, Note & note) override;
+	U_GET_CLASS_NAME(NoteDSP)
+	NoteDSPKeyData * init(NoteDSPKeyData * data, const Note & note) override;
 	};
 }

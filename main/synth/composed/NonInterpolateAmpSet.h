@@ -15,9 +15,9 @@ namespace yzrilyzr_simplesynth{
 	NonInterpolateAmpSet(){}
 	NonInterpolateAmpSet & add(int note, NoteProcPtr noteProcessor);
 	bool has(int note)const;
-	u_sample getAmp(Note & note)override;
+	u_sample getAmp(const Note & note)override;
 	void init(ChannelConfig & cfg)override;
-	bool noMoreData(Note & note)override;
+	bool noMoreData(const Note & note)override;
 	NoteProcPtr clone()override;
 	};
 }

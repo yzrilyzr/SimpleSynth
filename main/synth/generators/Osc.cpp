@@ -4,14 +4,15 @@
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	Osc::Osc(){
-		registerParamPhaseSrc("PhaseSrc", &_freq);
-		registerParamSrc("PM", &_pm);
-		registerParamSrc("LPM", &_lpm);
+	void Osc::onRegisterParam(){
+		RegisterUtil::registerParamPhaseSrc(*this,"PhaseSrc", &_freq);
+		RegisterUtil::registerParamSrc(*this, "PM", &_pm);
+		RegisterUtil::registerParamSrc(*this, "LPM", &_lpm);
 		static double pmMin=0, pmMax=10;
 		registerParam("PM Amp", ParamType::Double, &pmAmp, &pmMin, &pmMax);
 		registerParam("LPM Amp", ParamType::Double, &lpmAmp, &pmMin, &pmMax);
 	}
+	Osc::Osc(){}
 	Osc::Osc(u_sp<PhaseSrc> freq) :Osc(){
 		setPhaseSource(freq == nullptr?NotePhase:freq);
 	}

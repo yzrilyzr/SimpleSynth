@@ -1,4 +1,4 @@
-#include "../LangToEnum.h"
+#include "util/Lang.h"
 #include "../SimpleSynthProject.h"
 #include "../SimpleSynthWindow.h"
 #include "dsp/BiquadIIR.h"

@@ -3,6 +3,7 @@
 #include "interface/NoteProcessor.h"
 #include "synth/envelopers/AHDSREnvelop.h"
 #include "SimpleSynth.h"
+#include "SakuraExciter.h"
 #include "SynthUtil.h"
 #include "dsp/RingBuffer.h"
 #include "dsp/IIR.h"
@@ -22,46 +23,46 @@ namespace yzrilyzr_simplesynth{
 	public:
 	//exciter
 	NoteProcPtr exciter;
-	float noiseMixRatio=0.0f;
-	float noiseRate=1.0f;
-	float exciterHiCutFreq=1.0f;
-	float exciterHiCutQ=1.0f;
-	float exciterLowCutFreq=0.01f;
-	float exciterLowCutQ=1.0f;
-	AHDSREnvelop * exciterHiCutEnv=nullptr;
+	u_freq exciterHiCutFreq=1.0f;
+	u_sample exciterHiCutQ=1.0f;
+	u_freq exciterLowCutFreq=0.01f;
+	u_sample exciterLowCutQ=1.0f;
+	AHDSREnvelop exciterHiCutEnv;
 	//string
-	float stringVFeedback1=1.0f;
-	float stringVFeedback2=1.0f;
-	float stringVAlpha1=1.0f;
-	float stringVAlpha2=1.0f;
-	float stringFMul1=1.0f;
-	float stringFMul2=1.0f;
-	float stringMix=0.0f;
-	float stringOutputLevel=1.0f;
-	AHDSREnvelop * stringEnv=nullptr;
+	u_normal_11 stringVFeedback1=1.0f;
+	u_normal_11 stringVFeedback2=1.0f;
+	u_normal_01 stringVAlpha1=1.0f;
+	u_normal_01 stringVAlpha2=1.0f;
+	u_sample stringFMul1=1.0f;
+	u_sample stringFMul2=1.0f;
+	u_normal_11 stringMix=0.0f;
+	u_sample stringOutputLevel=1.0f;
+	AHDSREnvelop stringEnv;
 	//comb
-	float combPosition=1;
-	float combFeedback1=1;
-	float combFeedback2=-1;
-	float combOutputLevel=1;
+	u_normal_01 combPosition=1;
+	u_normal_11 combFeedback1=1;
+	u_normal_11 combFeedback2=-1;
+	u_sample combOutputLevel=1;
 	//resonator
-	float resonatorFeedback[8]={0};
-	u_sample resonatorFreq[8]={1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0};
+	u_normal_11 resonatorFeedback[8]={0};
+	u_freq resonatorFreq[8]={1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0, 1000.0};
 	bool resonatorEnabled[8]={false};
-	float resonatorOutputLevel=1;
+	u_sample resonatorOutputLevel=1;
 	//
-	yzrilyzr_dsp::RingBufferSample * resonators[8]={nullptr};
+	yzrilyzr_array::Array<yzrilyzr_dsp::RingBufferSample*> resonators;
 	u_sample sampleRate=0;
 	Sakura();
 	~Sakura();
 	void init(ChannelConfig & cfg) override;
 	u_sample postProcess(u_sample output) override;
 	NoteProcPtr clone() override;
-	u_sample getAmp(Note & note) override;
-	bool noMoreData(Note & note)override;
-	SakuraKeyData * init(SakuraKeyData * buffer, Note & note) override;
+	u_sample getAmp(const Note & note) override;
+	bool noMoreData(const Note & note)override;
+	SakuraKeyData * init(SakuraKeyData * buffer, const Note & note) override;
 	//static u_sample exciteClickFunc(s_phase mod);
-	u_sample procString(yzrilyzr_dsp::RingBufferSample & string, yzrilyzr_dsp::RingBufferSample & comb, Note & note, u_sample input, u_sample sampleRate, u_sample vAlpha, u_sample vFeedback, u_sample fMul, u_sample combFeedback);
+	u_sample procString(yzrilyzr_dsp::RingBufferSample & string, yzrilyzr_dsp::RingBufferSample & comb, const Note & note, u_sample input, u_sample sampleRate, u_sample vAlpha, u_sample vFeedback, u_sample fMul, u_sample combFeedback);
+	void onRegisterParam() override;
+	U_GET_CLASS_NAME(Sakura)
 	};
 	EBCLASS(SakuraBuilder){
 	private:
@@ -75,8 +76,10 @@ namespace yzrilyzr_simplesynth{
 		return *this;
 	}
 	SakuraBuilder & exciter(u_sample noiseMix, u_sample noiseRate){
-		sakura->noiseMixRatio=noiseMix;
-		sakura->noiseRate=noiseRate;
+		auto ex=mksp<SakuraExciter>();
+		ex->noiseMixRatio=noiseMix;
+		ex->noiseRate=noiseRate;
+		exciter(ex);
 		return *this;
 	}
 	SakuraBuilder & exciterHiCut(u_sample freq, u_sample q){
@@ -85,10 +88,10 @@ namespace yzrilyzr_simplesynth{
 		return *this;
 	}
 	SakuraBuilder & exciterHiCutEnv(u_time_ms aTime, u_time_ms hTime, u_time_ms dTime, u_sample sLevel){
-		sakura->exciterHiCutEnv->attackTime=aTime / 1000.0;
-		sakura->exciterHiCutEnv->holdTime=hTime / 1000.0;
-		sakura->exciterHiCutEnv->decayTime=dTime / 1000.0;
-		sakura->exciterHiCutEnv->sustainVolume=sLevel;
+		sakura->exciterHiCutEnv.attackTime=aTime / 1000.0;
+		sakura->exciterHiCutEnv.holdTime=hTime / 1000.0;
+		sakura->exciterHiCutEnv.decayTime=dTime / 1000.0;
+		sakura->exciterHiCutEnv.sustainVolume=sLevel;
 		return *this;
 	}
 	SakuraBuilder & exciterLowCut(u_freq freq, u_sample q){
@@ -113,12 +116,12 @@ namespace yzrilyzr_simplesynth{
 		return *this;
 	}
 	SakuraBuilder & stringEnv(u_time_ms aTime, u_time_ms hTime, u_time_ms dTime, bool sustainable, u_normal_01 sLevel, u_time_ms rTime){
-		sakura->stringEnv->attackTime=aTime / 1000.0;
-		sakura->stringEnv->holdTime=hTime / 1000.0;
-		sakura->stringEnv->decayTime=dTime / 1000.0;
-		sakura->stringEnv->canSustain=sustainable;
-		sakura->stringEnv->sustainVolume=sLevel;
-		sakura->stringEnv->releaseTime=rTime / 1000.0;
+		sakura->stringEnv.attackTime=aTime / 1000.0;
+		sakura->stringEnv.holdTime=hTime / 1000.0;
+		sakura->stringEnv.decayTime=dTime / 1000.0;
+		sakura->stringEnv.canSustain=sustainable;
+		sakura->stringEnv.sustainVolume=sLevel;
+		sakura->stringEnv.releaseTime=rTime / 1000.0;
 		return *this;
 	}
 	SakuraBuilder & stringLevel(u_sample mul){
@@ -143,7 +146,7 @@ namespace yzrilyzr_simplesynth{
 		return *this;
 	}
 	NoteProcPtr build(){
-		return spdc<NoteProcessor>(sakura);
+		return spsc<NoteProcessor>(sakura);
 	}
 	};
 }

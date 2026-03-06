@@ -4,11 +4,13 @@
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
+	void AmpBinaryComposition::onRegisterParam(){
+		RegisterUtil::registerParamSrc(*this, "A", &a);
+		RegisterUtil::registerParamSrc(*this, "B", &b);
+	}
 	AmpBinaryComposition::AmpBinaryComposition(NoteProcPtr a1, NoteProcPtr b1){
 		this->a=a1;
-		this->b=b1;
-		registerParamSrc("A", &a);
-		registerParamSrc("B", &b);
+		this->b=b1;		
 	}
 	String AmpBinaryComposition::toString() const{
 		return StringFormat::format("AmpBinaryComposition(%s,%s)", a, b);

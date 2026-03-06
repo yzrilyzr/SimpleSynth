@@ -4,7 +4,7 @@
 #include "nlohmann/json.hpp"
 
 namespace yzrilyzr_util{
-	class ParamRegister;
+	class ClassRegister;
 	struct ParamReg;
 }
 namespace yzrilyzr_lang{
@@ -20,10 +20,11 @@ EBCLASS(ProjectObject){
 	yzrilyzr_lang::String name;
 	yzrilyzr_lang::String showName;
 	json fromJSON=nullptr;
-	u_sp<yzrilyzr_util::ParamRegister> paramRegPtr=nullptr;
+	u_sp<yzrilyzr_util::ClassRegister> paramRegPtr=nullptr;
 	bool showWindow=true;
 	bool isSelected=false;
 	bool loadStoredData=false;
+	bool lockLayout=false;
 	ImVec2 windowPos;
 	ImVec2 windowSize;
 	ImVec2 leftButtonCenter;
@@ -35,10 +36,9 @@ EBCLASS(ProjectObject){
 	void from_json(const json & j);
 	void renderWindow(CurrentProjectContext & ctx);
 
-	static void paramToJSON(json & a, const yzrilyzr_util::ParamRegister & paramReg);
-	static void JSONToParam(const json & a, yzrilyzr_util::ParamRegister & paramReg);
-	static bool renderParams(CurrentProjectContext & ctx, std::vector<yzrilyzr_util::ParamReg> &paramReg);
-
+	static void paramToJSON(json & a, const yzrilyzr_util::ClassRegister & paramReg);
+	static void JSONToParam(const json & a, yzrilyzr_util::ClassRegister & paramReg);
+	
 	//template<typename T>
 	//static bool renderProjectObjectParam(CurrentProjectContext & ctx, yzrilyzr_util::ParamReg & param, const char * paramName, std::vector<const char *> payloadType){
 	//	bool uiInputChange=false;

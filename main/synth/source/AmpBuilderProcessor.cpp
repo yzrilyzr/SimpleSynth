@@ -32,7 +32,7 @@ namespace yzrilyzr_simplesynth{
 		stackLength=len;
 		stackPointer=0;
 	}
-	void AmpBuilderProcessor::pushStack(Note & id){
+	void AmpBuilderProcessor::pushStack(const Note & id){
 		pushStack(id.id);
 	}
 	void AmpBuilderProcessor::pushStack(uint8_t id){
@@ -46,7 +46,7 @@ namespace yzrilyzr_simplesynth{
 		std::cout << "BuilderStart" << std::endl;
 	}
 	void AmpBuilderProcessor::cc(ChannelConfig & cfg, ChannelControl & cc){}
-	u_sample AmpBuilderProcessor::getAmp(Note & note){
+	u_sample AmpBuilderProcessor::getAmp(const Note & note){
 		pushStack(note);
 		switch(stackType){
 			case TYPE_CONTROL:

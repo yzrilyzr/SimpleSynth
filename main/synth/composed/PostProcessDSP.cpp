@@ -7,7 +7,7 @@ using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
 	PostProcessDSP::PostProcessDSP() :AmpUnaryComposition(nullptr){
-		registerParamDSP("DSP", &dsp);
+		RegisterUtil::registerParamDSP(*this,"DSP", &dsp);
 	}
 	PostProcessDSP::PostProcessDSP(NoteProcPtr a, DSPPtr dsp) : AmpUnaryComposition(a){
 		this->dsp=dsp;
@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 		this->dsp->init(cfg.sampleRate);
 		this->dsp->resetMemory();
 	}
-	u_sample PostProcessDSP::getAmp(Note & note){
+	u_sample PostProcessDSP::getAmp(const Note & note){
 		return a->getAmp(note);
 	}
 	u_sample PostProcessDSP::postProcess(u_sample output){

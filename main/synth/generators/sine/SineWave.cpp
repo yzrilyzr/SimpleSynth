@@ -5,7 +5,7 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_dsp;
 namespace yzrilyzr_simplesynth{
-	u_sample SineWave::getAmp(Note & note){
+	u_sample SineWave::getAmp(const Note & note){
 		return fast_sin(getPhase(note) *  Math::TAU, note.freqSynth) * note.velocitySynth;
 	}
 	String SineWave::toString()const{

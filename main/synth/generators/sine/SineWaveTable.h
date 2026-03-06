@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 	~SineWaveTable();
 	SineWaveTable(double baseFreq,const yzrilyzr_array::DoubleArray &freqAndAmp);
 	SineWaveTable(u_sp<PhaseSrc> freq, double baseFreq, const yzrilyzr_array::DoubleArray & freqAndAmp);
-	u_sample getAmp(Note & note) override;
+	u_sample getAmp(const Note & note) override;
 	private:
 	u_sample a(double x, u_freq notef);
 	};
