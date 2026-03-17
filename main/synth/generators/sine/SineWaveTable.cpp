@@ -10,9 +10,9 @@ namespace yzrilyzr_simplesynth{
 	SineWaveTable::~SineWaveTable(){
 		
 	}
-	SineWaveTable::SineWaveTable(double baseFreq,const yzrilyzr_array::DoubleArray& freqAndAmp): SineWaveTable(nullptr, baseFreq, freqAndAmp){
+	SineWaveTable::SineWaveTable(double baseFreq,const DoubleArray& freqAndAmp): SineWaveTable(nullptr, baseFreq, freqAndAmp){
 	}
-	SineWaveTable::SineWaveTable(u_sp<PhaseSrc> freq, double baseFreq,const yzrilyzr_array::DoubleArray &freqAndAmp): Osc(freq){
+	SineWaveTable::SineWaveTable(u_sp<PhaseSrc> freq, double baseFreq,const DoubleArray &freqAndAmp): Osc(freq){
 		this->aa=freqAndAmp;
 		this->baseFreq=baseFreq;
 	}

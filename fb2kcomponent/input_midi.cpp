@@ -17,22 +17,27 @@ enum{
 	mixer_bits_per_sample=32
 };
 
+using namespace yzrilyzr_simplesynth;
+using namespace yzrilyzr_io;
+using namespace yzrilyzr_lang;
+using namespace yzrilyzr_array;
+
 static const char * supported_extensions[]={"mid", "midi", "rmi", "xm"};
 
 class input_midi : public input_stubs{
 	private:
-	u_sp<yzrilyzr_simplesynth::Mixer2> m_mixer=nullptr;
-	u_sp<yzrilyzr_simplesynth::MixerSequence> m_sequence=nullptr;
+	u_sp<Mixer2> m_mixer=nullptr;
+	u_sp<MixerSequence> m_sequence=nullptr;
 	u_time m_total_length=0;
 	void initMixer(){
 		if(!m_mixer){
 		//初始化合成器
-			m_mixer=mksp<yzrilyzr_simplesynth::Mixer2>(mixer_buffer_size);
+			m_mixer=mksp<Mixer2>(mixer_buffer_size);
 			m_mixer->setSampleRate(mixer_sample_rate);
-			m_mixer->setSynthMode(yzrilyzr_simplesynth::IMixer::MODE_THREAD_POOL, -1);
+			m_mixer->setSynthMode(IMixer::MODE_THREAD_POOL, -1);
 			m_mixer->setUseLimiter(true);
 			// 设置默认乐器
-			u_sp<yzrilyzr_simplesynth::SimpleMIDIInstrument> simple=mksp<yzrilyzr_simplesynth::SimpleMIDIInstrument>();
+			u_sp<SimpleMIDIInstrument> simple=mksp<SimpleMIDIInstrument>();
 			m_mixer->getGlobalConfig().setInstrumentProvider(simple);
 		}
 	}
@@ -49,18 +54,18 @@ class input_midi : public input_stubs{
 		initMixer();
 
 		//读取文件
-		yzrilyzr_array::ByteArray array((t_size)file_size);
+		ByteArray array((t_size)file_size);
 		m_file->read(array._array, (t_size)array.length, p_abort);
 		// 使用 MIDI 文件解析器
 		try{
-			yzrilyzr_io::ByteArrayInputStream bi(array);
-			yzrilyzr_lang::String path(p_path);
+			ByteArrayInputStream bi(array);
+			String path(p_path);
 			path=path.toLowerCase();
 			// 创建混音序列
 			if(path.contains("mid")){
-				m_sequence=yzrilyzr_simplesynth::SynthUtil::parseMIDI(bi);
+				m_sequence=SynthUtil::parseMIDI(bi);
 			} else if(path.contains("xm")){
-				m_sequence=yzrilyzr_simplesynth::SynthUtil::parseXM(bi);
+				m_sequence=SynthUtil::parseXM(bi);
 			}
 			if(!m_sequence){
 				throw exception_io_data();
@@ -150,7 +155,7 @@ class input_midi : public input_stubs{
 		if(m_mixer){
 			p_out.info_set_int("processing", m_mixer->getCurrentProcessingNoteCount());
 			p_out.info_set_int("post", m_mixer->getPostedEventCount());
-			p_out.info_set("synthload", (yzrilyzr_lang::String((int)(100.0 * m_mixer->getProcessTime() / m_mixer->getProcessStandardTime())) + yzrilyzr_lang::String(" %")).c_str());
+			p_out.info_set("synthload", (String((int)(100.0 * m_mixer->getProcessTime() / m_mixer->getProcessStandardTime())) + String(" %")).c_str());
 		}
 		p_timestamp_delta=0.1; // 更新间隔
 		return true;
@@ -173,7 +178,7 @@ class input_midi : public input_stubs{
 	static bool g_is_our_content_type(const char * p_content_type){ return false; } // match against supported mime types here
 	static bool g_is_our_path(const char * p_path, const char * p_extension){
 		for(const char * ext : supported_extensions){
-			if(yzrilyzr_lang::String(p_extension).toLowerCase().contains(yzrilyzr_lang::String(ext))){
+			if(String(p_extension).toLowerCase().contains(String(ext))){
 				return true;
 			}
 		}

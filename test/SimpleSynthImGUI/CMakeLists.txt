@@ -29,8 +29,8 @@ add_executable (${PROJECT_NAME} "main.cpp"
  "NodeAutoLayout.cpp" 
  "Serialize.cpp"
  "NodeRightContextMenu.cpp"
- "sakura/SakuraRender.h"
- "sakura/SakuraRender.cpp"
+ "twostringresonator/TwoStringResonatorRender.h"
+ "twostringresonator/TwoStringResonatorRender.cpp"
  "piano/PianoRender.h"
  "piano/PianoRender.cpp"
  "sample/SampleRender.h"
@@ -49,7 +49,7 @@ add_executable (${PROJECT_NAME} "main.cpp"
  "notesrcrender/FM6x6Render.cpp"
  "notesrcrender/NoteSrcRender.h" 
  "notesrcrender/MultiStageEnvRender.cpp"
- "ParamHelper.cpp" "notesrcrender/GraphEnvRender.cpp")
+ "ParamHelper.cpp" "notesrcrender/GraphEnvRender.cpp" "sswindow/ImportFromBank.cpp")
 
 #find_package(nlohmann_json REQUIRED)
 find_package(OpenGL REQUIRED)

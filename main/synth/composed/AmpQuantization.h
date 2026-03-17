@@ -22,6 +22,6 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
 
-	U_GET_CLASS_NAME(AmpQuantization);
+	U_CLASS_INFO(AmpQuantization);
 	};
 }

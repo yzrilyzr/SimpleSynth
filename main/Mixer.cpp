@@ -226,7 +226,7 @@ namespace yzrilyzr_simplesynth{
 		}
 		return spsc<IChannel>(res->second);
 	}
-	u_sp<yzrilyzr_dsp::DSPChain> * Mixer::getEQ(){
+	u_sp<DSPChain> * Mixer::getEQ(){
 		return finalEQ;
 	}
 	void Mixer::addChannel(u_sp<Channel> channel){
@@ -317,14 +317,14 @@ namespace yzrilyzr_simplesynth{
 	u_sample * Mixer::getOutput(uint32_t chIndex)const{
 		return output[chIndex]._array;
 	}
-	void Mixer::sendInstantEvent(ChannelEvent * event){
+	void Mixer::sendInstantEvent(u_up<ChannelEvent>  event){
 		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
 		u_sp<Channel> ch=spsc<Channel>(getMIDIChannel(event->groupName, event->channelID));
-		ch->sendInstantEvent(event);
+		ch->sendInstantEvent(std::move(event));
 	}
-	void Mixer::postEvent(ChannelEvent * event, u_time startAt){
+	void Mixer::postEvent(u_up<ChannelEvent>  event, u_time startAt){
 		u_sp<Channel> ch=spsc<Channel>(getMIDIChannel(event->groupName, event->channelID));
-		ch->sendPostEvent(event, startAt);
+		ch->sendPostEvent(std::move(event), startAt);
 	}
 	bool Mixer::hasMIDIChannel(const String & groupName, s_midichannel_id channelID){
 		auto res=midiChannelMap.find({groupName, channelID});
@@ -351,10 +351,10 @@ namespace yzrilyzr_simplesynth{
 	void Channel::setSustain(bool sus){
 		this->channelConfig.Sustain=sus;
 	}
-	void Channel::sendPostEvent(ChannelEvent * n1, u_time startAt){
+	void Channel::sendPostEvent(u_up<ChannelEvent>  n1, u_time startAt){
 		n1->startAtTime=startAt;
 		std::unique_lock<std::recursive_mutex > lock(eventLock);
-		postEventQueue.add(n1);
+		postEventQueue.push_back(std::move(n1));
 	}
 
 	void Channel::setSampleRate(u_sample_rate sr){
@@ -382,11 +382,11 @@ namespace yzrilyzr_simplesynth{
 		resetChannel();
 	}
 	bool Channel::hasData(){
-		if(!postEventQueue.isEmpty() || !instantEventQueue.isEmpty()) return true;
+		if(!postEventQueue.empty() || !instantEventQueue.empty()) return true;
 		return !workingNotesPool.isEmpty();
 	}
 	void Channel::noteOff(uint8_t noteId){
-		sendInstantEvent(new NoteOff(noteId));
+		sendInstantEvent(mkup< NoteOff>(noteId));
 	}
 	void Channel::setBufferSize(u_index bs){
 		for(u_index i=0;i < channelCount;i++){
@@ -450,26 +450,24 @@ namespace yzrilyzr_simplesynth{
 			s_eventTimeSum+=(u_time_f)s_currentDeltaTime;
 			if(s_eventTimeSum > setEventDeltaTime){
 				std::unique_lock <std::recursive_mutex > lock(eventLock);
-				{
-					auto eventIterator=postEventQueue.iterator();
-					while(eventIterator->hasNext()){
-						ChannelEvent * event=eventIterator->next();
+				/*{
+					auto eventIterator=postEventQueue.begin();
+					while(eventIterator!= postEventQueue.end()){
+						u_up<ChannelEvent>  event=std::move(eventIterator->next());
 						if(channelConfig.currentTime < event->startAtTime) break;
-						eventIterator->remove();
+						eventIterator->era();
 						procEvent(*event);
-						delete event;
 					}
 				}
 				{
 					auto eventIterator=instantEventQueue.iterator();
 					while(eventIterator->hasNext()){
-						ChannelEvent * event=eventIterator->next();
+						u_up<ChannelEvent>  event=std::move(eventIterator->next());
 						if(channelConfig.currentTime < event->startAtTime) break;
 						eventIterator->remove();
 						procEvent(*event);
-						delete event;
 					}
-				}
+				}*/
 				s_eventTimeSum=0;
 				checkSostenuto();
 				checkSustainState();
@@ -878,10 +876,11 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 	u_sp<AHDSREnvelop> Channel::getAHDSREnv()const{
-		auto a=dynamic_cast<EnvelopMultiplier *>(channelConfig.noteProcessor);
-		if(!a)return nullptr;
-		auto b=spdc<AHDSREnvelop>(a->a);
-		return b;
+		if(auto a=U_INSTANCE_OF(EnvelopMultiplier, channelConfig.noteProcessor)){
+			if(auto b=U_INSTANCE_OF_PTR(AHDSREnvelop,a->a)){
+				return b;
+			}
+		}
 	}
 	void Channel::procDataEntry(){
 		PNData & rpn=channelConfig.rpn;
@@ -964,7 +963,7 @@ namespace yzrilyzr_simplesynth{
 	void Channel::setVolume(u_normal_01_f volume){
 		this->channelConfig.Volume=volume;
 	}
-	void Channel::addDSPToChain(u_sp<yzrilyzr_dsp::DSP> * dsp){
+	void Channel::addDSPToChain(DSPPtr * dsp){
 		for(u_index i=0;i < 2;i++){
 			dspChain[i]->add(dsp[i]);
 		}
@@ -1011,12 +1010,12 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	void Channel::noteOn(uint8_t noteId, s_note_vel velocity){
-		sendInstantEvent(new NoteOn(noteId, velocity));
+		sendInstantEvent(mkup< NoteOn>(noteId, velocity));
 	}
-	void Channel::sendInstantEvent(ChannelEvent * n1){
+	void Channel::sendInstantEvent(u_up<ChannelEvent>  n1){
 		n1->startAtTime=channelConfig.currentTime;
 		std::unique_lock<std::recursive_mutex > lock(eventLock);
-		instantEventQueue.add(n1);
+		instantEventQueue.push_back(std::move(n1));
 	}
 	bool Channel::isSustain() const{
 		return channelConfig.Sustain;

@@ -15,6 +15,7 @@ namespace yzrilyzr_simplesynth{
 }
 namespace yzrilyzr_dsp{
 	class DSP;
+	typedef u_sp<DSP> DSPPtr;
 }
 namespace yzrilyzr_array{
 	class SampleProvider;
@@ -30,7 +31,7 @@ namespace yzrilyzr_util{
 		U_EXPORT_API void registerParamPhaseSrc(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, u_sp<yzrilyzr_simplesynth::PhaseSrc> * value);
 		U_EXPORT_API void registerParamSrc(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, yzrilyzr_simplesynth::NoteProcPtr * value);
 		U_EXPORT_API void registerParamOscSrc(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, u_sp<yzrilyzr_simplesynth::Osc> * value);
-		U_EXPORT_API void registerParamDSP(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, u_sp<yzrilyzr_dsp::DSP> * value);
+		U_EXPORT_API void registerParamDSP(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, yzrilyzr_dsp::DSPPtr * value);
 		U_EXPORT_API void registerParamSampleData(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, u_sp<yzrilyzr_array::SampleProvider> * value);
 	}
 }

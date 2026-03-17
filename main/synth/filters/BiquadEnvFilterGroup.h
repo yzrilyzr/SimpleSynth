@@ -48,7 +48,7 @@ namespace yzrilyzr_simplesynth{
 		BiquadEnvFilterGroupKeyData * init(BiquadEnvFilterGroupKeyData * data, const Note & note) override;
 		yzrilyzr_lang::String toString() const override;
 		void onRegisterParam() override;
-		U_GET_CLASS_NAME(BiquadEnvFilterGroup);
+		U_CLASS_INFO(BiquadEnvFilterGroup);
 
 	};
 }

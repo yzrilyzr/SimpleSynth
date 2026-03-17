@@ -78,14 +78,14 @@ bool renderMatrix(u_sp<Matrix6x6Modulation> paramRegPtr, int type){
 	return change;
 }
 void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	u_sp<Matrix6x6Modulation> paramRegPtr=std::dynamic_pointer_cast<Matrix6x6Modulation, ClassRegister>(obj.paramRegPtr);
+	u_sp<Matrix6x6Modulation> paramRegPtr=spsc<Matrix6x6Modulation, ClassRegister>(obj.paramRegPtr);
 	u_index MTX_SIZE=Matrix6x6Modulation::MATRIX_SIZE;
 	auto & data=obj.storeData;
 	if(obj.loadStoredData){
 		obj.loadStoredData=false;
 		auto it=data.find("FM_Matrix");
 		if(it != data.end()){
-			u_sp<SampleArray> arr=spdc<SampleArray>(it->second);
+			auto arr=spsc<SampleArray>(it->second);
 			u_index k=0;
 			for(u_index x=0;x < MTX_SIZE;x++){
 				for(u_index y=0;y < MTX_SIZE;y++){
@@ -95,7 +95,7 @@ void Matrix6x6ModulationRenderFunc(CurrentProjectContext & ctx, ProjectObject & 
 		}
 		it=data.find("RM_Matrix");
 		if(it != data.end()){
-			u_sp<SampleArray> arr=spdc<SampleArray>(it->second);
+			auto arr=spsc<SampleArray>(it->second);
 			u_index k=0;
 			for(u_index x=0;x < MTX_SIZE;x++){
 				for(u_index y=0;y < MTX_SIZE;y++){

@@ -12,6 +12,6 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg) override;
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(AmpBinaryComposition);
+	U_CLASS_INFO(AmpBinaryComposition);
 	};
 }

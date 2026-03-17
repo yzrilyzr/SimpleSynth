@@ -71,8 +71,8 @@ namespace yzrilyzr_simplesynth{
 		u_sample_rate getSampleRate()const;
 		virtual void setSampleRate(u_sample_rate sr);
 
-		virtual void sendInstantEvent(ChannelEvent * event)=0;
-		virtual void postEvent(ChannelEvent * event, u_time startAt)=0;
+		virtual void sendInstantEvent(u_up<ChannelEvent> event)=0;
+		virtual void postEvent(u_up<ChannelEvent> event, u_time startAt)=0;
 
 		virtual void resetLimiter()=0;
 		virtual u_time getCurrentTime()const=0;

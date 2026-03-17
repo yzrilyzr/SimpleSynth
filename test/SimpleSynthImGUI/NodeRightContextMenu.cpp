@@ -24,9 +24,9 @@ void CurrentProjectContext::deleteSelectedLinks(){
 		if(link.ended_at_attribute_id == OUTPUT_ATTR_ID && link.ended_at_node_id == OUTPUT_NODE_ID){
 			finalProcessor=nullptr;
 		} else{
-			ParamReg * endParam=findParam(link.ended_at_node_id, link.ended_at_attribute_id);
-			if(endParam){
-				setParamValue(*endParam, nullptr);
+			auto endParam=findParam(link.ended_at_node_id, link.ended_at_attribute_id);
+			if(endParam.has_value()){
+				setParamValue(endParam.value(), nullptr);
 			}
 		}
 		paramChange=true;

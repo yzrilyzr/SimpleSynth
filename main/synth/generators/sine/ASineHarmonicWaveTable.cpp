@@ -1,7 +1,7 @@
 #include "ASineHarmonicWaveTable.h"
 using namespace yzrilyzr_array;
 namespace yzrilyzr_simplesynth{
-	ASineHarmonicWaveTable::ASineHarmonicWaveTable() : SineHarmonicWaveTable(Array<yzrilyzr_array::DoubleArray>({
+	ASineHarmonicWaveTable::ASineHarmonicWaveTable() : SineHarmonicWaveTable(Array<DoubleArray>({
 			dBToAmp(4,  DoubleArray({0, 261, 2051, -25.7f, -26.2f, -21.7f, -21.2f, -15.6f, -07.6f})),
 			dBToAmp(4,  DoubleArray({0, 261, 2051, -33.4f, -31.7f, -19.6f, -26.8f, -35.4f, -49.6f})),
 			dBToAmp(4,  DoubleArray({0, 261, 2051, -34.3f, -22.3f, -15.4f, -39.5f, -48.3f, -45.2f})),

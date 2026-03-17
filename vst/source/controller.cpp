@@ -23,14 +23,15 @@ using namespace Steinberg::Vst;
 using namespace yzrilyzr_io;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_util;
+using namespace yzrilyzr_array;
 
 namespace yzrilyzr_simplesynth_vst{
 //------------------------------------------------------------------------
 // SimpleSynthController Implementation
 //------------------------------------------------------------------------
 	yzrilyzr_lang::String readStreamToString(CResourceInputStream & stream){
-		yzrilyzr_io::ByteArrayOutputStream content;
-		yzrilyzr_array::ByteArray buffer(4096);
+		ByteArrayOutputStream content;
+		ByteArray buffer(4096);
 		uint32_t bytesRead=0;
 		do{
 			bytesRead=stream.readRaw(buffer._array, buffer.length - 1);

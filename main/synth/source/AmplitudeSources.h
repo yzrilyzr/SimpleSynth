@@ -14,13 +14,16 @@
 namespace yzrilyzr_simplesynth{
 	ECLASS(_NotePhase, public PhaseSrc){
 	public:
+	inline u_freq getFreq(const Note & note) override final{
+		return note.freqSynth;
+	}
 	inline s_phase getPhase(const Note & note) override final{
 		return note.phaseSynth;
 	}
 	yzrilyzr_lang::String toString() const override{
 		return "NotePhase";
 	}
-	U_GET_CLASS_NAME(NotePhase)
+	U_CLASS_INFO(NotePhase)
 	};
 	ECLASS(_MulPhase, public PhaseSrc){
 	private:
@@ -33,6 +36,9 @@ namespace yzrilyzr_simplesynth{
 		if(src == nullptr)throw yzrilyzr_lang::NullPointerException("src == null");
 		src->init();
 	}
+	inline u_freq getFreq(const Note & note) override final{
+		return src->getFreq(note) * r;
+	}
 	inline s_phase getPhase(const Note & note) override final{
 		return src->getPhase(note) * r;
 	}
@@ -44,7 +50,7 @@ namespace yzrilyzr_simplesynth{
 		yzrilyzr_util::RegisterUtil::registerParamPhaseSrc(*this, "Src", &src);
 		registerParam("Multiply", yzrilyzr_util::ParamType::Sample, &r, &min, &max);
 	}
-	U_GET_CLASS_NAME(MulPhase)
+	U_CLASS_INFO(MulPhase)
 	};
 	ECLASS(_AddPhase, public PhaseSrc){
 	private:
@@ -59,6 +65,9 @@ namespace yzrilyzr_simplesynth{
 		a->init();
 		b->init();
 	}
+	inline u_freq getFreq(const Note & note) override final{
+		return a->getFreq(note) + b->getFreq(note);
+	}
 	inline s_phase getPhase(const Note & note) override final{
 		return a->getPhase(note) + b->getPhase(note);
 	}
@@ -70,7 +79,7 @@ namespace yzrilyzr_simplesynth{
 		yzrilyzr_util::RegisterUtil::registerParamPhaseSrc(*this, "A", &a);
 		yzrilyzr_util::RegisterUtil::registerParamPhaseSrc(*this, "B", &b);
 	}
-	U_GET_CLASS_NAME(AddPhase)
+	U_CLASS_INFO(AddPhase)
 	};
 	ECLASS(_ConstPhase, public PhaseSrc){
 	private:
@@ -78,6 +87,9 @@ namespace yzrilyzr_simplesynth{
 	public:
 	_ConstPhase() : hz(1000){}
 	_ConstPhase(u_freq hz) : hz(hz){}
+	inline u_freq getFreq(const Note & note) override final{
+		return hz;
+	}
 	inline s_phase getPhase(const Note & note) override final{
 		return hz * note.passedTime;
 	}
@@ -87,7 +99,7 @@ namespace yzrilyzr_simplesynth{
 	void onRegisterParam() override{
 		yzrilyzr_util::RegisterUtil::registerParamFreq(*this, "Freq", &hz);
 	}
-	U_GET_CLASS_NAME(ConstPhase)
+	U_CLASS_INFO(ConstPhase)
 	};
 	ECLASS(_ConstAmp, public NoteProcessor){
 	public:
@@ -104,7 +116,7 @@ namespace yzrilyzr_simplesynth{
 		static u_sample min=-100, max=100;
 		registerParam("Value", yzrilyzr_util::ParamType::Sample, &value, &min, &max);
 	}
-	U_GET_CLASS_NAME(ConstAmp)
+	U_CLASS_INFO(ConstAmp)
 	};
 	ECLASS(_NoteIDAmp, public NoteProcessor){
 	public:
@@ -114,7 +126,7 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override{
 		return "NoteIDAmp";
 	}
-	U_GET_CLASS_NAME(NoteIDAmp)
+	U_CLASS_INFO(NoteIDAmp)
 	};
 	ECLASS(_NoteFreqAmp, public NoteProcessor){
 	public:
@@ -124,7 +136,7 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override{
 		return "NoteFreqAmp";
 	}
-	U_GET_CLASS_NAME(NoteFreqAmp)
+	U_CLASS_INFO(NoteFreqAmp)
 	};
 	ECLASS(_NoteVelAmp, public NoteProcessor){
 	public:
@@ -134,7 +146,7 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override{
 		return "NoteVelAmp";
 	}
-	U_GET_CLASS_NAME(NoteVelAmp)
+	U_CLASS_INFO(NoteVelAmp)
 	};
 #ifndef NotePhase
 #define NotePhase mksp<_NotePhase>()

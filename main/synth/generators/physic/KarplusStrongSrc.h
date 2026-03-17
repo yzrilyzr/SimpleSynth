@@ -48,7 +48,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample getAmp(const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(KarplusStrongSrc);
+	U_CLASS_INFO(KarplusStrongSrc);
 	private:
 	u_freq getSetFreq(const Note & note);
 	};

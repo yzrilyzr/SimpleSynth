@@ -19,7 +19,7 @@ using namespace yzrilyzr_lang;
 
 void GraphEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	bool changed=false;
-	u_sp<GraphEnvelop> paramRegPtr=std::dynamic_pointer_cast<GraphEnvelop, ClassRegister>(obj.paramRegPtr);
+	u_sp<GraphEnvelop> paramRegPtr=spsc<GraphEnvelop, ClassRegister>(obj.paramRegPtr);
 	auto & pts=paramRegPtr->points;
 	if(ImPlot::BeginPlot(ctx.LANG.getc("module.graph_envelope.data"), ImVec2(500, 200))){
 		ImPlot::SetupAxis(ImAxis_Y1, "Value", ImPlotAxisFlags_NoLabel);

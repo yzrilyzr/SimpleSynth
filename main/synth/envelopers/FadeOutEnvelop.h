@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
  * - OnNoteOff: NoteOn 时保持 1，NoteOff 后开始线性衰减
  * 衰减速率由 fade 参数控制，fade=0 时永不衰减（始终输出 1）
  */
-	ECLASS(FadeOutEnvelop, public NoteProcessor, public Enveloper){
+	ECLASS(FadeOutEnvelop, public Enveloper){
 	public:
 
 	static constexpr int OnNoteOn=0;   ///< 从 NoteOn 开始衰减
@@ -35,6 +35,7 @@ namespace yzrilyzr_simplesynth{
 	u_sp<NoteProcessor> clone() override;
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam()override;
+	U_CLASS_INFO_B(FadeOutEnvelop, Enveloper);
 
 	private:
 	float fade;   ///< 衰减速率 (1/秒)

@@ -33,6 +33,6 @@ namespace yzrilyzr_simplesynth{
 	bool cornerModulation;       // 是否使用折角调制
 
 	yzrilyzr_lang::String toString() const override;
-	U_GET_CLASS_NAME(SVPWM)
+	U_CLASS_INFO(SVPWM)
 	};
 }

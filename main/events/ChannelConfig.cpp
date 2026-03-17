@@ -6,11 +6,12 @@
 #include "tuning/EqualTemperament.h"
 
 using namespace yzrilyzr_interpolator;
+using namespace yzrilyzr_dsp;
 
 namespace yzrilyzr_simplesynth{
 	ChannelConfig::~ChannelConfig(){}
-	void ChannelConfig::postInstantEvent(ChannelEvent * event){
-		if(mixer != nullptr)mixer->sendInstantEvent(event);
+	void ChannelConfig::postInstantEvent(u_up<ChannelEvent> event){
+		if(mixer != nullptr)mixer->sendInstantEvent(std::move(event));
 	}
 	void ChannelConfig::setOnlyChannelConfig(const ChannelConfig & other){
 		Sustain=other.Sustain;
@@ -74,7 +75,7 @@ namespace yzrilyzr_simplesynth{
 		sp_noteProcessor=val;
 		noteProcessor=val.get();
 	}
-	
+
 	void ChannelConfig::reset(){
 		Pan=0;
 		Volume=0.7f;
@@ -104,7 +105,7 @@ namespace yzrilyzr_simplesynth{
 		Bank=0;
 		Program=0;
 	}
-	void ChannelConfig::setContext(IMixer * mixer,  IChannel * channel){
+	void ChannelConfig::setContext(IMixer * mixer, IChannel * channel){
 		this->mixer=mixer;
 		this->channel=channel;
 	}
@@ -112,7 +113,7 @@ namespace yzrilyzr_simplesynth{
 		sp_tuning=val;
 		tuning=val.get();
 	}
-	void ChannelConfig::setNoteVelocityMap(u_sp<yzrilyzr_interpolator::Interpolator> val){
+	void ChannelConfig::setNoteVelocityMap(u_sp<Interpolator> val){
 		sp_velocityMap=val;
 		velocityMap=val.get();
 	}
@@ -126,14 +127,14 @@ namespace yzrilyzr_simplesynth{
 	u_sp<NoteTuning> ChannelConfig::getNoteTuning()const{
 		return sp_tuning;
 	}
-	u_sp<yzrilyzr_interpolator::Interpolator> ChannelConfig::getNoteVelocityMap()const{
+	u_sp<Interpolator> ChannelConfig::getNoteVelocityMap()const{
 		return sp_velocityMap;
 	}*/
-	void ChannelConfig::set3DEffect(u_sp<yzrilyzr_dsp::DSP3D> dsp3d){
+	void ChannelConfig::set3DEffect(u_sp<DSP3D> dsp3d){
 		this->sp_dsp3d=dsp3d;
 		this->dsp3d=dsp3d.get();
 	}
-	/*u_sp<yzrilyzr_dsp::DSP3D> ChannelConfig::get3DEffect(){
+	/*u_sp<DSP3D> ChannelConfig::get3DEffect(){
 		return sp_dsp3d;
 	}*/
 	void ChannelConfig::set(const ChannelConfig & other){

@@ -245,12 +245,12 @@ namespace yzrilyzr_simplesynth{
 	void DLSFormatInstrument::buildInstruments(){
 		auto instruments=soundbank->getInstruments();
 		for(auto & instrument : instruments){
-			auto dlsInstrument=spdc<DLSInstrument>(instrument);
-			if(!dlsInstrument)continue;
-			if(dlsInstrument->druminstrument){
-				buildDrumInstrument(*dlsInstrument);
-			} else{
-				buildMelodicInstrument(*dlsInstrument);
+			if(auto dlsInstrument=U_INSTANCE_OF_PTR(DLSInstrument, instrument)){
+				if(dlsInstrument->druminstrument){
+					buildDrumInstrument(*dlsInstrument);
+				} else{
+					buildMelodicInstrument(*dlsInstrument);
+				}
 			}
 		}
 	}
@@ -276,7 +276,7 @@ namespace yzrilyzr_simplesynth{
 
 	void DLSFormatInstrument::buildDrumInstrument(DLSInstrument & instrument){
 		s_bank_id bank=instrument.getBank();
-		u_sp<NonInterpolateAmpSet> drumSet=spdc<NonInterpolateAmpSet>(getDrumSet(bank, 0));
+		u_sp<NonInterpolateAmpSet> drumSet=U_INSTANCE_OF_PTR(NonInterpolateAmpSet, getDrumSet(bank, 0));
 		if(drumSet == nullptr){
 			drumSet=mksp<NonInterpolateAmpSet>();
 			drumSetMap[bank]=drumSet;

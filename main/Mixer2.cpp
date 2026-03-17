@@ -208,7 +208,7 @@ namespace yzrilyzr_simplesynth{
 	void Mixer2::processInstantEvents(u_time deltaTime, u_index bufSize){
 		std::unique_lock<std::shared_mutex> lock(eventLock);
 		for(auto it=instantEventQueue.begin(); it != instantEventQueue.end();){
-			ChannelEvent * event=*it;
+			u_up<ChannelEvent> & event=*it;
 			int64_t snapshotIndex=0;
 			auto & data=*getOrCreateMIDIChannelData(event->groupName, event->channelID);
 			ChannelConfig & cfg=*data.cfgSnapshots[snapshotIndex];
@@ -216,26 +216,45 @@ namespace yzrilyzr_simplesynth{
 			transferSnapshot(data, snapshotIndex);
 			data.lastSnapshotChange=true;
 			it=instantEventQueue.erase(it);
-			delete event;
 		}
 	}
 
 	void Mixer2::processScheduledEvents(u_time deltaTime, u_index bufSize){
 		std::unique_lock<std::shared_mutex> lock(eventLock);
-		for(auto it=postEventQueue.begin(); it != postEventQueue.end();){
-			ChannelEvent * event=*it;
-			u_time ti=event->startAtTime - getCurrentTime();
-			int64_t snapshotIndex=static_cast<int64_t>(ti / deltaTime);
-			if(snapshotIndex < 0) snapshotIndex=0;
-			if(snapshotIndex >= static_cast<int64_t>(bufSize)) break;
+		u_time now=getCurrentTime();
 
-			auto & data=*getOrCreateMIDIChannelData(event->groupName, event->channelID);
-			ChannelConfig & cfg=*data.cfgSnapshots[snapshotIndex];
-			procEvent(data, cfg, *event);
-			transferSnapshot(data, snapshotIndex);
-			data.lastSnapshotChange=true;
-			it=postEventQueue.erase(it);
-			delete event;
+		for(auto it=postEventQueue.begin(); it != postEventQueue.end(); ){
+			auto & queue=it->second;
+			bool groupChanged=false;
+
+			// 处理该组所有到期事件
+			while(!queue.empty()){
+				auto & event=queue.front();
+				if(event->startAtTime <= now){  // 已到期（允许误差）
+					// 计算快照索引（与原逻辑一致）
+					u_time ti=event->startAtTime - now;
+					int64_t snapshotIndex=static_cast<int64_t>(ti / deltaTime);
+					if(snapshotIndex < 0) snapshotIndex=0;
+					if(snapshotIndex < static_cast<int64_t>(bufSize)){
+						auto & data=*getOrCreateMIDIChannelData(event->groupName, event->channelID);
+						ChannelConfig & cfg=*data.cfgSnapshots[snapshotIndex];
+						procEvent(data, cfg, *event);
+						transferSnapshot(data, snapshotIndex);
+						data.lastSnapshotChange=true;
+					}
+					queue.pop_front();  // 移除已处理事件
+					groupChanged=true;
+				} else{
+					break;  // 队首未到期，该组后续事件都不到期
+				}
+			}
+
+			// 如果该组已空，可考虑从 map 中移除（可选，避免空组长期存在）
+			if(queue.empty()){
+				it=postEventQueue.erase(it);
+			} else{
+				++it;
+			}
 		}
 	}
 
@@ -456,7 +475,12 @@ namespace yzrilyzr_simplesynth{
 		return sum;
 	}
 	u_index Mixer2::getPostedEventCount(){
-		return instantEventQueue.size() + postEventQueue.size();
+		std::shared_lock<std::shared_mutex> lock(eventLock);
+		u_index count=instantEventQueue.size();
+		for(const auto & pair : postEventQueue){
+			count+=pair.second.size();
+		}
+		return count;
 	}
 	bool Mixer2::hasData(){
 		return !postEventQueue.empty() || !instantEventQueue.empty() || getCurrentProcessingNoteCount() != 0;
@@ -592,16 +616,18 @@ namespace yzrilyzr_simplesynth{
 			}
 		}
 	}
-	void Mixer2::sendInstantEvent(ChannelEvent * event){
+	void Mixer2::sendInstantEvent(u_up<ChannelEvent> event){
 		std::unique_lock <std::shared_mutex > lock(eventLock);
 		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
-		instantEventQueue.push_back(event);
+		instantEventQueue.push_back(std::move(event));
 	}
-	void Mixer2::postEvent(ChannelEvent * event, u_time startAt){
+	void Mixer2::postEvent(u_up<ChannelEvent> event, u_time startAt){
 		std::unique_lock <std::shared_mutex > lock(eventLock);
-		if(event->groupName.empty())event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
+		if(event->groupName.empty()){
+			event->groupName=DEFAULT_MIDI_CHANNEL_GROUP_NAME;
+		}
 		event->startAtTime=startAt;
-		postEventQueue.push_back(event);
+		postEventQueue[event->groupName].push_back(std::move(event));
 	}
 	void Mixer2::setSampleRate(u_sample_rate sr){
 		IMixer::setSampleRate(sr);
@@ -1123,7 +1149,7 @@ namespace yzrilyzr_simplesynth{
 			threadPool=new FixedThreadPool(cores);
 		}
 	}
-	u_sp<yzrilyzr_dsp::DSPChain> * Mixer2::getEQ(){
+	u_sp<DSPChain> * Mixer2::getEQ(){
 		return finalEQ;
 	}
 	u_sp<IChannel> Mixer2::getMIDIChannel(const String & group, s_midichannel_id ch){

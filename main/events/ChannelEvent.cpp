@@ -3,8 +3,9 @@
 #include "interface/NoteTuning.h"
 #include "util/MIDIFile.h"
 
-namespace yzrilyzr_simplesynth{
+using namespace yzrilyzr_util;
 
+namespace yzrilyzr_simplesynth{
 	// ChannelEvent 实现
 	ChannelEvent::ChannelEvent(const ChannelEvent * other){
 		this->groupName=other->groupName;
@@ -30,8 +31,8 @@ namespace yzrilyzr_simplesynth{
 		this->velocity=clone->velocity;
 	}
 
-	ChannelEvent * NoteOff::clone(){
-		return new NoteOff(this);
+	u_up<ChannelEvent>  NoteOff::clone(){
+		return mkup<NoteOff>(this);
 	}
 
 	uint8_t NoteOff::getType(){
@@ -53,8 +54,8 @@ namespace yzrilyzr_simplesynth{
 		this->velocity=clone->velocity;
 	}
 
-	ChannelEvent * NoteOn::clone(){
-		return new NoteOn(this);
+	u_up<ChannelEvent>  NoteOn::clone(){
+		return  mkup< NoteOn>(this);
 	}
 
 	uint8_t NoteOn::getType(){
@@ -76,8 +77,8 @@ namespace yzrilyzr_simplesynth{
 		this->velocity=clone->velocity;
 	}
 
-	ChannelEvent * NotePressure::clone(){
-		return new NotePressure(this);
+	u_up<ChannelEvent>  NotePressure::clone(){
+		return  mkup<NotePressure>(this);
 	}
 
 	uint8_t NotePressure::getType(){
@@ -99,8 +100,8 @@ namespace yzrilyzr_simplesynth{
 		this->value=clone->value;
 	}
 
-	ChannelEvent * NotePitchBend::clone(){
-		return new NotePitchBend(this);
+	u_up<ChannelEvent>  NotePitchBend::clone(){
+		return  mkup<NotePitchBend>(this);
 	}
 
 	uint8_t NotePitchBend::getType(){
@@ -123,15 +124,15 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	bool ChannelControl::isMSB(){
-		return control == yzrilyzr_util::MIDIFile::CC::DATA_ENTRY_MSB;
+		return control == MIDIFile::CC::DATA_ENTRY_MSB;
 	}
 
 	bool ChannelControl::isLSB(){
-		return control == yzrilyzr_util::MIDIFile::CC::DATA_ENTRY_LSB;
+		return control == MIDIFile::CC::DATA_ENTRY_LSB;
 	}
 
-	ChannelEvent * ChannelControl::clone(){
-		return new ChannelControl(this);
+	u_up<ChannelEvent>  ChannelControl::clone(){
+		return  mkup<ChannelControl>(this);
 	}
 
 	uint8_t ChannelControl::getType(){
@@ -152,8 +153,8 @@ namespace yzrilyzr_simplesynth{
 		this->value=clone->value;
 	}
 
-	ChannelEvent * ChannelPitchBend::clone(){
-		return new ChannelPitchBend(this);
+	u_up<ChannelEvent>  ChannelPitchBend::clone(){
+		return  mkup<ChannelPitchBend>(this);
 	}
 
 	uint8_t ChannelPitchBend::getType(){
@@ -185,8 +186,8 @@ namespace yzrilyzr_simplesynth{
 		}
 	}
 
-	ChannelEvent * ProgramChange::clone(){
-		return new ProgramChange(this);
+	u_up<ChannelEvent>  ProgramChange::clone(){
+		return  mkup<ProgramChange>(this);
 	}
 
 	uint8_t ProgramChange::getType(){
@@ -207,8 +208,8 @@ namespace yzrilyzr_simplesynth{
 		this->value=clone->value;
 	}
 
-	ChannelEvent * ChannelPressure::clone(){
-		return new ChannelPressure(this);
+	u_up<ChannelEvent>  ChannelPressure::clone(){
+		return  mkup<ChannelPressure>(this);
 	}
 
 	uint8_t ChannelPressure::getType(){
@@ -229,8 +230,8 @@ namespace yzrilyzr_simplesynth{
 		this->value=clone->value;
 	}
 
-	ChannelEvent * TuningChange::clone(){
-		return new TuningChange(this);
+	u_up<ChannelEvent>  TuningChange::clone(){
+		return  mkup<TuningChange>(this);
 	}
 
 	uint8_t TuningChange::getType(){
@@ -251,8 +252,8 @@ namespace yzrilyzr_simplesynth{
 		this->enable=clone->enable;
 	}
 
-	ChannelEvent * DrumChannel::clone(){
-		return new DrumChannel(this);
+	u_up<ChannelEvent>  DrumChannel::clone(){
+		return  mkup<DrumChannel>(this);
 	}
 
 	uint8_t DrumChannel::getType(){

@@ -8,7 +8,7 @@
 namespace yzrilyzr_simplesynth{
 	ECLASS(PostProcessDSP, public AmpUnaryComposition){
 	private:
-	u_sp<yzrilyzr_dsp::DSP> dsp=nullptr;
+	yzrilyzr_dsp::DSPPtr dsp=nullptr;
 	public:
 	~PostProcessDSP()=default;
 	PostProcessDSP();

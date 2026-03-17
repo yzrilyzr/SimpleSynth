@@ -50,6 +50,6 @@ namespace yzrilyzr_simplesynth{
 	void lpm(NoteProcPtr lpmSrc, double lpmAmp);
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(Osc);
+	U_CLASS_INFO(Osc);
 	};
 }

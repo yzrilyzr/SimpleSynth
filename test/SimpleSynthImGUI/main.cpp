@@ -16,7 +16,7 @@
 #include "lang/System.h"
 #include "lang/Thread.h"
 #include "stdio.h"
-#include "synth/generators/physic/Sakura.h"
+#include "synth/generators/physic/TwoStringResonator.h"
 #include "util/Lang.h"
 #include "util/Locale.h"
 #include "util/Util.h"
@@ -357,6 +357,7 @@ int main(int argc, char * argv[]){
 
 	static bool showEQWindow=false;
 	static bool showChannelWindow=true;
+	static bool showImportBankWindow=false;
 	static bool showMixerWindow=true;
 	static bool showInstSourceWindow=false;
 	static bool showOscilloscopeWindow=false;
@@ -422,6 +423,7 @@ int main(int argc, char * argv[]){
 			if(ImGui::BeginMenu(ctx.LANG.getc("menu.windows"))){
 				ImGui::MenuItem(ctx.LANG.getc("menu.windows.eq"), nullptr, &showEQWindow);
 				ImGui::MenuItem(ctx.LANG.getc("menu.windows.channel"), nullptr, &showChannelWindow);
+				ImGui::MenuItem(ctx.LANG.getc("menu.windows.import_bank"), nullptr, &showImportBankWindow);
 				ImGui::MenuItem(ctx.LANG.getc("menu.windows.mixer"), nullptr, &showMixerWindow);
 				ImGui::MenuItem(ctx.LANG.getc("menu.windows.inst_source"), nullptr, &showInstSourceWindow);
 				ImGui::MenuItem(ctx.LANG.getc("menu.windows.oscilloscope"), nullptr, &showOscilloscopeWindow);
@@ -477,6 +479,7 @@ int main(int argc, char * argv[]){
 		ctx.renderCurrentProjectWindow();
 		if(showMixerWindow)mixerSettingWindow(ctx);
 		if(showChannelWindow)channelSettingWindow(ctx);
+		if(showImportBankWindow)importFromBankWindow(ctx);
 		if(showPlayFileWindow)fileOpenWindow(ctx);
 		if(showInstSourceWindow)instrumentSourceWindow(ctx);
 		if(showOscilloscopeWindow)oscilloscopeWindow(ctx);

@@ -2,6 +2,7 @@
 #include "lang/StringFormat.hpp"
 
 using namespace yzrilyzr_util;
+using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
 
@@ -68,8 +69,8 @@ namespace yzrilyzr_simplesynth{
 		return mksp<FadeOutEnvelop>(fade, mode);
 	}
 
-	yzrilyzr_lang::String FadeOutEnvelop::toString() const{
-		return yzrilyzr_lang::StringFormat::object2string("FadeOutEnvelop", fade, mode);
+	String FadeOutEnvelop::toString() const{
+		return StringFormat::object2string("FadeOutEnvelop", fade, mode);
 	}
 
 } // namespace yzrilyzr_simplesynth

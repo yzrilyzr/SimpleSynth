@@ -120,6 +120,7 @@ void instrumentSourceWindow(CurrentProjectContext & ctx){
 	ImGui::Begin(ctx.LANG.getc("window.instrument.title"));
 	if(ImGui::Button(ctx.LANG.getc("window.instrument.refresh")) || initRefresh){
 		initRefresh=false;
+		if(!folderPath.exists())folderPath.mkdirs();
 		fileList=folderPath.listFiles();
 		fileList=Arrays::copyOf(fileList, fileList.length+2);
 		fileList[fileList.length-2]=(File(ctx.LANG.get("window.instrument.default")));

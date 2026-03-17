@@ -40,6 +40,17 @@ void NodeAutoLayout::start(CurrentProjectContext * ctx, int mode){
 				//计算参数位置垂直偏移量，接受输出的不需要计算
 				if(line.right->obj != nullptr){
 					for(auto & param : line.right->obj->paramRegPtr->RegisteredParams){
+						if((param.type & 0xff) == ParamType::ObjectArray){
+							ArrayList<u_sp<Object>> & arr=*static_cast<ArrayList<u_sp<Object>> *>(param.value);
+							for(int i=0;i < arr.size();i++){
+								int attrId=reinterpret_cast<int>(&arr[i]);
+								if(attrId == link.ended_at_attribute_id){
+									break;
+								}
+								paramIndex++;
+							}
+							continue;
+						}
 						int attrId=reinterpret_cast<int>(param.value);
 						if(attrId == link.ended_at_attribute_id){
 							break;

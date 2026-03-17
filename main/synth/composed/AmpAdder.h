@@ -17,6 +17,6 @@ namespace yzrilyzr_simplesynth{
 		return mksp<AmpAdder>(a->clone(), b->clone());
 	}
 	yzrilyzr_lang::String toString() const override;
-	U_GET_CLASS_NAME(AmpAdder);
+	U_CLASS_INFO(AmpAdder);
 	};
 }

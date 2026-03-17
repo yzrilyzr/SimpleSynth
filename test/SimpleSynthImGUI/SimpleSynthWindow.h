@@ -12,3 +12,4 @@ void instrumentSourceWindow(CurrentProjectContext & ctx);
 void oscilloscopeWindow(CurrentProjectContext & ctx);
 void eqWindow(CurrentProjectContext & ctx);
 void objectToStringWindow(CurrentProjectContext & ctx);
+void importFromBankWindow(CurrentProjectContext & ctx);

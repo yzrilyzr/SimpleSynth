@@ -122,11 +122,11 @@ namespace yzrilyzr_simplesynth{
 		// ==================== 事件处理 ====================
 		void noteOn(s_note_id_i noteId, s_note_vel velocity); // 音符开启
 		void noteOff(s_note_id_i noteId); // 音符关闭
-		void sendInstantEvent(ChannelEvent * n1); // 发送即时事件
-		void sendPostEvent(ChannelEvent * n1, u_time startAt); // 发送延时事件
+		void sendInstantEvent(u_up<ChannelEvent> n1); // 发送即时事件
+		void sendPostEvent(u_up<ChannelEvent> n1, u_time startAt); // 发送延时事件
 
 		// ==================== DSP效果处理 ====================
-		void addDSPToChain(u_sp<yzrilyzr_dsp::DSP> *dsp); // 添加DSP效果到处理链
+		void addDSPToChain(yzrilyzr_dsp::DSPPtr *dsp); // 添加DSP效果到处理链
 		yzrilyzr_dsp::Chorus & getChorus(u_index ch)const override; // 获取合唱效果器
 		yzrilyzr_dsp::Phaser & getPhaser(u_index ch)const override; // 获取相位效果器
 		yzrilyzr_dsp::Freeverb & getReverb(u_index ch)const override; // 获取混响效果器
@@ -140,14 +140,14 @@ namespace yzrilyzr_simplesynth{
 			// ==================== 私有成员变量 ====================
 		std::recursive_mutex eventLock;       // 事件队列锁
 		std::recursive_mutex noteLock;        // 音符操作锁
-		yzrilyzr_collection::LinkedList<ChannelEvent *> postEventQueue; // 延时事件队列
-		yzrilyzr_collection::LinkedList<ChannelEvent *> instantEventQueue; // 即时事件队列
+		std::deque<u_up<ChannelEvent> > postEventQueue; // 延时事件队列
+		std::deque<u_up<ChannelEvent> > instantEventQueue; // 即时事件队列
 		u_sp<yzrilyzr_dsp::DSPChain> dspChain[2]; // DSP处理链
-		u_sp<yzrilyzr_dsp::DSP> choruser[2];     // 合唱效果器
-		u_sp<yzrilyzr_dsp::DSP> phaser[2];     // 合唱效果器
-		u_sp<yzrilyzr_dsp::DSP> reverber[2];      // 混响效果器
-		u_sp<yzrilyzr_dsp::DSP> panner[2];       // 声像效果器
-		u_sp<yzrilyzr_dsp::DSP> limiter[2];      // 限制器
+		yzrilyzr_dsp::DSPPtr choruser[2];     // 合唱效果器
+		yzrilyzr_dsp::DSPPtr phaser[2];     // 合唱效果器
+		yzrilyzr_dsp::DSPPtr reverber[2];      // 混响效果器
+		yzrilyzr_dsp::DSPPtr panner[2];       // 声像效果器
+		yzrilyzr_dsp::DSPPtr limiter[2];      // 限制器
 		s_midichannel_id channelID=-1;     // 通道ID
 		u_time_f processTime;            // 处理时间统计
 		bool commited=false;           // 提交状态		
@@ -202,8 +202,8 @@ namespace yzrilyzr_simplesynth{
 		void setEQ(int32_t seg, double value); // 设置均衡器参数
 		u_sp<yzrilyzr_dsp::DSPChain> * getEQ()override;             // 获取均衡器链
 		// ==================== MIDI快速消息 ====================
-		void sendInstantEvent(ChannelEvent * event)override;
-		void postEvent(ChannelEvent * event, u_time startAt)override;
+		void sendInstantEvent(u_up<ChannelEvent>  event)override;
+		void postEvent(u_up<ChannelEvent>  event, u_time startAt)override;
 
 		// ==================== 通道管理 ====================
 		void addChannel(u_sp<Channel>channel);     // 添加通道
@@ -242,6 +242,7 @@ namespace yzrilyzr_simplesynth{
 		u_sample * getOutput(uint32_t chIndex)const override;
 		std::vector<u_sp<IChannel>> getAllChannels()const override;
 		bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)override;
+		U_CLASS_INFO(Mixer)
 
 		private:
 			// ==================== 私有成员变量 ====================
@@ -268,5 +269,6 @@ namespace yzrilyzr_simplesynth{
 		static constexpr uint32_t FLAG_RESET_LIMITER=0b10;
 		static constexpr uint32_t FLAG_RESET_BUFFER=0b1000;
 		static constexpr uint32_t FLAG_RESET_EQ=0b10000;
+		
 	};
 }

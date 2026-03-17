@@ -67,9 +67,10 @@
 //
 #include "synth/generators/physic/KarplusStrongSrc.h"
 #include "synth/generators/physic/BowedString.h"
+#include "synth/generators/physic/dwg/DWGNoteProcessor.h"
 #include "synth/generators/physic/Sitar.h"
-#include "synth/generators/physic/SakuraExciter.h"
-#include "synth/generators/physic/Sakura.h"
+#include "synth/generators/physic/TwoStringResonatorExciter.h"
+#include "synth/generators/physic/TwoStringResonator.h"
 #include "synth/generators/physic/PianoSrc.h"
 //
 #include "synth/generators/sampler/WaveSampler.h"
@@ -92,7 +93,7 @@
 #include "imgui.h"
 #include "dsp/IIRUtil.h"
 #include "SimpleSynthWindow.h"
-#include "sakura/SakuraRender.h"
+#include "twostringresonator/TwoStringResonatorRender.h"
 #include "piano/PianoRender.h"
 #include "sample/SampleRender.h"
 #include "dsprender/DSPRender.h"
@@ -161,10 +162,11 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	String physicsn=lang.get("register_module.category.notesrc.physic");
 	String physic="Physic";
 	reg.registerModule(lang, physic, physicsn, "KarplusStrongSrc", "register_module.notesrc.name.karplus_strong", [](){return mksp<KarplusStrongSrc>();});
+	reg.registerModule(lang, physic, physicsn, "DWGNoteProcessor", "register_module.notesrc.name.digital_wave_guide", [](){return mksp<DWGNoteProcessor>();});
 	reg.registerModule(lang, physic, physicsn, "BowedString", "register_module.notesrc.name.bowed_string", [](){return mksp<BowedString>();});
 	reg.registerModule(lang, physic, physicsn, "Sitar", "register_module.notesrc.name.sitar", [](){return mksp<Sitar>();});
-	reg.registerModule(lang, physic, physicsn, "Sakura", "register_module.notesrc.name.sakura", [](){return mksp<Sakura>();}, sakuraRenderFunc,false);
-	reg.registerModule(lang, physic, physicsn, "SakuraExciter", "register_module.notesrc.name.sakura_exciter", [](){return mksp<SakuraExciter>();});
+	reg.registerModule(lang, physic, physicsn, "TwoStringResonator", "register_module.notesrc.name.twostringresonator", [](){return mksp<TwoStringResonator>();}, twostringresonatorRenderFunc,false);
+	reg.registerModule(lang, physic, physicsn, "TwoStringResonatorExciter", "register_module.notesrc.name.twostringresonator_exciter", [](){return mksp<TwoStringResonatorExciter>();});
 	reg.registerModule(lang, physic, physicsn, "PianoSrc", "register_module.notesrc.name.piano_src", [](){return mksp<PianoSrc>();}, pianoRenderFunc);
 
 	// 采样器（Sampler）分类 - 补充未完善模块的翻译键，统一参数顺序
@@ -179,7 +181,7 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, envelop, envelopsn, "EnvelopMultiplier", "register_module.notesrc.name.envelop_multiplier", [](){return mksp<EnvelopMultiplier>();});
 	reg.registerModule(lang, envelop, envelopsn, "AHDSREnvelop", "register_module.notesrc.name.ahdsr", [](){return mksp<AHDSREnvelop>();});
 	reg.registerModule(lang, envelop, envelopsn, "GraphEnvelop", "register_module.notesrc.name.graph", [](){return mksp<GraphEnvelop>();}, GraphEnvRenderFunc);
-	reg.registerModule(lang, envelop, envelopsn, "FadeOutEnvelop", "register_module.notesrc.name.fadeout", [](){return mksp<FadeOutEnvelop>();});
+	reg.registerModule(lang, envelop, envelopsn, "FadeOutEnvelop", "register_module.notesrc.name.fade_out", [](){return mksp<FadeOutEnvelop>();});
 	reg.registerModule(lang, envelop, envelopsn, "TimeEnvelop", "register_module.notesrc.name.time", [](){return mksp<TimeEnvelop>();});
 	reg.registerModule(lang, envelop, envelopsn, "MultiStageEnvelope", "register_module.notesrc.name.multi_stage_envelope", [](){return mksp<MultiStageEnvelope>();}, MultiStageEnvRenderFunc);
 

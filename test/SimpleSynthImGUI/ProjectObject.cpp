@@ -13,10 +13,20 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
+using namespace yzrilyzr_collection;
 
 void ProjectObject::paramToJSON(json & a, const ClassRegister & paramReg){
 	for(auto & p : paramReg.RegisteredParams){
-		//a[(p->name + "type").c_str()]=p->type;
+		if((p.type & 0xff) == ParamType::ObjectArray){
+			ArrayList<u_sp<Object>> & arr=*static_cast<ArrayList<u_sp<Object>> *>(p.value);
+			json jsonArr=json::array();
+			for(int i=0;i < arr.size();i++){
+				void * rawPtr=arr[i].get();
+				jsonArr.push_back(reinterpret_cast<uint64_t>(rawPtr));
+			}
+			a[p.name.c_str()]=jsonArr;
+			continue;
+		}
 		switch(p.type){
 			case ParamType::Float:
 				a[p.name.c_str()]=*static_cast<float *>(p.value);
@@ -123,6 +133,9 @@ void ProjectObject::JSONToParam(const json & j, ClassRegister & paramReg){
 	for(auto & param : paramReg.RegisteredParams){
 		const char * key=param.name.c_str();
 		if(!j.contains(key))continue;
+		if((param.type & 0xff) == ParamType::ObjectArray){
+			continue;
+		}
 		switch(param.type){
 			case ParamType::Float:
 				*static_cast<float *>(param.value)=j.value(key, 0.0f);

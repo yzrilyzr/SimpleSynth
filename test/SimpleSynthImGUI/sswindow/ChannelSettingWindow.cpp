@@ -1,14 +1,14 @@
-#include "util/Lang.h"
 #include "../SimpleSynthProject.h"
 #include "../SimpleSynthWindow.h"
-#include "interface/IChannel.h"
-#include "interface/IMixer.h"
-#include "events/ChannelConfig.h"
 #include "SynthUtil.h"
 #include "array/Array.hpp"
 #include "dsp/Chorus.h"
 #include "dsp/Freeverb.h"
 #include "dsp/RMSCompute.h"
+#include "events/ChannelConfig.h"
+#include "interface/IChannel.h"
+#include "interface/IMixer.h"
+#include "util/Lang.h"
 
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_util;
@@ -17,75 +17,6 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_interpolator;
 
-extern MenuRegister allNoteProcessor;
-extern MenuRegister allDSP;
-extern MenuRegister allInterpolator;
-extern MenuRegister allPhaseSrc;
-extern MenuRegister allSubModule;
-
-void buildProjectFromInstrument(CurrentProjectContext & ctx, u_sp<ClassRegister> np, int parType){
-	ProjectObject * obj=new ProjectObject();
-	obj->paramRegPtr=np;
-	np->registerParams();
-	MenuRegister::MenuRegisterObject * menuObj=nullptr;
-	String clzName=np->getClassName();
-	System::out.println(clzName);
-	if(clzName == "BaseObject"){
-		System::out.println();
-	}
-	if(parType == ParamType::NoteSrc || parType == ParamType::SampleData){
-		for(auto & reg : allNoteProcessor.allRegObjects){
-			if(reg.name == clzName){
-				menuObj=&reg;
-				break;
-			}
-		}
-	} else if(parType == ParamType::DSP){
-		for(auto & reg : allDSP.allRegObjects){
-			if(reg.name == clzName){
-				menuObj=&reg;
-				break;
-			}
-		}
-	} else if(parType == ParamType::Interpolator){
-		for(auto & reg : allInterpolator.allRegObjects){
-			if(reg.name == clzName){
-				menuObj=&reg;
-				break;
-			}
-		}
-	} else if(parType == ParamType::PhaseSrc){
-		for(auto & reg : allPhaseSrc.allRegObjects){
-			if(reg.name == clzName){
-				menuObj=&reg;
-				break;
-			}
-		}
-	}
-	if(menuObj){
-		obj->name=menuObj->name;
-		obj->category=menuObj->category;
-		obj->showName=menuObj->showName;
-		obj->renderFunc=menuObj->rfunc;
-		obj->enableOriginalRender=menuObj->enableOriginalRender;
-	}
-	ctx.objects.add(obj);
-	for(auto & par : obj->paramRegPtr->RegisteredParams){
-		if(!par.value)continue;
-		switch(par.type){
-			case ParamType::DSP:
-			case ParamType::NoteSrc:
-			case ParamType::Interpolator:
-			case ParamType::PhaseSrc:
-			case ParamType::SampleData:
-			{
-				u_sp<ClassRegister> nptr=*static_cast<u_sp<ClassRegister> *>(par.value);
-				if(nptr)buildProjectFromInstrument(ctx, spsc<ClassRegister>(nptr), par.type);
-				break;
-			}
-		}
-	}
-}
 
 void channelSettingWindow(CurrentProjectContext & ctx){
 	IMixer & mixer=*ctx.mixer;
@@ -107,10 +38,10 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 	static s_program_id program=0;
 	if(ImGui::InputInt(ctx.LANG.getc("window.channel.program"), &program)){
 		if(sendToChannel != 20){
-			ProgramChange * event=new ProgramChange(program);
+			auto event=mkup< ProgramChange>(program);
 			event->groupName="WM_MIDI_Instant";
 			event->channelID=sendToChannel;
-			mixer.sendInstantEvent(event);
+			mixer.sendInstantEvent(std::move(event));
 		}
 	}
 	ImGuiKey start_key=ImGuiKey_0;
@@ -130,26 +61,19 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 			s_note_vel vel=1;
 			if(down && !isKeyDownState[ii]){
 				isKeyDownState[ii]=true;
-				NoteOn * event=new NoteOn(sendToChannel, noteid, vel);
+				auto event=mkup< NoteOn>(sendToChannel, noteid, vel);
 				event->groupName="WM_MIDI_Instant";
-				mixer.sendInstantEvent(event);
+				mixer.sendInstantEvent(std::move(event));
 			} else if(!down && isKeyDownState[ii]){
 				isKeyDownState[ii]=false;
-				NoteOff * event=new NoteOff(sendToChannel, noteid, vel);
+				auto event=mkup < NoteOff>(sendToChannel, noteid, vel);
 				event->groupName="WM_MIDI_Instant";
-				mixer.sendInstantEvent(event);
+				mixer.sendInstantEvent(std::move(event));
 			}
 		}
 	}
 	if(ImGui::Button(ctx.LANG.getc("window.channel.reset"))){
 		ch->reset();
-	}
-	ImGui::SameLine();
-	if(ImGui::Button(ctx.LANG.getc("window.channel.import_program_project"))){
-		ctx.objects.clear();
-		ctx.finalProcessor=ch->getConfig().instrument->get(0, program, mixer.getSampleRate());
-		buildProjectFromInstrument(ctx, ctx.finalProcessor, ParamType::NoteSrc);
-		//registerParams(*ctx.finalProcessor);
 	}
 	static LangToEnum disableNames;
 	if(disableNames.empty(ctx.LANG)){
@@ -243,7 +167,7 @@ void channelSettingWindow(CurrentProjectContext & ctx){
 		Chorus & c=ch->getChorus(i);
 		ImGui::PushID(i + 100);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.depth"), ImGuiDataType_Double, &c.depthMs, &def_min, &depthMax);
-		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.freq"), ImGuiDataType_Double, &(spdc<Oscillator>(c.osc)->freq), &def_min, &rateMax);
+		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.freq"), ImGuiDataType_Double, &(spsc<Oscillator>(c.osc)->freq), &def_min, &rateMax);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.feedback"), ImGuiDataType_Double, &c.feedback, &feedBackMin, &feedBackMax);
 		ImGui::SliderScalar(ctx.LANG.getc("window.channel.chorus.wet_ratio"), ImGuiDataType_Double, &c.wetRatio, &def_min, &def_max);
 		ImGui::PopID();

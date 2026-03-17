@@ -3,10 +3,23 @@
 #include "dsp/DSP.h"
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
+using namespace yzrilyzr_collection;
 namespace yzrilyzr_simplesynth{
 	DigitalWaveGuide::DigitalWaveGuide(){}
 	DigitalWaveGuide::DigitalWaveGuide(u_sample z, u_sample delayLen1, u_sample delayLen2){
 		init(z, delayLen1, delayLen2);
+	}
+	void DigitalWaveGuide::resetMemory(){
+		delayBuffers[0].fill(0);
+		delayBuffers[1].fill(0);
+	}
+	void DigitalWaveGuide::resetConnection(){
+		leftNodeCount=0;
+		rightNodeCount=0;
+		leftConnectedNodes[0]=nullptr;
+		leftConnectedNodes[1]=nullptr;
+		rightConnectedNodes[0]=nullptr;
+		rightConnectedNodes[1]=nullptr;
 	}
 	void DigitalWaveGuide::init(u_sample z, u_sample delayLen1, u_sample delayLen2){
 		// 初始化延迟缓冲区（大小为延迟长度，使用RingBufferSample）
@@ -155,9 +168,10 @@ namespace yzrilyzr_simplesynth{
 			rightNodeAlphas[k]=2.0 * rightConnectedNodes[k]->impedance / totalImpedance;
 		}
 	}
-	void DigitalWaveGuide::setDispersion(std::vector<u_sp<DSP>> dispersion, u_sp<DSP> lowpass, u_sample fracDelay){
+	void DigitalWaveGuide::setDispersion(const ArrayList<DSPPtr> & dispersion, DSPPtr lowpass, u_sample fracDelay){
 		commuteFlag=true;
-		this->dispersion=dispersion;
+		this->dispersion.clear();
+		this->dispersion.addAll(dispersion);
 		this->lowpass=lowpass;
 		this->fracDelayLen=fracDelay;
 		this->fracDelay.ensureCapacity(fracDelay);

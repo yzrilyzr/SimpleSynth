@@ -18,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 		float tick;
 		TickChange(long startAtTick, float tick) : startAtTick(startAtTick), tick(tick){}
 		uint8_t getType() override{ throw - 1; }
-		ChannelEvent * clone() override{ throw - 1; }
+		u_up<ChannelEvent>  clone() override{ throw - 1; }
 		yzrilyzr_lang::String toString() const override;
 	};
 	EBCLASS(SynthUtil){
@@ -32,9 +32,9 @@ namespace yzrilyzr_simplesynth{
 		static NoteProcPtr getDefault();
 		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2);
 		static void sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const yzrilyzr_lang::String & groupName);
-		static void sendMIDIEvent(ChannelEvent * event, const yzrilyzr_lang::String & deviceName);
-		static ChannelEvent * MIDIBytes2Event(uint8_t ty, uint8_t data1, uint8_t data2);
-		static uint64_t Event2MIDIBytes(ChannelEvent * event);
+		static void sendMIDIEvent(u_up<ChannelEvent>  event, const yzrilyzr_lang::String & deviceName);
+		static u_up<ChannelEvent>  MIDIBytes2Event(uint8_t ty, uint8_t data1, uint8_t data2);
+		static uint64_t Event2MIDIBytes(u_up<ChannelEvent>  event);
 		static uint64_t MergeMIDIBytes(uint8_t ty, uint8_t data1, uint8_t data2);
 		static yzrilyzr_array::SampleArray * noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2);
 		static yzrilyzr_array::SampleArray * NOISE;

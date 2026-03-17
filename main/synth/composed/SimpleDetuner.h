@@ -34,6 +34,6 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig &cfg) override;
 	SimpleDetunerKeyData * init(SimpleDetunerKeyData * data, const Note & note) override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(SimpleDetuner)
+	U_CLASS_INFO(SimpleDetuner)
 	};
 }

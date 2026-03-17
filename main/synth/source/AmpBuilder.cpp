@@ -75,9 +75,15 @@ namespace yzrilyzr_simplesynth{
 	 * 音符时长为 this->_src和mul两者 中的最短
 	 */
 	AmpBuilder & AmpBuilder::mul(NoteProcPtr mul1){
-		if(spdc<Enveloper>(this->_src)) this->_src=mksp<EnvelopMultiplier>(this->_src, mul1);
-		else if(spdc<Enveloper>(mul1)) this->_src=mksp<EnvelopMultiplier>(mul1, this->_src);
-		else this->_src=mksp<AmpMultiplier>(this->_src, mul1);
+		if(U_INSTANCE_OF_PTR(Enveloper, this->_src)){
+			this->_src=mksp<EnvelopMultiplier>(this->_src, mul1);
+		}
+		else if(U_INSTANCE_OF_PTR(Enveloper, mul1)){
+			this->_src=mksp<EnvelopMultiplier>(mul1, this->_src);
+		}
+		else{
+			this->_src=mksp<AmpMultiplier>(this->_src, mul1);
+		}
 		return *this;
 	}
 	AmpBuilder & AmpBuilder::multyKey(const IntArray& noteShift,const DoubleArray &velocityMul){
@@ -106,7 +112,7 @@ namespace yzrilyzr_simplesynth{
 		spsc<Osc>(this->_src)->setPhaseSource(src);
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::cc(const yzrilyzr_array::IntArray & cc){
+	AmpBuilder & AmpBuilder::cc(const IntArray & cc){
 		this->_src=mksp<AmpWithCC>(this->_src, cc);
 		return *this;
 	}
@@ -122,11 +128,11 @@ namespace yzrilyzr_simplesynth{
 		this->_src=mksp<AmpAdder>(this->_src, mksp<AmpMultiplier>(src1, ConstAmp(mul)));
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::noteDSP(yzrilyzr_dsp::DSPPtr dsp){
+	AmpBuilder & AmpBuilder::noteDSP(DSPPtr dsp){
 		this->_src=mksp<NoteDSP>(this->_src, dsp);
 		return *this;
 	}
-	AmpBuilder & AmpBuilder::postDSP(yzrilyzr_dsp::DSPPtr dsp){
+	AmpBuilder & AmpBuilder::postDSP(DSPPtr dsp){
 		this->_src=mksp<PostProcessDSP>(this->_src, dsp);
 		return *this;
 	}
@@ -300,7 +306,7 @@ namespace yzrilyzr_simplesynth{
 	AmpBuilder & AmpBuilder::biquadEnvID(double idOffset, double q, FilterPassType type){
 		return biquadEnv(AmpBuilder(NoteIDAmp).add(idOffset).build(), ConstAmp(q), type);
 	}
-	AmpBuilder & AmpBuilder::biquadEnvVel(s_note_id idMin, s_note_id idMax, double q, yzrilyzr_dsp::FilterPassType type){
+	AmpBuilder & AmpBuilder::biquadEnvVel(s_note_id idMin, s_note_id idMax, double q, FilterPassType type){
 		return biquadEnv(AmpBuilder(ConstAmp(idMax - idMin)).mul(NoteVelAmp).add(ConstAmp(idMin)).build(), ConstAmp(q), type);
 	}
 	AmpBuilder & AmpBuilder::biquad(u_sample_rate sampleRate, FilterPassType type, u_freq f1, double q, double gain){

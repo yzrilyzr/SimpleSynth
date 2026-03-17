@@ -60,10 +60,10 @@ void mixerSettingWindow(CurrentProjectContext & ctx){
 		else if(tuningType == 7)t=mksp<Young>();
 		mixer.getGlobalConfig().setNoteTuning(t);
 		for(auto channel : mixer.getAllChannels()){
-			TuningChange * event=new TuningChange(t);
+			auto event=mkup < TuningChange>(t);
 			event->channelID=channel->getChannelID();
 			event->groupName=channel->getGroupName();
-			mixer.sendInstantEvent(event);
+			mixer.sendInstantEvent(std::move(event));
 		}
 	}
 	ImGui::End();

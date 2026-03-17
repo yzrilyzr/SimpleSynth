@@ -19,7 +19,7 @@
 #include "synth/generators/physic/BowedString.h"
 #include "synth/generators/physic/KarplusStrongSrc.h"
 #include "synth/generators/physic/PianoSrc.h"
-#include "synth/generators/physic/Sakura.h"
+#include "synth/generators/physic/TwoStringResonator.h"
 #include "synth/generators/physic/Sitar.h"
 #include "synth/generators/pulse/CymbalOsc.h"
 #include "synth/generators/pulse/Pulse.h"
@@ -287,7 +287,7 @@ namespace yzrilyzr_simplesynth{
 				return acoustic_grand_piano();
 			case MIDIFile::Instruments::PIANO_BRIGHT_ACOUSTIC_PIANO:
 				return bright_acoustic_piano();
-				/*return SakuraBuilder()
+				/*return TwoStringResonatorBuilder()
 					.exciter(0.676, 1)
 					.exciterHiCut(0.839, 0.996)
 					.exciterHiCutEnv(0, 0, 298.611, 0)
@@ -333,12 +333,12 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::PIANO_ELECTRIC_PIANO_2:
 				return AmpBuilder(Matrix6x6ModulationBuilder()//alg 5
-								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 3000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
+								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 3000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.8, 0.0, 1.0, 0.99)
 								  .setOp(1, AmpBuilder(SineW()).ADSR(1, 300, 0, false, 100, Pow(-5), Pow(4), Pow(2)).build(), 14.0, 0.0, 0.0, 1.0, 0.0)
 								  .setOp(2, AmpBuilder(SineW()).ADSR(1, 7500, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
 								  .setOp(3, AmpBuilder(SineW()).velMix(0.143).ADSR(1, 5000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.0)
-								  .setOp(4, AmpBuilder(SineW()).ADSR(1, 7000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
-								  .setOp(5, AmpBuilder(SineW()).velMix(0.143).ADSR(1, 3500, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0.0, 0.0, 0.0, 1.0, 0.0)
+								  .setOp(4, AmpBuilder(SineW()).ADSR(1, 7000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 1.0, -1.0, 0.0, 1.0, 0.99)
+								  .setOp(5, AmpBuilder(SineW()).velMix(0.143).ADSR(1, 3500, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 1.0, 1.0, 0.0, 1.0, 0.0)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 0, 0.58 * 6)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 3, 2, 0.89 * 6)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 4, 0.79 * 6)
@@ -417,19 +417,19 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::CHROMATIC_PERCUSSION_TUBULAR_BELLS:
 				return AmpBuilder(Matrix6x6ModulationBuilder()//alg 5
-								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 2000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.95)
-								  .setOp(1, AmpBuilder(SineW()).ADSR(1, 8000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 3.5, 0.0, 0.0, 1.0, 0.0)
-								  .setOp(2, AmpBuilder(SineW()).ADSR(1, 2000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.99)
-								  .setOp(3, AmpBuilder(SineW()).ADSR(1, 8000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 3.5, 0.0, 0.0, 1.0, 0.0)
+								  .setOp(0, AmpBuilder(SineW()).ADSR(1, 2000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.8, 0.0, 1.0, 0.95)
+								  .setOp(1, AmpBuilder(SineW()).ADSR(1, 8000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 3.5, 1.2, 0.0, 1.0, 0.0)
+								  .setOp(2, AmpBuilder(SineW()).ADSR(1, 2000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, -2.0, 0.0, 1.0, 0.99)
+								  .setOp(3, AmpBuilder(SineW()).ADSR(1, 8000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 3.5, -0.8, 0.0, 1.0, 0.0)
 								  .setOp(4, AmpBuilder(SineW()).ADSR(1, 100, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 0, 323.594, 0.0, 1.0, 0.99)
-								  .setOp(5, AmpBuilder(SineW()).ADSR(1, 100, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 2.0, 0.0, 0.0, 1.0, 0.0)
+								  .setOp(5, AmpBuilder(SineW()).ADSR(1, 100, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 2.0, -2.8, 0.0, 1.0, 0.0)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 0, 0.78 * 2)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 3, 2, 0.75 * 2)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 4, 0.85 * 2)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 5, 0.01)
 								  .build())
 					.mul(0.5)
-					.ADSR(1, 9000, 0, false, 100, Pow(-5), Pow(3), Pow(1))
+					.ADSR(1, 9000, 0, false, 300, Pow(-5), Pow(3), Pow(1))
 					.build();
 			case MIDIFile::Instruments::CHROMATIC_PERCUSSION_DULCIMER:
 				return AmpBuilder().ks(0.9).ADSR(10, 5000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build();
@@ -446,7 +446,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(0.4)
 					.ADSR(10, 1, 0.7, true, 200, Pow(-5), Pow(5), Pow(5)).build();
 			case MIDIFile::Instruments::ORGAN_PERCUSSIVE_ORGAN:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.833, 1)
 					.exciterHiCut(0.829, 4.861)
 					.exciterHiCutEnv(0.1, 0.1, 215.356, 0.541667)
@@ -461,7 +461,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(0.397)
 					.build();
 			case MIDIFile::Instruments::ORGAN_ROCK_ORGAN:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.833, 1)
 					.exciterHiCut(0.8, 4.861)
 					.exciterHiCutEnv(0.1, 0.1, 215.356, 0.618056)
@@ -476,7 +476,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(0.397)
 					.build();
 			case MIDIFile::Instruments::ORGAN_CHURCH_ORGAN:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.052, 1)
 					.exciterHiCut(0.919, 2.41)
 					.exciterHiCutEnv(0.1, 0.1, 215.356, 0.493056)
@@ -492,7 +492,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(0.358)
 					.build();
 			case MIDIFile::Instruments::ORGAN_REED_ORGAN:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.376, 1)
 					.exciterHiCut(0.828, 2.269)
 					.exciterHiCutEnv(0.1, 0.1, 27.875, 0)
@@ -514,7 +514,7 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(37, 2000, 0.71, true, 100, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::ORGAN_HARMONICA:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.095, 1)
 					.exciterHiCut(0.81, 1.844)
 					.exciterHiCutEnv(13.9875, 62.5938, 55.65, 0.270833)
@@ -615,7 +615,7 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(10, 50, 1, true, 100, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::GUITAR_GUITAR_HARMONICS:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.619, 1)
 					.exciterHiCut(1, 1)
 					.exciterHiCutEnv(100, 100, 100, 0.784722)
@@ -639,7 +639,7 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(5, 1000, 0.3, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::BASS_ELECTRIC_BASS_FINGER:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.105, 1)
 					.exciterHiCut(0.866, 1)
 					.exciterHiCutEnv(0.1, 0.1, 41.7625, 0.125)
@@ -654,7 +654,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(0.54)
 					.build();
 			case MIDIFile::Instruments::BASS_ELECTRIC_BASS_PICK:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.105, 1)
 					.exciterHiCut(0.866, 1)
 					.exciterHiCutEnv(0.1, 0.1, 41.7625, 0.125)
@@ -768,7 +768,7 @@ namespace yzrilyzr_simplesynth{
 			//=====================================
 
 			case MIDIFile::Instruments::ENSEMBLE_STRING_ENSEMBLE_1:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.142, 0.612)
 					.exciterHiCut(0.693, 1.322)
 					.exciterHiCutEnv(0, 0, 0, 1)
@@ -782,7 +782,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(1)
 					.build();
 			case MIDIFile::Instruments::ENSEMBLE_STRING_ENSEMBLE_2:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.142, 0.612).exciterHiCut(0.706, 1.994)
 					.exciterHiCutEnv(0, 0, 0, 1)
 					.exciterLowCut(0.407, 0.756)
@@ -795,7 +795,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(1)
 					.build();
 			case MIDIFile::Instruments::ENSEMBLE_SYNTH_STRINGS_1:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(mksp<Pulse>(0.0, 0.714, 0.04, 0))
 					.exciterHiCut(0.802, 1.994)
 					.exciterHiCutEnv(0, 0, 0, 1)
@@ -809,7 +809,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(1)
 					.build();
 			case MIDIFile::Instruments::ENSEMBLE_SYNTH_STRINGS_2:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(mksp<Pulse>(0.0, 0.714, 0.04, 0))
 					.exciterHiCut(1, 1.994)
 					.exciterHiCutEnv(0, 0, 0, 1)
@@ -848,7 +848,7 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::ENSEMBLE_ORCHESTRA_HIT:
 				return AmpBuilder()
-					.src(SakuraBuilder()
+					.src(TwoStringResonatorBuilder()
 						 .exciter(1, 0.257)
 						 .exciterHiCut(1, 1.043)
 						 .exciterHiCutEnv(1, 105.625, 1000, 0.222222)
@@ -1023,7 +1023,7 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(50, 100, 0.7, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::PIPE_PAN_FLUTE:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(AmpBuilder().src(mksp<Pulse>(0.3, 0.2, 0.2, 0)).add(mksp<NoiseSrc>()).build())
 					.exciterHiCut(0.93, 1)
 					.exciterHiCutEnv(97.2222, 0, 0, 0.791667)
@@ -1037,7 +1037,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(1)
 					.build();
 			case MIDIFile::Instruments::PIPE_BOTTLE_BLOW:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(AmpBuilder().src(mksp<Pulse>(0.3, 0.2, 0.2, 0)).add(mksp<NoiseSrc>()).build())
 					.exciterHiCut(0.76, 1)
 					.exciterHiCutEnv(97.2222, 0, 0, 0.791667)
@@ -1051,7 +1051,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(1)
 					.build();
 			case MIDIFile::Instruments::PIPE_SHAKUHACHI:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(AmpBuilder().src(mksp<Pulse>(0.3, 0.2, 0.2, 0)).add(mksp<NoiseSrc>()).build())
 					.exciterHiCut(0.91, 1)
 					.exciterHiCutEnv(256.944, 0, 0, 0.909722)
@@ -1099,7 +1099,7 @@ namespace yzrilyzr_simplesynth{
 					.AHDSR(5, 30, 300, 0.75, true, 300, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::LEAD_CALIOPE_LEAD:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(mksp<SawWave>())
 					.exciterHiCut(0.82, 1.01)
 					.exciterHiCutEnv(0, 0, 145.833, 0.638889)
@@ -1148,7 +1148,7 @@ namespace yzrilyzr_simplesynth{
 			//=====================================
 
 			case MIDIFile::Instruments::PAD_NEW_AGE:
-				return  AmpBuilder().src(SakuraBuilder()
+				return  AmpBuilder().src(TwoStringResonatorBuilder()
 										 .exciter(0, 1)
 										 .exciterHiCut(0.677, 0.76)
 										 .exciterHiCutEnv(0, 0, 48.7062, 1)
@@ -1164,7 +1164,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(2)
 					.build();
 			case MIDIFile::Instruments::PAD_WARM:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.09, 1)
 					.exciterHiCut(0.547, 2.41)
 					.exciterHiCutEnv(0.1, 48.7062, 659.756, 0.0972218)
@@ -1180,7 +1180,7 @@ namespace yzrilyzr_simplesynth{
 					.resonatorLevel(0.358)
 					.build();
 			case MIDIFile::Instruments::PAD_POLYSYNTH:
-				return SakuraBuilder()
+				return TwoStringResonatorBuilder()
 					.exciter(0.09, 1)
 					.exciterHiCut(0.843, 0.76)
 					.exciterHiCutEnv(0.1, 69.5375, 319.512, 0.631944)
@@ -1199,7 +1199,7 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::PAD_BOWED:
-				return  AmpBuilder().src(SakuraBuilder()
+				return  AmpBuilder().src(TwoStringResonatorBuilder()
 										 .exciter(0.148, 1)
 										 .exciterHiCut(0.648, 1.279)
 										 .exciterHiCutEnv(48.7062, 0.1, 0.1, 0.611111)
@@ -1215,7 +1215,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(2)
 					.build();
 			case MIDIFile::Instruments::PAD_METALLIC:
-				return AmpBuilder().src(SakuraBuilder()
+				return AmpBuilder().src(TwoStringResonatorBuilder()
 										.exciter(0.09, 1)
 										.exciterHiCut(0.843, 0.76)
 										.exciterHiCutEnv(0.1, 69.5375, 319.512, 0.618055)
@@ -1231,7 +1231,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(8)
 					.build();
 			case MIDIFile::Instruments::PAD_HALO:
-				return AmpBuilder().src(SakuraBuilder()
+				return AmpBuilder().src(TwoStringResonatorBuilder()
 										.exciter(0.09, 1)
 										.exciterHiCut(0.738, 0.76)
 										.exciterHiCutEnv(0.1, 0.1, 319.512, 0.520833)
@@ -1247,7 +1247,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(2)
 					.build();
 			case MIDIFile::Instruments::PAD_SWEEP:
-				return  AmpBuilder().src(SakuraBuilder()
+				return  AmpBuilder().src(TwoStringResonatorBuilder()
 										 .exciter(0, 1)
 										 .exciterHiCut(0.724, 0.76)
 										 .exciterHiCutEnv(0.1, 0.1, 48.7058, 1)

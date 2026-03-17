@@ -27,8 +27,7 @@ namespace yzrilyzr_simplesynth{
 		registerParam("LoopStart", ParamType::Int, &startLoopIndex, &loop_min, &loop_max);
 		registerParam("LoopEnd", ParamType::Int, &endLoopIndex, &loop_min, &loop_max);
 		static const char * enumNames[]={"LOOP_DISABLE", "LOOP_ONCE", "LOOP_LOOP", "LOOP_PING_PONG"};
-		static int names=4;
-		registerParam("LoopType", ParamType::Enum, &loopType, enumNames, &names);
+		registerParamEnum("LoopType", &loopType, enumNames, 4);
 	}
 	WaveSampler::WaveSampler() :Osc(nullptr){}
 

@@ -30,6 +30,6 @@ namespace yzrilyzr_simplesynth{
 	void cc(ChannelConfig & cfg, ChannelControl & cc) override;
 	VVVFKeyData * init(VVVFKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
-	U_GET_CLASS_NAME(VVVF)
+	U_CLASS_INFO(VVVF)
 	};
 }

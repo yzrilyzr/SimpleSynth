@@ -6,7 +6,7 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
-	NoteDSP::NoteDSP(NoteProcPtr a, u_sp<DSP> dsp) : AmpUnaryComposition(a){
+	NoteDSP::NoteDSP(NoteProcPtr a, DSPPtr dsp) : AmpUnaryComposition(a){
 		this->dsp=dsp;
 	}
 	void NoteDSP::init(ChannelConfig & cfg){

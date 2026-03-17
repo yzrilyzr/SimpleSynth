@@ -42,7 +42,7 @@ namespace yzrilyzr_simplesynth{
 		shaping5.resetMemory();
 		soundboard.resetMemory();
 	}
-	u_sp<DSP> PianoSoundBoard::cloneDSP(){
+	DSPPtr PianoSoundBoard::cloneDSP(){
 		return mksp< PianoSoundBoard>(*param);
 	}
 	void PianoSoundBoard::cloneParam(DSP * obj1){}

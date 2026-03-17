@@ -40,7 +40,7 @@ namespace yzrilyzr_simplesynth{
 	int32_t clampToLoop(int32_t index) const;
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(WaveSampler)
+	U_CLASS_INFO(WaveSampler)
 
 	};
 	EBCLASS(WaveSamplerBuilder){

@@ -22,7 +22,7 @@ namespace yzrilyzr_simplesynth{
 	String TickChange::toString() const{
 		return StringFormat::format("[TickChange:%.2fms Start:%d]", tick * 1000.0f, startAtTick);
 	}
-	void SynthUtil::sequenceToMIDI(u_sp<MixerSequence> mixerSeq, yzrilyzr_io::OutputStream & os){
+	void SynthUtil::sequenceToMIDI(u_sp<MixerSequence> mixerSeq, OutputStream & os){
 		auto midiSeq=mksp<MIDIFile::MIDISequence>();
 		midiSeq->midiFormat=1; // 多音轨格式
 		midiSeq->ticksForQuarterNote=480; // 标准PPQ
@@ -59,15 +59,16 @@ namespace yzrilyzr_simplesynth{
 			u_time lastEventTime=0;
 
 			for(auto & eventWrapper : events){
-				ChannelEvent * event=eventWrapper.event;
-				u_time eventTime=event->startAtTime; // 绝对时间（秒）
+				ChannelEvent & event=*eventWrapper.event;
+				u_time eventTime=event.startAtTime; // 绝对时间（秒）
 				int deltaTicks=static_cast<int>((eventTime - lastEventTime) * ticksPerSecond + 0.5f);
 				lastEventTime=eventTime;
 
 				// 根据事件类型创建MIDI事件
 				u_sp<MIDIFile::MIDIEvent> midiEvent=nullptr;
-
-				if(auto * noteOn=dynamic_cast<NoteOn *>(event)){
+				auto eventType=event.getType();
+				if(eventType == EventType::NOTE_ON){
+					auto * noteOn=static_cast<NoteOn *>(&event);
 					uint8_t status=0x90 | (midiChannel & 0x0F);
 					auto midiNote=mksp<MIDIFile::MIDINote>(
 						deltaTicks,
@@ -76,7 +77,8 @@ namespace yzrilyzr_simplesynth{
 						static_cast<uint8_t>(noteOn->velocity * 127)
 					);
 					midiEvent=midiNote;
-				} else if(auto * noteOff=dynamic_cast<NoteOff *>(event)){
+				} else if(eventType == EventType::NOTE_OFF){
+					auto * noteOff=static_cast<NoteOff *>(&event);
 					uint8_t status=0x80 | (midiChannel & 0x0F);
 					auto midiNote=mksp<MIDIFile::MIDINote>(
 						deltaTicks,
@@ -85,7 +87,8 @@ namespace yzrilyzr_simplesynth{
 						static_cast<uint8_t>(noteOff->velocity * 127)
 					);
 					midiEvent=midiNote;
-				} else if(auto * progChange=dynamic_cast<ProgramChange *>(event)){
+				} else if(eventType == EventType::CHANNEL_PROGRAM_CHANGE){
+					auto * progChange=static_cast<ProgramChange *>(&event);
 					uint8_t status=0xC0 | (midiChannel & 0x0F);
 					auto midiPC=mksp<MIDIFile::MIDIProgramChange>(
 						deltaTicks,
@@ -93,7 +96,8 @@ namespace yzrilyzr_simplesynth{
 						progChange->id
 					);
 					midiEvent=midiPC;
-				} else if(auto * pitchBend=dynamic_cast<ChannelPitchBend *>(event)){
+				} else if(eventType == EventType::CHANNEL_PITCH_BEND){
+					auto * pitchBend=static_cast<ChannelPitchBend *>(&event);
 					uint8_t status=0xE0 | (midiChannel & 0x0F);
 					int midiValue=static_cast<int>((pitchBend->value + 1.0f) * 8192.0f);
 					midiValue=Util::clamp(midiValue, 0, 16383);
@@ -101,7 +105,8 @@ namespace yzrilyzr_simplesynth{
 					uint8_t msb=(midiValue >> 7) & 0x7F;
 					auto midiPB=mksp<MIDIFile::MIDIPitchBend>(deltaTicks, status, lsb, msb);
 					midiEvent=midiPB;
-				} else if(auto * channelPressure=dynamic_cast<ChannelPressure *>(event)){
+				} else if(eventType == EventType::CHANNEL_PRESSURE){
+					auto * channelPressure=static_cast<ChannelPressure *>(&event);
 					uint8_t status=0xD0 | (midiChannel & 0x0F);
 					auto midiPressure=mksp<MIDIFile::MIDIChannelPressure>(
 						deltaTicks,
@@ -109,7 +114,8 @@ namespace yzrilyzr_simplesynth{
 						static_cast<uint8_t>(channelPressure->value * 127)
 					);
 					midiEvent=midiPressure;
-				} else if(auto * channelControl=dynamic_cast<ChannelControl *>(event)){
+				} else if(eventType == EventType::CHANNEL_CONTROL){
+					auto * channelControl=static_cast<ChannelControl *>(&event);
 					uint8_t status=0xB0 | (midiChannel & 0x0F);
 					auto midiCC=mksp<MIDIFile::MIDIChannelControl>(
 						deltaTicks,
@@ -118,7 +124,8 @@ namespace yzrilyzr_simplesynth{
 						channelControl->value
 					);
 					midiEvent=midiCC;
-				} else if(auto * notePressure=dynamic_cast<NotePressure *>(event)){
+				} else if(eventType == EventType::NOTE_PRESSURE){
+					auto * notePressure=static_cast<NotePressure *>(&event);
 					uint8_t status=0xA0 | (midiChannel & 0x0F);
 					auto midiNote=mksp<MIDIFile::MIDINote>(
 						deltaTicks,
@@ -128,13 +135,10 @@ namespace yzrilyzr_simplesynth{
 					);
 					midiEvent=midiNote;
 				}
-
 				if(midiEvent){
 					track->events.add(midiEvent);
 				}
-
 			}
-
 			// 添加音轨结束事件
 			auto endMeta=mksp<MIDIFile::FFMessage>(0);
 			endMeta->type=0x2F;
@@ -160,7 +164,7 @@ namespace yzrilyzr_simplesynth{
 			auto midiSequence=MIDIFile::parse(is);
 			if(midiSequence == nullptr)return nullptr;
 			int noteShift=0;
-			ArrayList<ChannelEvent *> ticks;
+			std::vector<u_up<ChannelEvent>> ticks;
 			bool isGS=midiSequence->standard == MIDIFile::Standard::ROLAND_GENERAL_STANDARD;
 			bool isXG=midiSequence->standard == MIDIFile::Standard::YAMAHA_EXTENDED_GENERAL;
 			if(isGS)System::out.println("MIDI GS");
@@ -179,8 +183,8 @@ namespace yzrilyzr_simplesynth{
 					delayTicks+=e->deltaTimeTicks;
 					delay+=e->deltaTimeTicks * ticksSecond;
 					for(int32_t i=(int32_t)ticks.size() - 1;i >= 0;i--){
-						ChannelEvent * m=ticks.get(i);
-						TickChange * change=(TickChange *)m;
+						u_up<ChannelEvent> & m=ticks[i];
+						TickChange * change=(TickChange *)m.get();
 						if(delayTicks >= change->startAtTick){
 							//if(change->tick!=ticksSecond){
 							ticksSecond=change->tick;
@@ -198,14 +202,14 @@ namespace yzrilyzr_simplesynth{
 						}
 						channel+=midiPort * 16;
 						if(mnote->action == 0){
-							ChannelEvent * n1=new NoteOff(mnote->id + noteShift, mnote->velocity / 127.0f);
-							mixerSequence->postToSequence(channel, n1, delay);
+							u_up<ChannelEvent>  n1=mkup< NoteOff>(mnote->id + noteShift, mnote->velocity / 127.0f);
+							mixerSequence->postToSequence(channel, std::move(n1), delay);
 						} else if(mnote->action == 1){
-							ChannelEvent * n1=new NoteOn(mnote->id + noteShift, mnote->velocity / 127.0f);
-							mixerSequence->postToSequence(channel, n1, delay);
+							u_up<ChannelEvent>  n1=mkup < NoteOn>(mnote->id + noteShift, mnote->velocity / 127.0f);
+							mixerSequence->postToSequence(channel, std::move(n1), delay);
 						} else if(mnote->action == 2){
-							ChannelEvent * n1=new NotePressure(mnote->id + noteShift, mnote->velocity / 127.0f);
-							mixerSequence->postToSequence(channel, n1, delay);
+							u_up<ChannelEvent>  n1=mkup < NotePressure>(mnote->id + noteShift, mnote->velocity / 127.0f);
+							mixerSequence->postToSequence(channel, std::move(n1), delay);
 						}
 					} else if(et == MIDIFile::EventType::ChannelPitchBend){
 						auto pitchBend=spsc<MIDIFile::MIDIPitchBend>(e);
@@ -214,8 +218,8 @@ namespace yzrilyzr_simplesynth{
 							channel=mapToDrumDst;
 						}
 						channel+=midiPort * 16;
-						ChannelEvent * n1=new ChannelPitchBend((pitchBend->value - 8192.0f) / 8192.0f);
-						mixerSequence->postToSequence(channel, n1, delay);
+						u_up<ChannelEvent>  n1=mkup< ChannelPitchBend>((pitchBend->value - 8192.0f) / 8192.0f);
+						mixerSequence->postToSequence(channel, std::move(n1), delay);
 					} else if(et == MIDIFile::EventType::ChannelPressure){
 						auto pressure=spsc<MIDIFile::MIDIChannelPressure>(e);
 						int channel=pressure->channel;
@@ -223,8 +227,8 @@ namespace yzrilyzr_simplesynth{
 							channel=mapToDrumDst;
 						}
 						channel+=midiPort * 16;
-						ChannelEvent * n1=new ChannelPressure(pressure->value / 127.0f);
-						mixerSequence->postToSequence(channel, n1, delay);
+						u_up<ChannelEvent>  n1=mkup< ChannelPressure>(pressure->value / 127.0f);
+						mixerSequence->postToSequence(channel, std::move(n1), delay);
 					} else if(et == MIDIFile::EventType::ChannelControl){
 						auto control=spsc<MIDIFile::MIDIChannelControl>(e);
 						int channel=control->channel;
@@ -232,8 +236,8 @@ namespace yzrilyzr_simplesynth{
 							channel=mapToDrumDst;
 						}
 						channel+=midiPort * 16;
-						ChannelEvent * n1=new ChannelControl(control->control, control->value);
-						mixerSequence->postToSequence(channel, n1, delay);
+						u_up<ChannelEvent>  n1=mkup < ChannelControl>(control->control, control->value);
+						mixerSequence->postToSequence(channel, std::move(n1), delay);
 					} else if(et == MIDIFile::EventType::ProgramChange){
 						auto setInstrument=spsc<MIDIFile::MIDIProgramChange>(e);
 						int channel=setInstrument->channel;
@@ -241,8 +245,8 @@ namespace yzrilyzr_simplesynth{
 							channel=mapToDrumDst;
 						}
 						channel+=midiPort * 16;
-						ChannelEvent * n1=new ProgramChange(setInstrument->num);
-						mixerSequence->postToSequence(channel, n1, delay);
+						u_up<ChannelEvent>  n1=mkup < ProgramChange>(setInstrument->num);
+						mixerSequence->postToSequence(channel, std::move(n1), delay);
 					} else if(et == MIDIFile::EventType::Sysex){
 						auto sys=spsc<MIDIFile::SysexMessage>(e);
 						auto & b=sys->b;
@@ -255,15 +259,14 @@ namespace yzrilyzr_simplesynth{
 							} else if(b[2] == 0x42 && (b[3] & 0x10) == 0x10){
 								int32_t channel=b[3] - 0x10;
 							}
-
 						}
 					} else if(et == MIDIFile::EventType::FF){
 						auto ffMessage=spsc<MIDIFile::FFMessage>(e);
 						if(ffMessage->type == 0x51){
 							float newTick=ffMessage->quarterNoteDurationMicroSeconds / (float)midiSequence->ticksForQuarterNote / 1000000.0f;
-							ChannelEvent * ce=new TickChange(delayTicks, newTick);
+							u_up<ChannelEvent>  ce=mkup<TickChange>(delayTicks, newTick);
 							ce->startAtTime=delay;
-							ticks.add(ce);
+							ticks.emplace_back(std::move(ce));
 						} else if(ffMessage->type == 0x21){
 							midiPort=ffMessage->b[0];
 							System::out.printf("MIDI File Port: %d\n", midiPort);
@@ -283,40 +286,24 @@ namespace yzrilyzr_simplesynth{
 			.ADSR(5, 5000, 0, false, 100, Pow(-5), Pow(8), Pow(5))
 			.build();
 	}
-	//u_sp<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, s_midichannel_id channelID){
-	//	return getMIDIChannelOrNew(mixer, IMixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME, channelID);
-	//}
-	//u_sp<IChannel> SynthUtil::getMIDIChannelOrNew(IMixer * mixer, const String & groupName, s_midichannel_id channelID){
-	//	if(auto m1=dynamic_cast<Mixer *>(mixer)){
-	//		u_sp<Channel> channel=spsc<Channel>(m1->getMIDIChannel(groupName, channelID));
-	//		if(channel == nullptr){
-	//			channel=mksp<Channel>();
-	//			channel->setName(groupName + " #" + std::to_string(channelID));
-	//			m1->setMIDIChannel(groupName, channelID, channel);
-	//		}
-	//		if(channelID == 9) channel->setSustain(true);
-	//		return spsc<IChannel>(channel);
-	//	}
-	//	return nullptr;
-	//}
-	ChannelEvent * SynthUtil::MIDIBytes2Event(uint8_t ty, uint8_t data1, uint8_t data2){
+	u_up<ChannelEvent>  SynthUtil::MIDIBytes2Event(uint8_t ty, uint8_t data1, uint8_t data2){
 		int type=ty & 0b11110000;
 		int channelID=ty & 0b1111;
 		switch(type){
 			case 0x80:
-				return new NoteOff(channelID, data1 & 0xff, (data2 & 0xff) / 127.0f);
+				return mkup< NoteOff>(channelID, data1 & 0xff, (data2 & 0xff) / 127.0f);
 			case 0x90:
-				return  new NoteOn(channelID, data1 & 0xff, (data2 & 0xff) / 127.0f);
+				return  mkup < NoteOn>(channelID, data1 & 0xff, (data2 & 0xff) / 127.0f);
 			case 0xa0:
-				return new NotePressure(channelID, (data1 & 0xff), (data2 & 0xff) / 127.0f);
+				return mkup < NotePressure>(channelID, (data1 & 0xff), (data2 & 0xff) / 127.0f);
 			case 0xb0:
-				return new ChannelControl(channelID, data1 & 0xff, data2 & 0xff);
+				return mkup < ChannelControl>(channelID, data1 & 0xff, data2 & 0xff);
 			case 0xc0:
-				return new ProgramChange(channelID, data1 & 0xff);
+				return mkup < ProgramChange>(channelID, data1 & 0xff);
 			case 0xd0:
-				return new ChannelPressure(channelID, (data2 & 0xff) / 127.0f);
+				return mkup < ChannelPressure>(channelID, (data2 & 0xff) / 127.0f);
 			case 0xe0:
-				return new ChannelPitchBend(channelID, (((data1 & 0x7f) | ((data2 & 0x7f) << 7)) - 8192.0f) / 8191.0f);
+				return mkup < ChannelPitchBend>(channelID, (((data1 & 0x7f) | ((data2 & 0x7f) << 7)) - 8192.0f) / 8191.0f);
 			case 0xf0:
 				break;
 		}
@@ -326,20 +313,20 @@ namespace yzrilyzr_simplesynth{
 		sendMIDIBytes(mixer, ty, data1, data2, Mixer::DEFAULT_MIDI_CHANNEL_GROUP_NAME);
 	}
 	void SynthUtil::sendMIDIBytes(IMixer * mixer, uint8_t ty, uint8_t data1, uint8_t data2, const String & groupName){
-		auto * event=MIDIBytes2Event(ty, data1, data2);
+		auto event=MIDIBytes2Event(ty, data1, data2);
 		if(event == nullptr)return;
 		event->groupName=groupName;
-		mixer->sendInstantEvent(event);
+		mixer->sendInstantEvent(std::move(event));
 	}
-	void SynthUtil::sendMIDIEvent(ChannelEvent * event, const String & deviceName){
-		if(callback != nullptr)(*callback)(deviceName, Event2MIDIBytes(event));
+	void SynthUtil::sendMIDIEvent(u_up<ChannelEvent>  event, const String & deviceName){
+		if(callback != nullptr)(*callback)(deviceName, Event2MIDIBytes(std::move(event)));
 	}
 	uint64_t SynthUtil::MergeMIDIBytes(uint8_t ty, uint8_t data1, uint8_t data2){
 		return (uint64_t)(ty & 0xFF) |
 			((uint64_t)(data1 & 0x7F) << 8) |
 			((uint64_t)(data2 & 0x7F) << 16);
 	}
-	uint64_t SynthUtil::Event2MIDIBytes(ChannelEvent * event){
+	uint64_t SynthUtil::Event2MIDIBytes(u_up<ChannelEvent>  event){
 		uint8_t ch=event->channelID & 0b1111;
 		switch(event->getType()){
 			case EventType::NOTE_ON:
@@ -420,10 +407,10 @@ namespace yzrilyzr_simplesynth{
 		double ticksPerSecond=module1.bpm * 0.4;
 		double rowsPerSecond=ticksPerSecond / module1.tempo;
 		for(u_index i=0;i < module1.num_channels;i++){
-			ChannelEvent * event=new ChannelControl(MIDIFile::CC::MONO_MODE, 127);
-			mixerSequence->postToSequence(i, event, 0);
-			event=new DrumChannel(false);
-			mixerSequence->postToSequence(i, event, 0);
+			auto event=mkup< ChannelControl>(MIDIFile::CC::MONO_MODE, 127);
+			mixerSequence->postToSequence(i, std::move(event), 0);
+			auto event2=mkup< DrumChannel>(false);
+			mixerSequence->postToSequence(i, std::move(event2), 0);
 		}
 		IntArray notePrevInstrument(module1.num_channels);
 		//在模式索引表查找
@@ -451,8 +438,8 @@ namespace yzrilyzr_simplesynth{
 					int channel=channelI;
 					XMFile::PatternSlot & s=pattern.slots[slotIndex];//从模式获取槽位
 					if(s.instrument > 0 && notePrevInstrument[channelI] != s.instrument){
-						ChannelEvent * channelEvent=new ProgramChange(s.instrument - 1);
-						mixerSequence->postToSequence(channel, channelEvent, time);
+						u_up<ChannelEvent>  channelEvent=mkup< ProgramChange>(s.instrument - 1);
+						mixerSequence->postToSequence(channel, std::move(channelEvent), time);
 						//channelEvent=new ChannelControl(MIDIFile::CC::RESET_MUTE_ALL_NOTES, 127);
 						//mixerSequence->postToSequence(channel, channelEvent, time);
 						notePrevInstrument[channelI]=s.instrument;
@@ -460,21 +447,21 @@ namespace yzrilyzr_simplesynth{
 					uint32_t vv=s.volume_column << 16;
 					vv|=s.effect_type << 8;
 					vv|=s.effect_param;
-					ChannelEvent * channelEvent=new ChannelControl(256, vv);
-					mixerSequence->postToSequence(channel, channelEvent, time);					
+					u_up<ChannelEvent>  channelEvent=mkup < ChannelControl>(256, vv);
+					mixerSequence->postToSequence(channel, std::move(channelEvent), time);
 
 					if(s.effect_type != 0 || s.effect_param != 0){
 						switch(s.effect_type){
 							case XMFile::EffectType::VIBRATO:
 							{
-								ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::MODULATION, s.effect_param);
-								mixerSequence->postToSequence(channel, channelEvent, time);
+								u_up<ChannelEvent>  channelEvent=mkup < ChannelControl>(MIDIFile::CC::MODULATION, s.effect_param);
+								mixerSequence->postToSequence(channel, std::move(channelEvent), time);
 							}
 							break;
 							case XMFile::EffectType::TREMOLO:
 							{
-								ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::MODULATION, s.effect_param);
-								mixerSequence->postToSequence(channel, channelEvent, time);
+								u_up<ChannelEvent>  channelEvent=mkup < ChannelControl>(MIDIFile::CC::MODULATION, s.effect_param);
+								mixerSequence->postToSequence(channel, std::move(channelEvent), time);
 							}
 							break;
 							case XMFile::EffectType::PATTERN_BREAK:
@@ -490,12 +477,12 @@ namespace yzrilyzr_simplesynth{
 					}
 					if(s.note > 0 && s.note < 97){
 						if(s.instrument > 0){
-							ChannelEvent * channelEvent=new NoteOn(s.note - 1, 1);
-							mixerSequence->postToSequence(channel, channelEvent, time);
+							u_up<ChannelEvent>  channelEvent=mkup < NoteOn>(s.note - 1, 1);
+							mixerSequence->postToSequence(channel, std::move(channelEvent), time);
 						}
 					} else if(s.note == 97){
-						ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::ALL_NOTES_OFF, 127);
-						mixerSequence->postToSequence(channel, channelEvent, time);
+						u_up<ChannelEvent>  channelEvent=mkup < ChannelControl>(MIDIFile::CC::ALL_NOTES_OFF, 127);
+						mixerSequence->postToSequence(channel, std::move(channelEvent), time);
 					}
 				}
 			}
@@ -503,8 +490,8 @@ namespace yzrilyzr_simplesynth{
 		time+=1.0 / rowsPerSecond;
 		for(u_index channelI=0;channelI < module1.num_channels;channelI++){
 			int channel=channelI;
-			ChannelEvent * channelEvent=new ChannelControl(MIDIFile::CC::ALL_NOTES_OFF, 127);
-			mixerSequence->postToSequence(channel, channelEvent, time);
+			u_up<ChannelEvent>  channelEvent=mkup < ChannelControl>(MIDIFile::CC::ALL_NOTES_OFF, 127);
+			mixerSequence->postToSequence(channel, std::move(channelEvent), time);
 		}
 		mixerSequence->setInstrument(mksp<XMInstrument>(modulep));
 		mixerSequence->sortPosted();

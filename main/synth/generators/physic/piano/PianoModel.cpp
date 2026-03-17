@@ -11,6 +11,7 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
+using namespace yzrilyzr_collection;
 namespace yzrilyzr_simplesynth{
 	/**
  * 初始化钢琴键的物理参数和模型组件
@@ -106,7 +107,7 @@ namespace yzrilyzr_simplesynth{
 		key.hammer->init(param.sampleRate, hammerMass, hammerForce, stiffnessExponent, key.Z, hammerHysteresis);
 	}
 	void PianoModel::Piano_initString(PianoDwgs & pianoDWGs, u_sample freq, u_sample sampleRate, u_sample hammerPos, u_sample c1, u_sample c3, u_sample dispersionFactor, u_sample Z, u_sample Zb, u_sample Zh){
-		std::vector<u_sp<DSP>> dispersion;
+		ArrayList<DSPPtr> dispersion;
 		u_sample dispersionDelay=0;
 		int dispersionOrder=0;
 		if(freq > 400)dispersionOrder=1;
@@ -117,7 +118,7 @@ namespace yzrilyzr_simplesynth{
 			dispersionDelay+=targetDelay;
 			u_sp<BiquadIIR> f=mksp<BiquadIIR>();
 			IIRUtil::designThiranFilter(f->aCoeff, f->bCoeff, targetDelay, 2);
-			dispersion.push_back(f);
+			dispersion.add(f);
 		}
 		u_sp<IIR> lowpass=IIRUtil::newC1C3IIRFilter(freq, c1, c3);
 		u_sample lowpassDelay=IIRUtil::groupDelay(*lowpass, freq, sampleRate);

@@ -1,4 +1,4 @@
-﻿#include "SakuraRender.h"
+﻿#include "TwoStringResonatorRender.h"
 #include "imgui.h"
 #include "ast/ASTTokenizer.h"
 #include "ast/TokenReader.h"
@@ -13,8 +13,8 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 static int fMulI1=4;
 static int fMulI2=4;
-void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	u_sp<Sakura> paramRegPtr=spsc<Sakura, ClassRegister>(obj.paramRegPtr);
+void twostringresonatorRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
+	u_sp<TwoStringResonator> paramRegPtr=spsc<TwoStringResonator, ClassRegister>(obj.paramRegPtr);
 	int renderPar=0;
 	for(auto & reg : paramRegPtr->RegisteredParams){
 		if(renderPar < 6){
@@ -123,7 +123,7 @@ void sakuraRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	ImGui::Text("Resonator Output Level");
 	change=ImGui::SliderFloat("OutputLevel", &paramRegPtr->resonatorOutputLevel, 0.0f, 1.0f) || change;
 	ImGui::EndChild();
-	//SakuraEditWindow(*ctx.mixer, paramRegPtr);
+	//TwoStringResonatorEditWindow(*ctx.mixer, paramRegPtr);
 	ctx.paramChange=ctx.paramChange || change;
 }
 
@@ -134,8 +134,8 @@ int toFMulI(double x){
 	}
 	return 4;
 }
-void SakuraEditWindow(IMixer & mixer, u_sp<Sakura> & paramRegPtr){
-	ImGui::Begin("SakuraEdit");
+void TwoStringResonatorEditWindow(IMixer & mixer, u_sp<TwoStringResonator> & paramRegPtr){
+	ImGui::Begin("TwoStringResonatorEdit");
 	static char text[1024 * 16]="";
 	ImGui::InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 16), ImGuiInputTextFlags_AllowTabInput);
 	if(ImGui::Button("Import")){
@@ -270,7 +270,7 @@ void SakuraEditWindow(IMixer & mixer, u_sp<Sakura> & paramRegPtr){
 	ImGui::SameLine();
 	if(ImGui::Button("Export")){
 		std::stringstream ss;
-		ss << "SakuraBuilder()" << std::endl;
+		ss << "TwoStringResonatorBuilder()" << std::endl;
 		//ss << ".exciter(" <<
 			//paramRegPtr->noiseMixRatio << ", " <<
 			//paramRegPtr->noiseRate << ")" << std::endl;

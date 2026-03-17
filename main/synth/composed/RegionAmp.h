@@ -89,7 +89,7 @@ namespace yzrilyzr_simplesynth{
 	yzrilyzr_lang::String toString() const override{
 		return "RegionAmp";
 	}
-	U_GET_CLASS_NAME(RegionAmp)
+	U_CLASS_INFO(RegionAmp)
 
 	};
 }

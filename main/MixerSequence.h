@@ -9,7 +9,7 @@ namespace yzrilyzr_simplesynth{
 	EBCLASS(MixerSequence){
 		private:
 		struct EventWrapper{
-			ChannelEvent * event;
+			u_up<ChannelEvent>  event;
 			u_index index;
 		};
 		u_sp<InstrumentProvider> instrument=nullptr;
@@ -17,7 +17,7 @@ namespace yzrilyzr_simplesynth{
 		public:
 		
 		std::unordered_map<s_midichannel_id, std::vector<EventWrapper>> channelEvents;
-		void postToSequence(s_midichannel_id channel, ChannelEvent * n1, u_time startAt);
+		void postToSequence(s_midichannel_id channel, u_up<ChannelEvent>  n1, u_time startAt);
 		void sortPosted();
 		void postToMixer(IMixer * mixer, u_time startDelay)const;
 		void postToMixer(IMixer * mixer, u_time startDelay, u_time sequenceOffset, const yzrilyzr_lang::String & groupName)const;

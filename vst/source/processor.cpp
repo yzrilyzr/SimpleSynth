@@ -62,7 +62,7 @@ namespace yzrilyzr_simplesynth_vst{
 		}
 		if(!state){
 			for(auto & p : mixer->getAllChannels()){
-				mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::ALL_NOTES_OFF, 127));
+				mixer->sendInstantEvent(mkup< ChannelControl>(chID, MIDIFile::CC::ALL_NOTES_OFF, 127));
 			}
 		}
 		return kResultOk;
@@ -79,7 +79,7 @@ namespace yzrilyzr_simplesynth_vst{
 						switch(paramQueue->getParameterId()){
 							case kParamSustain:
 							{
-								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::SUSTAIN_SWITCH, value > 0.5?127:0));
+								mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::SUSTAIN_SWITCH, value > 0.5?127:0));
 								break;
 							}
 							case kParamIsDrum:
@@ -94,22 +94,22 @@ namespace yzrilyzr_simplesynth_vst{
 							}
 							case kParamProgram:
 							{
-								mixer->sendInstantEvent(new ProgramChange(chID, static_cast<s_program_id>(std::round(value * 127.0))));
+								mixer->sendInstantEvent(mkup < ProgramChange>(chID, static_cast<s_program_id>(std::round(value * 127.0))));
 								break;
 							}
 							case kParamExpression:
 							{
-								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::EXPRESSION, static_cast<uint8_t>(value * 127.0)));
+								mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::EXPRESSION, static_cast<uint8_t>(value * 127.0)));
 								break;
 							}
 							case kParamVolume:
 							{
-								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::VOLUME, static_cast<uint8_t>(value * 127.0)));
+								mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::VOLUME, static_cast<uint8_t>(value * 127.0)));
 								break;
 							}
 							case kParamPan:
 							{
-								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PAN, static_cast<uint8_t>(value * 127.0)));
+								mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::PAN, static_cast<uint8_t>(value * 127.0)));
 								break;
 							}
 							case kParamChorus:
@@ -139,31 +139,31 @@ namespace yzrilyzr_simplesynth_vst{
 							case kParamPortamento:
 							{
 								if(value == 0){
-									mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PORTAMENTO_SWITCH, 0));
+									mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::PORTAMENTO_SWITCH, 0));
 								} else{
-									mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PORTAMENTO_SWITCH, 127));
-									mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::PORTAMENTO_TIME, static_cast<uint8_t>(value * 127.0)));
+									mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::PORTAMENTO_SWITCH, 127));
+									mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::PORTAMENTO_TIME, static_cast<uint8_t>(value * 127.0)));
 								}
 								break;
 							}
 							case kParamMod:
 							{
-								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::MODULATION, static_cast<uint8_t>(value * 127.0)));
+								mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::MODULATION, static_cast<uint8_t>(value * 127.0)));
 								break;
 							}
 							case kParamPitchBend:
 							{
-								mixer->sendInstantEvent(new ChannelPitchBend(chID, value - 0.5));
+								mixer->sendInstantEvent(mkup < ChannelPitchBend>(chID, value - 0.5));
 								break;
 							}
 							case kParamSoftPedal:
 							{
-								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::SOFT_PEDAL_SWITCH, value > 0.5?127:0));
+								mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::SOFT_PEDAL_SWITCH, value > 0.5?127:0));
 								break;
 							}
 							case kParamSostenuto:
 							{
-								mixer->sendInstantEvent(new ChannelControl(chID, MIDIFile::CC::SOSTENUTO_SWITCH, value > 0.5?127:0));
+								mixer->sendInstantEvent(mkup < ChannelControl>(chID, MIDIFile::CC::SOSTENUTO_SWITCH, value > 0.5?127:0));
 								break;
 							}
 						}
@@ -179,13 +179,13 @@ namespace yzrilyzr_simplesynth_vst{
 				if(data.inputEvents->getEvent(i, event) == kResultOk){
 					if(event.type == Steinberg::Vst::Event::EventTypes::kNoteOnEvent){
 						NoteOnEvent & e=event.noteOn;
-						mixer->sendInstantEvent(new NoteOn(chID, e.pitch, e.velocity));
+						mixer->sendInstantEvent(mkup < NoteOn>(chID, e.pitch, e.velocity));
 					} else if(event.type == Steinberg::Vst::Event::EventTypes::kNoteOffEvent){
 						NoteOffEvent & e=event.noteOff;
-						mixer->sendInstantEvent(new NoteOff(chID, e.pitch, e.velocity));
+						mixer->sendInstantEvent(mkup < NoteOff>(chID, e.pitch, e.velocity));
 					} else if(event.type == Steinberg::Vst::Event::EventTypes::kPolyPressureEvent){
 						PolyPressureEvent & e=event.polyPressure;
-						mixer->sendInstantEvent(new NotePressure(chID, e.pitch, e.pressure));
+						mixer->sendInstantEvent(mkup < NotePressure>(chID, e.pitch, e.pressure));
 					}
 				}
 			}

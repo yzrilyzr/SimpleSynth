@@ -9,9 +9,8 @@
 
 namespace yzrilyzr_simplesynth{
 	ECLASS(NonInterpolateAmpSet, public NoteProcessor){
-	protected:
-	NoteProcPtr set[CHANNEL_MAX_NOTE_ID];
 	public:
+	NoteProcPtr set[CHANNEL_MAX_NOTE_ID];
 	NonInterpolateAmpSet(){}
 	NonInterpolateAmpSet & add(int note, NoteProcPtr noteProcessor);
 	bool has(int note)const;
@@ -19,5 +18,6 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg)override;
 	bool noMoreData(const Note & note)override;
 	NoteProcPtr clone()override;
+	U_CLASS_INFO(NonInterpolateAmpSet)
 	};
 }

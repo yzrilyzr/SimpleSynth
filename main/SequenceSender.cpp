@@ -31,13 +31,13 @@
 //		stop();
 //	}
 //
-//	void SequenceSender::addSequence(const yzrilyzr_lang::String & name, u_sp<MixerSequence> seq){
+//	void SequenceSender::addSequence(const String & name, u_sp<MixerSequence> seq){
 //		if(seq){
 //			sequences[name]=seq;
 //		}
 //	}
 //
-//	void SequenceSender::switchSequence(const yzrilyzr_lang::String & name, u_time_ms fadeout, u_time_ms fadein){
+//	void SequenceSender::switchSequence(const String & name, u_time_ms fadeout, u_time_ms fadein){
 //		auto it=sequences.find(name);
 //		if(it != sequences.end()){
 //			// 先停止当前序列（如果有淡出时间）

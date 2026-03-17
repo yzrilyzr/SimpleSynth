@@ -44,7 +44,7 @@ namespace yzrilyzr_simplesynth{
 	void init(ChannelConfig & cfg)override;
 	u_sample getAmp(const Note & note)override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(Matrix6x6Modulation);
+	U_CLASS_INFO(Matrix6x6Modulation);
 	};
 	EBCLASS(Matrix6x6ModulationBuilder){
 		private:

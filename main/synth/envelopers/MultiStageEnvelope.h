@@ -46,7 +46,7 @@ namespace yzrilyzr_simplesynth{
 		u_time releaseTime;
 	};
 
-	ECLASS(MultiStageEnvelope, public NoteProcessor, public Enveloper, NoteData<MultiStageEnvelopeKeyData>){
+	ECLASS(MultiStageEnvelope, public Enveloper, NoteData<MultiStageEnvelopeKeyData>){
 		public:
 		MSEPoint * decayPoint=nullptr;
 		MSEPoint * loopPoint=nullptr;
@@ -60,7 +60,7 @@ namespace yzrilyzr_simplesynth{
 		u_sample getAmp(const Note & note) override;
 		yzrilyzr_lang::String toString() const override;
 		MultiStageEnvelopeKeyData * init(MultiStageEnvelopeKeyData * data, const Note & note) override;
-		U_GET_CLASS_NAME(MultiStageEnvelope)
+		U_CLASS_INFO_B(MultiStageEnvelope, Enveloper);
 
 		private:
 		u_time calcLoopTime(u_time curTime);

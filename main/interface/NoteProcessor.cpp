@@ -6,21 +6,23 @@ using namespace yzrilyzr_array;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
+using namespace yzrilyzr_simplesynth;
+
 namespace yzrilyzr_util{
 	namespace RegisterUtil{
-		void registerParamPhaseSrc(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, u_sp<yzrilyzr_simplesynth::PhaseSrc> * value){
+		void registerParamPhaseSrc(ClassRegister & reg, const String & name, u_sp<PhaseSrc> * value){
 			reg.registerParam(name, ParamType::PhaseSrc, value, nullptr, nullptr);
 		}
 
-		void registerParamSrc(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, yzrilyzr_simplesynth::NoteProcPtr * value){
+		void registerParamSrc(ClassRegister & reg, const String & name, NoteProcPtr * value){
 			reg.registerParam(name, ParamType::NoteSrc, value, nullptr, nullptr);
 		}
 
-		void registerParamOscSrc(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, u_sp<yzrilyzr_simplesynth::Osc> * value){
+		void registerParamOscSrc(ClassRegister & reg, const String & name, u_sp<Osc> * value){
 			reg.registerParam(name, ParamType::OscSrc, value, nullptr, nullptr);
 		}
 
-		void registerParamSampleData(yzrilyzr_util::ClassRegister & reg, const yzrilyzr_lang::String & name, u_sp<yzrilyzr_array::SampleProvider> * value){
+		void registerParamSampleData(ClassRegister & reg, const String & name, u_sp<SampleProvider> * value){
 			reg.registerParam(name, ParamType::SampleData, value, nullptr, nullptr);
 		}
 	}

@@ -6,21 +6,23 @@
 #include "events/Note.h"
 
 namespace yzrilyzr_simplesynth{
-	ECLASS(EnvelopMultiplier, public AmpMultiplier), public Enveloper{
+	ECLASS(EnvelopMultiplier, public AmpMultiplier){
 	public:
-	EnvelopMultiplier(){
-		registerParamAlias("B", "Src");
-		registerParamAlias("A", "Env");
-	}
+	EnvelopMultiplier(){}
 	EnvelopMultiplier(NoteProcPtr env, NoteProcPtr src) : AmpMultiplier(std::move(env), std::move(src)){}
 	u_sample getAmp(const Note & note)override{
 		return a->getAmp(note) * b->getAmp(note);
+	}
+	void onRegisterParam()override{
+		AmpMultiplier::onRegisterParam();
+		registerParamAlias("B", "Src");
+		registerParamAlias("A", "Env");
 	}
 	bool noMoreData(const Note & note)override{
 		bool nmd=a->noMoreData(note);
 		if(nmd){
 			b->noMoreData(note);
-			const_cast<Note&>(note).requestClose(*note.cfg);
+			const_cast<Note &>(note).requestClose(*note.cfg);
 		}
 		return nmd;
 	}
@@ -33,6 +35,6 @@ namespace yzrilyzr_simplesynth{
 	u_sample postProcess(u_sample output)override{
 		return b->postProcess(output);
 	}
-	U_GET_CLASS_NAME(EnvelopMultiplier)
+	U_CLASS_INFO(EnvelopMultiplier)
 	};
 }

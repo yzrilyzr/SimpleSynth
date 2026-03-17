@@ -1,7 +1,7 @@
 ﻿#include "events/Note.h"
 #include "interface/NoteTuning.h"
-#include "Sakura.h"
-#include "SakuraExciter.h"
+#include "TwoStringResonator.h"
+#include "TwoStringResonatorExciter.h"
 #include "synth/envelopers/EnvUtil.h"
 #include "dsp/BiquadIIR.h"
 #include "dsp/BufferDelayer.h"
@@ -12,7 +12,7 @@ using namespace yzrilyzr_util;
 using namespace yzrilyzr_array;
 using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
-	void Sakura::onRegisterParam(){
+	void TwoStringResonator::onRegisterParam(){
 		Osc::onRegisterParam();
 		static u_sample q_min=0.01;
 		static u_sample q_max=10;
@@ -56,7 +56,7 @@ namespace yzrilyzr_simplesynth{
 		RegisterUtil::registerParamGain(*this, "ResonatorOutputLevel", &resonatorOutputLevel);
 
 	}
-	Sakura::Sakura() :Osc(nullptr){
+	TwoStringResonator::TwoStringResonator() :Osc(nullptr){
 		resonators=Array<RingBufferSample*>(8);
 		for(u_index i=0;i < 8;i++){
 			resonators[i]=new RingBufferSample(256);
@@ -83,17 +83,17 @@ namespace yzrilyzr_simplesynth{
 		stringEnv.dCurve=Pow(5);
 		stringEnv.rCurve=Pow(5);
 	}
-	Sakura::~Sakura(){
+	TwoStringResonator::~TwoStringResonator(){
 		for(u_index i=0;i < 8;i++){
 			delete resonators[i];
 		}
 	}
-	void Sakura::init(ChannelConfig & cfg){
+	void TwoStringResonator::init(ChannelConfig & cfg){
 		this->sampleRate=cfg.sampleRate;
-		if(exciter == nullptr)exciter=mksp<SakuraExciter>();
+		if(exciter == nullptr)exciter=mksp<TwoStringResonatorExciter>();
 		exciter->init(cfg);
 	}
-	u_sample Sakura::postProcess(u_sample output){
+	u_sample TwoStringResonator::postProcess(u_sample output){
 		u_sample sum=output;
 		for(u_index i=0;i < 8;i++){
 			bool enabled=resonatorEnabled[i];
@@ -109,11 +109,11 @@ namespace yzrilyzr_simplesynth{
 		}
 		return sum;
 	}
-	NoteProcPtr Sakura::clone(){
+	NoteProcPtr TwoStringResonator::clone(){
 		return nullptr;
 	}
-	u_sample Sakura::getAmp(const Note & note){
-		SakuraKeyData & data=*getData(note);
+	u_sample TwoStringResonator::getAmp(const Note & note){
+		TwoStringResonatorKeyData & data=*getData(note);
 		u_sample sumExcite=exciter->getAmp(note);
 		u_freq hcFreq=note.cfg->tuning->getFrequencyByID(127.0 * exciterHiCutFreq * exciterHiCutEnv.getAmp(note));
 		u_freq lcFreq=note.cfg->tuning->getFrequencyByID(127.0 * exciterLowCutFreq);
@@ -133,7 +133,7 @@ namespace yzrilyzr_simplesynth{
 		sumString*=stringEnv.getAmp(note) * static_cast<u_sample>(stringOutputLevel);
 		return sumString;
 	}
-	u_sample Sakura::procString(RingBufferSample & stringBuf, RingBufferSample & combBuf, const Note & note, u_sample input, u_sample sampleRate, u_sample vAlpha, u_sample vFeedback, u_sample fMul, u_sample combFeedback){
+	u_sample TwoStringResonator::procString(RingBufferSample & stringBuf, RingBufferSample & combBuf, const Note & note, u_sample input, u_sample sampleRate, u_sample vAlpha, u_sample vFeedback, u_sample fMul, u_sample combFeedback){
 		u_freq noteFreq=note.freqSynth * fMul;
 		u_freq combFreq=noteFreq / combPosition;
 		u_sample delayIndex1=RingBufferUtil::freq2delayIndex(noteFreq, sampleRate);
@@ -149,9 +149,9 @@ namespace yzrilyzr_simplesynth{
 		return delayed + delayedComb * static_cast<u_sample>(combOutputLevel);
 	}
 
-	SakuraKeyData * Sakura::init(SakuraKeyData * data, const Note & note){
+	TwoStringResonatorKeyData * TwoStringResonator::init(TwoStringResonatorKeyData * data, const Note & note){
 		if(data == nullptr){
-			data=new SakuraKeyData();
+			data=new TwoStringResonatorKeyData();
 		}
 		data->string1.fill(0);
 		data->string2.fill(0);
@@ -161,7 +161,7 @@ namespace yzrilyzr_simplesynth{
 		data->lowCut.resetMemory();
 		return data;
 	}
-	bool Sakura::noMoreData(const Note & note){
+	bool TwoStringResonator::noMoreData(const Note & note){
 		if(exciter != nullptr)exciter->noMoreData(note);
 		return stringEnv.noMoreData(note);
 	}

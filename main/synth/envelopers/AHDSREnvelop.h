@@ -13,7 +13,7 @@ namespace yzrilyzr_simplesynth{
 	u_sample releaseVolume=0;
 	u_time attackTime=0;
 	};
-	ECLASS(AHDSREnvelop, public NoteProcessor, public Enveloper, NoteData<AHDSREnvelopKeyData>){
+	ECLASS(AHDSREnvelop, public Enveloper, NoteData<AHDSREnvelopKeyData>){
 	public:
 	u_time forceReleaseTime=0;
 	u_time delayTime=0;
@@ -52,7 +52,7 @@ namespace yzrilyzr_simplesynth{
 	void cc(ChannelConfig & cfg, ChannelControl & cc)override;
 	AHDSREnvelopKeyData * init(AHDSREnvelopKeyData * data, const Note & note) override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(AHDSREnvelop);
+	U_CLASS_INFO_B(AHDSREnvelop, Enveloper);
 
 	private:
 	bool isNoteNotReleased(const Note & n) const;

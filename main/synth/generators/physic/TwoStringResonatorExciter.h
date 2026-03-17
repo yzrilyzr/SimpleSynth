@@ -10,27 +10,27 @@
 
 
 namespace yzrilyzr_simplesynth{
-	EBCLASS(SakuraExciterKeyData){
+	EBCLASS(TwoStringResonatorExciterKeyData){
 	public:
 	double noiseRateCounter=0;
 	u_sample lastNoiseValue=0;
 	};
-	ECLASS(SakuraExciter, public Osc, NoteData<SakuraExciterKeyData>){
+	ECLASS(TwoStringResonatorExciter, public Osc, NoteData<TwoStringResonatorExciterKeyData>){
 	public:
 	float noiseMixRatio=0.0f;
 	float noiseRate=1.0f;
 	FixedRandom random;
-	SakuraExciter();
-	~SakuraExciter(){}
+	TwoStringResonatorExciter();
+	~TwoStringResonatorExciter(){}
 	void init(ChannelConfig & cfg) override;
 	//u_sample postProcess(u_sample output) override;
 	NoteProcPtr clone() override;
 	u_sample getAmp(const Note & note) override;
 	//bool noMoreData(const Note & note)override;
-	SakuraExciterKeyData * init(SakuraExciterKeyData * data, const Note & note) override;
+	TwoStringResonatorExciterKeyData * init(TwoStringResonatorExciterKeyData * data, const Note & note) override;
 	static u_sample exciteClickFunc(s_phase mod);
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(SakuraExciter)
+	U_CLASS_INFO(TwoStringResonatorExciter)
 
 	};
 }

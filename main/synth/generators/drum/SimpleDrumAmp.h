@@ -41,6 +41,6 @@ namespace yzrilyzr_simplesynth{
 	SimpleDrumAmpKeyData * init(SimpleDrumAmpKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString()const override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(SimpleDrumAmp);
+	U_CLASS_INFO(SimpleDrumAmp);
 	};
 }

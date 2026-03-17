@@ -22,8 +22,8 @@ namespace yzrilyzr_simplesynth{
 	u_sample procDsp(u_sample in) override;
 	void init(u_sample_rate sampleRate) override;
 	void resetMemory() override;
-	void cloneParam(DSP * obj1)override;
-	u_sp<DSP> cloneDSP() override;
+	void cloneParam(yzrilyzr_dsp::DSP * obj1)override;
+	yzrilyzr_dsp::DSPPtr cloneDSP() override;
 	void setParam(PianoSoundBoardParameters & param);
 	};
 }

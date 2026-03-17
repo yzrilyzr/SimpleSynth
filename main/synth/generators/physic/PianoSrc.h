@@ -31,7 +31,7 @@ namespace yzrilyzr_simplesynth{
 	PianoKey * init(PianoKey * data, const Note & note)override;
 	void noteOn(ChannelConfig & cfg, s_note_id_i id, s_note_vel vel)override;
 	void noteOff(ChannelConfig & cfg, s_note_id_i id, s_note_vel vel)override;
-	U_GET_CLASS_NAME(PianoSrc);
+	U_CLASS_INFO(PianoSrc);
 
 	};
 }

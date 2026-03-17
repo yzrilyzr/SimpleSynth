@@ -39,7 +39,7 @@ namespace yzrilyzr_simplesynth{
 	BiquadFilterSrcKeyData * init(BiquadFilterSrcKeyData * data, const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(BiquadFilterSrc);
+	U_CLASS_INFO(BiquadFilterSrc);
 
 	};
 }

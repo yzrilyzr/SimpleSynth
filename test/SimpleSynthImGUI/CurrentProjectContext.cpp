@@ -90,28 +90,43 @@ ProjectObject * CurrentProjectContext::findNode(int nodeId){
 	return nullptr;
 }
 
-ParamReg * CurrentProjectContext::findParam(ClassRegister & params, int attrId){
+std::optional<ParamReg> CurrentProjectContext::findParam(ClassRegister & params, int attrId){
 	//查找哪个被连接了
 	for(ParamReg & param : params.RegisteredParams){
+		if((param.type & 0xff) == ParamType::ObjectArray){
+			ArrayList<u_sp<Object>> & arr=*static_cast<ArrayList<u_sp<Object>> *>(param.value);
+			int subParType=(param.type >> 8) & 0xffffff;
+			for(int i=0;i < arr.size();i++){
+				int vattrId=reinterpret_cast<int>(&arr[i]);
+				if(vattrId == attrId){
+					ParamReg vpreg;
+					vpreg.type=subParType;
+					vpreg.value=&arr[i];
+					return vpreg;
+				}
+
+			}
+			continue;
+		}
 		if(param.value != nullptr && param.type == ParamType::Sub){
 			auto val=static_cast<ClassRegister *>(param.value);
-			ParamReg * par=findParam(*val, attrId);
-			if(par != nullptr)return par;
+			auto par=findParam(*val, attrId);
+			if(par.has_value())return par;
 		}
 		int paramId=reinterpret_cast<int>(param.value);
 		if(attrId == paramId){
-			return &param;
+			return param;
 		}
 	}
-	return nullptr;
+	return std::nullopt;
 }
-ParamReg * CurrentProjectContext::findParam(ProjectObject & obj, int attrId){
+std::optional<ParamReg> CurrentProjectContext::findParam(ProjectObject & obj, int attrId){
 	return findParam(*obj.paramRegPtr, attrId);
 }
 
-ParamReg * CurrentProjectContext::findParam(int nodeId, int attrId){
+std::optional<ParamReg> CurrentProjectContext::findParam(int nodeId, int attrId){
 	ProjectObject * obj=findNode(nodeId);
-	if(obj == nullptr)return nullptr;
+	if(obj == nullptr)return std::nullopt;
 	return findParam(*obj, attrId);
 }
 
@@ -166,17 +181,17 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 		try{
 			ChannelConfig & cfg=mixer->getMIDIChannel(group, sendToChannel)->getConfig();
 			finalProcessor->init(cfg);
-			ProgramChange * event=new ProgramChange();
+			auto event=mkup< ProgramChange>();
 			event->channelID=sendToChannel;
 			event->groupName=group;
 			event->noteProcessor=finalProcessor;
-			mixer->sendInstantEvent(event);
+			mixer->sendInstantEvent(std::move(event));
 		} catch(...){
-			ProgramChange * event=new ProgramChange();
+			auto event=mkup< ProgramChange>();
 			event->channelID=sendToChannel;
 			event->groupName=group;
 			event->noteProcessor=SynthUtil::getDefault();
-			mixer->sendInstantEvent(event);
+			mixer->sendInstantEvent(std::move(event));
 		}
 		paramChange=false;
 	}
@@ -249,9 +264,9 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 			}
 			if(nodeStart && nodeEnd){
 				System::out.println(String("Link: ") + started_at_node_id + " " + started_at_attribute_id + " " + ended_at_node_id + " " + ended_at_attribute_id);
-				ParamReg * endParam=findParam(*nodeEnd, ended_at_attribute_id);
-				if(endParam){
-					paramChange=setParamValue(*endParam, nodeStart->paramRegPtr) || paramChange;
+				auto endParam=findParam(*nodeEnd, ended_at_attribute_id);
+				if(endParam.has_value()){
+					paramChange=setParamValue(endParam.value(), nodeStart->paramRegPtr) || paramChange;
 				}
 			}
 		}
@@ -261,8 +276,39 @@ void CurrentProjectContext::renderCurrentProjectWindow(){
 	ImGui::End();
 	//ImGui::SetWindowFontScale(1.0);
 }
+
+void CurrentProjectContext::buildLink(ProjectObject & obj, ParamReg & param){
+	u_sp<void> * paramRegPtr=reinterpret_cast<u_sp<void>*>(param.value);
+	void * value=paramRegPtr->get();
+	for(ProjectObject * obj2 : objects){
+		if(obj2 == &obj)continue;
+		void * poPtr=obj2->paramRegPtr.get();
+		if(value == poPtr){
+			int started_at_node_id=reinterpret_cast<int>(obj2);
+			int started_at_attribute_id=reinterpret_cast<int>(obj2->paramRegPtr.get());
+			int ended_at_node_id=reinterpret_cast<int>(&obj);
+			int ended_at_attribute_id=reinterpret_cast<int>(param.value);
+			links.push_back(LinkLine{started_at_node_id, started_at_attribute_id, ended_at_node_id, ended_at_attribute_id, getPinColor(param)});
+			break;
+		}
+	}
+}
+
 void CurrentProjectContext::buildLinks(ProjectObject & obj, ClassRegister & params){
 	for(auto & param : params.RegisteredParams){
+		if((param.type & 0xff) == ParamType::ObjectArray){
+			ArrayList<u_sp<Object>> & arr=*static_cast<ArrayList<u_sp<Object>> *>(param.value);
+			int subParType=(param.type >> 8) & 0xffffff;
+			for(int i=0;i < arr.size();i++){
+				if(arr[i]){
+					ParamReg vReg;
+					vReg.type=subParType;
+					vReg.value=&arr[i];
+					buildLink(obj, vReg);
+				}
+			}
+			continue;
+		}
 		switch(param.type){
 			case ParamType::Float:
 			case ParamType::Double:
@@ -284,20 +330,7 @@ void CurrentProjectContext::buildLinks(ProjectObject & obj, ClassRegister & para
 			break;
 			default:
 			{
-				u_sp<void> * paramRegPtr=reinterpret_cast<u_sp<void>*>(param.value);
-				void * value=paramRegPtr->get();
-				for(ProjectObject * obj2 : objects){
-					if(obj2 == &obj)continue;
-					void * poPtr=obj2->paramRegPtr.get();
-					if(value == poPtr){
-						int started_at_node_id=reinterpret_cast<int>(obj2);
-						int started_at_attribute_id=reinterpret_cast<int>(obj2->paramRegPtr.get());
-						int ended_at_node_id=reinterpret_cast<int>(&obj);
-						int ended_at_attribute_id=reinterpret_cast<int>(param.value);
-						links.push_back(LinkLine{started_at_node_id, started_at_attribute_id, ended_at_node_id, ended_at_attribute_id, getPinColor(param)});
-						break;
-					}
-				}
+				buildLink(obj, param);
 			}
 			break;
 		}

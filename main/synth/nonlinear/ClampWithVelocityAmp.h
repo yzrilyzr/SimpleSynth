@@ -15,6 +15,6 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(ClampWithVelocityAmp)
+	U_CLASS_INFO(ClampWithVelocityAmp)
 	};
 }

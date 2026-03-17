@@ -25,6 +25,7 @@ SimpleSynth提供了丰富的合成模块，让你能够创建各种声音：
 - **基础波形**：正弦波、方波、锯齿波、三角波
 - **特殊波形**：SVPWM、VVVF、脉冲波、CymbalOsc
 - **谐波合成**：AHarmonicWave、SineHarmonicWave系列
+- **鼓类**：SimpleDrumAmp
 
 ### 包络控制
 - AHDSR包络、多阶段包络
@@ -36,9 +37,10 @@ SimpleSynth提供了丰富的合成模块，让你能够创建各种声音：
 - 均值滤波器（MeanFilterSrc）
 
 ### 物理建模合成
-- **弦乐器**：BowedString、KarplusStrongSrc、Sitar
-- **钢琴**：PianoSrc、PianoSrc2、Sakura（基于物理模型的钢琴）
-- **鼓类**：SimpleDrumAmp
+- **弦乐器**：BowedString、KarplusStrongSrc、Sitar、TwoStringResonator
+- **钢琴**：PianoSrc、PianoSrc2
+- **通用数字波导**：DWGNoteProcessor
+
 
 ### 声音处理
 - **失真效果**：ArctanDistortion、SoftClip、TapeSaturation

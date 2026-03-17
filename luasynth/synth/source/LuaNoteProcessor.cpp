@@ -12,7 +12,7 @@ using namespace yzrilyzr_lang;
 using namespace yzrilyzr_dsp;
 namespace yzrilyzr_simplesynth{
 
-	LuaNoteProcessor::LuaNoteProcessor(const yzrilyzr_lang::String & script)
+	LuaNoteProcessor::LuaNoteProcessor(const String & script)
 		: script_(script), L(nullptr), luaInitialized(false),
 		luaInitRef(LUA_NOREF), luaGetAmpRef(LUA_NOREF),
 		luaPostProcessRef(LUA_NOREF), luaNoMoreDataRef(LUA_NOREF),

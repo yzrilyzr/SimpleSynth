@@ -71,7 +71,7 @@ namespace yzrilyzr_simplesynth{
 		InstrumentProvider * instrument=nullptr;
 		//
 		void setContext(IMixer * mixer,  IChannel * channel);
-		void postInstantEvent(ChannelEvent * event);
+		void postInstantEvent(u_up<ChannelEvent>  event);
 		void setNoteProcessor(NoteProcPtr val);
 		void setOnlyChannelConfig(const ChannelConfig & other);
 		void sostenutoChange();

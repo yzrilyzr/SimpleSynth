@@ -8,7 +8,7 @@ namespace yzrilyzr_simplesynth{
 	void SimpleDetuner::onRegisterParam(){
 		AmpUnaryComposition::onRegisterParam();
 		static int minCount=1, maxCount=7;
-		registerParam("Count", yzrilyzr_util::ParamType::Int, &count, &minCount, &maxCount);
+		registerParam("Count", ParamType::Int, &count, &minCount, &maxCount);
 		RegisterUtil::registerParamNormal01(*this, "Offset", &offset);
 		RegisterUtil::registerParamNormal01(*this, "InitPhase", &initPhase);
 	}

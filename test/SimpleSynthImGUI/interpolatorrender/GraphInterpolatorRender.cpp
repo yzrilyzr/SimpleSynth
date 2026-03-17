@@ -11,12 +11,12 @@ using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
 void graphInterpRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
-	u_sp<GraphInterpolator> paramRegPtr=std::dynamic_pointer_cast<GraphInterpolator, ClassRegister>(obj.paramRegPtr);
+	u_sp<GraphInterpolator> paramRegPtr=spsc<GraphInterpolator, ClassRegister>(obj.paramRegPtr);
 	auto & data=obj.storeData;
 	if(data.find("PointSize") == data.end()){
 		data["PointSize"]=mksp<Integer>(3);
 	}
-	Integer & PointSize=*spdc<Integer>(data["PointSize"]);
+	Integer & PointSize=*spsc<Integer>(data["PointSize"]);
 	ImGui::PushItemWidth(200);
 	ImGui::InputInt(ctx.LANG.getc("module.interpolator.graph.points"), &PointSize.value);
 	ImGui::PopItemWidth();

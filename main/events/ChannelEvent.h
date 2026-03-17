@@ -29,12 +29,10 @@ namespace yzrilyzr_simplesynth{
 
 		ChannelEvent()=default;
 		virtual ~ChannelEvent()=default;
-
-		virtual ChannelEvent * clone()=0;
-		virtual uint8_t getType()=0;
-
-		protected:
 		ChannelEvent(const ChannelEvent * other);
+
+		virtual u_up<ChannelEvent>  clone()=0;
+		virtual uint8_t getType()=0;
 	};
 
 	ECLASS(NoteOff, public ChannelEvent){
@@ -46,10 +44,9 @@ namespace yzrilyzr_simplesynth{
 		NoteOff(s_note_id_i id, s_note_vel vel);
 		NoteOff(s_note_id_i id);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		NoteOff(const NoteOff * clone);
 	};
 
@@ -61,10 +58,9 @@ namespace yzrilyzr_simplesynth{
 		NoteOn(s_midichannel_id channelID, s_note_id_i id, s_note_vel velocity);
 		NoteOn(s_note_id_i id, s_note_vel velocity);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		NoteOn(const NoteOn * clone);
 	};
 
@@ -76,10 +72,9 @@ namespace yzrilyzr_simplesynth{
 		NotePressure(s_midichannel_id channelID, s_note_id_i id, s_note_vel velocity);
 		NotePressure(s_note_id_i id, s_note_vel velocity);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		NotePressure(const NotePressure * clone);
 	};
 
@@ -91,10 +86,9 @@ namespace yzrilyzr_simplesynth{
 		NotePitchBend(s_midichannel_id channelID, s_note_id_i id, s_note_id value);
 		NotePitchBend(s_note_id_i id, s_note_id value);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		NotePitchBend(const NotePitchBend * clone);
 	};
 
@@ -109,10 +103,9 @@ namespace yzrilyzr_simplesynth{
 		bool isMSB();
 		bool isLSB();
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		ChannelControl(const ChannelControl * clone);
 	};
 
@@ -123,10 +116,9 @@ namespace yzrilyzr_simplesynth{
 		ChannelPitchBend(s_midichannel_id channelID, u_normal_11_f value);
 		ChannelPitchBend(u_normal_11_f value);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		ChannelPitchBend(const ChannelPitchBend * clone);
 	};
 
@@ -141,10 +133,9 @@ namespace yzrilyzr_simplesynth{
 		ProgramChange(NoteProcPtr np);
 		ProgramChange(s_midichannel_id channelID, NoteProcPtr np);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		ProgramChange(const ProgramChange * clone);
 	};
 
@@ -155,10 +146,9 @@ namespace yzrilyzr_simplesynth{
 		ChannelPressure(s_midichannel_id channelID, s_note_vel value);
 		ChannelPressure(s_note_vel value);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		ChannelPressure(const ChannelPressure * clone);
 	};
 
@@ -168,10 +158,9 @@ namespace yzrilyzr_simplesynth{
 		TuningChange(u_sp<NoteTuning> value);
 		TuningChange(s_midichannel_id channelID, u_sp<NoteTuning> value);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		TuningChange(const TuningChange * clone);
 	};
 
@@ -183,10 +172,9 @@ namespace yzrilyzr_simplesynth{
 		DrumChannel(s_midichannel_id channelID, bool enable);
 		DrumChannel(bool enable);
 
-		ChannelEvent * clone() override;
+		u_up<ChannelEvent>  clone() override;
 		uint8_t getType() override;
 
-		protected:
 		DrumChannel(const DrumChannel * clone);
 	};
 }

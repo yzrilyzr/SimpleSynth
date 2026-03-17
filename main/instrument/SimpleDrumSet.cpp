@@ -82,8 +82,8 @@ namespace yzrilyzr_simplesynth{
 			.build());
 		add(MIDIFile::DrumSet::SLAP,
 			AmpBuilder().src(mksp<NoiseSrc>())
-			//.mul(0.5)
 			.IIR(sampleRate, 2, 748.2, 3544.7)
+			.mul(1.8)
 			.AR(5, 200, Pow(5), Pow(5))
 			.build());
 		add(MIDIFile::DrumSet::SCRATCH_PULL,
@@ -108,7 +108,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 5549, 10.0, 20)
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 3000, 1.5, 0)
 					 .build())
-			.mul(0.15)
+			.mul(0.25)
 			.AR(5, 500, Pow(5), Pow(10))
 			.build());
 		add(MIDIFile::DrumSet::SQUARE_CLICK,
@@ -129,7 +129,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 5549, 10.0, 15)
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 2000, 0.7, 0)
 					 .build())
-			.mul(0.2)
+			.mul(0.4)
 			.AR(5, 500, Pow(5), Pow(50))
 			.build());
 		add(MIDIFile::DrumSet::METRONOME_BELL,
@@ -145,12 +145,12 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 5549, 10.0, 15)
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 2000, 0.7, 0)
 					 .build())
-			.mul(0.18)
+			.mul(0.38)
 			.AR(5, 500, Pow(5), Pow(50))
 			.add(AmpBuilder()
 				 .src(mksp<SineWave>(ConstPhase(5460)))
 				 .addMul(mksp<SineWave>(ConstPhase(2048)), 0.3)
-				 .mul(0.1)
+				 .mul(0.2)
 				 .AR(5, 1000, Pow(5), Pow(5))
 				 .build())
 			.build());
@@ -184,7 +184,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 6231, 7.0, 15)
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 2000, 0.7, 0)
 					 .build())
-			.mul(0.18)
+			.mul(0.28)
 			.AR(5, 500, Pow(5), Pow(20))
 			.build());
 		add(MIDIFile::DrumSet::SNARE_ACOUSTIC,
@@ -201,9 +201,9 @@ namespace yzrilyzr_simplesynth{
 							 .biquad(sampleRate, FilterPassType::BELL, 1554, 10, 7)
 							 .biquad(sampleRate, FilterPassType::HIGHPASS, 500, 0.5, 0)
 							 .build())
-					.build(), 0.5)
+					.build(), 0.3)
 			.MultiStageEnv(releaseWithCompressorEffect(2, 10, 10, 500, 0.7))
-			.mul(0.5)
+			.mul(0.6)
 			.build());
 		add(MIDIFile::DrumSet::SNARE_ELECTRIC,
 			AmpBuilder()
@@ -219,9 +219,9 @@ namespace yzrilyzr_simplesynth{
 							 .biquad(sampleRate, FilterPassType::BELL, 1554, 10, 7)
 							 .biquad(sampleRate, FilterPassType::HIGHPASS, 500, 0.5, 0)
 							 .build())
-					.build(), 0.5)
+					.build(), 0.3)
 			.MultiStageEnv(releaseWithCompressorEffect(2, 10, 10, 500, 0.7))
-			.mul(0.5)
+			.mul(0.6)
 			.build());
 		add(MIDIFile::DrumSet::HAND_CLAP,
 			AmpBuilder()
@@ -238,6 +238,7 @@ namespace yzrilyzr_simplesynth{
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_1,
 			AmpBuilder(mksp<CymbalOsc>(ConstAmp(1), 0.12, IntArray{305, 444, 558, 630, 794, 824, 1136}))
+			.arctanDistortion(1,10,0.5)
 			.noteDSP(DSPGroupBuilder()
 					 .begin(DSPGroupBuilder::TYPE_CHAIN)
 					 .biquad(sampleRate, FilterPassType::BELL, 4000, 0.5, 15)
@@ -245,11 +246,12 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::HIGHPASS, 200, 0.5, 0)
 					 .build())
 			.mul(0.05)
-			.AR(100, 2000, Pow(-5), Pow(4))
+			.AR(30, 2000, Pow(2), Pow(3))
 			.addMul(AmpBuilder().src(SineAmp(490)).AR(3, 3, Pow(-5), Pow(4)).build(), 0.25)
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_CRASH_2,
 			AmpBuilder(mksp<CymbalOsc>(ConstAmp(0.9), 0.12, IntArray{305, 444, 558, 630, 794, 824, 1136}))
+			.arctanDistortion(1, 10, 0.5)
 			.noteDSP(DSPGroupBuilder()
 					 .begin(DSPGroupBuilder::TYPE_CHAIN)
 					 .biquad(sampleRate, FilterPassType::BELL, 3600, 0.5, 15)
@@ -257,7 +259,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::HIGHPASS, 200, 0.5, 0)
 					 .build())
 			.mul(0.05)
-			.AR(100, 2000, Pow(-5), Pow(4))
+			.AR(30, 2000, Pow(2), Pow(3))
 			.addMul(AmpBuilder().src(SineAmp(420)).AR(3, 3, Pow(-5), Pow(4)).build(), 0.25)
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_SPLASH,
@@ -276,7 +278,7 @@ namespace yzrilyzr_simplesynth{
 					   .AR(1, 3000, Line(), Line())
 					   .add(ConstAmp(70))
 					   .build(), ConstAmp(1), FilterPassType::LOWPASS)
-			.mul(0.2)
+			.mul(0.3)
 			.AR(50, 2000, Pow(-5), Pow(4))
 			.build());
 		add(MIDIFile::DrumSet::CYMBAL_CHINESE,
@@ -324,13 +326,14 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 19875, 10.0, 20)
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 2000, 0.7, 0)
 					 .build())
-			.mul(0.05)
+			.mul(0.08)
 			.AR(5, 500, Pow(5), Pow(5))
 			.build());
 		add(MIDIFile::DrumSet::BELL_RIDE,
 			AmpBuilder(mksp<CymbalOsc>(ConstAmp(0.95), 0.12))
 			.addMul(AmpBuilder(mksp<NoiseSrc>()).AR(1, 50, Line(), Pow(5)).build(), 1.0)
 			.biquad(sampleRate, BANDPASS, 3049, 3, 0)
+			.mul(2)
 			.AR(1, 2000, Pow(5), Pow(5)).build());
 		add(MIDIFile::DrumSet::CYMBAL_RIDE_1,
 			AmpBuilder(mksp<CymbalOsc>(ConstAmp(1.3), 0.12))
@@ -384,6 +387,7 @@ namespace yzrilyzr_simplesynth{
 			.mul(1.5)
 			.am(mksp<SineWave>(), 0.9, 53)
 			.clampV(0.2, 0.3)
+			.mul(2)
 			.AR(5, 1500, Pow(5), Pow(5))
 			.build());
 		add(MIDIFile::DrumSet::BONGO_HI,
@@ -398,7 +402,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 3043, 15.0, 20)
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 1744, 2.0, 0)
 					 .build())
-			.mul(0.4)
+			.mul(0.5)
 			.addMul(AmpBuilder().src(mksp<SineWave>()).drum(300, 10, 0.05).build(), 0.05)
 			.AR(5, 1000, Pow(5), Pow(20))
 			.build());
@@ -415,7 +419,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 3243, 15.0, 20)
 					 .biquad(sampleRate, FilterPassType::BANDPASS, 1744, 2.0, 0)
 					 .build())
-			.mul(0.2)
+			.mul(0.3)
 			.addMul(AmpBuilder().src(mksp<SineWave>()).drum(300, 10, 0.1).build(), 0.1)
 			.AR(5, 1000, Pow(5), Pow(20))
 			.build());
@@ -476,7 +480,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 908, 7, 20)
 					 .biquad(sampleRate, FilterPassType::LOWPASS, 4000, 0.5, 0)
 					 .build())
-			.mul(0.04)
+			.mul(0.06)
 			.AR(1, 1000, Pow(5), Pow(15))
 			.build());
 		add(MIDIFile::DrumSet::TIMBALE_HI,
@@ -495,7 +499,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, BELL, 4402, 15, 20)
 					 .biquad(sampleRate, LOWPASS, 5000, 0.3, 0)
 					 .build())
-			.mul(0.02)
+			.mul(0.03)
 			.addMul(AmpBuilder()
 					.src(mksp<NoiseSrc>())
 					.biquad(sampleRate, BANDPASS, 560, 0.8, 0)
@@ -627,7 +631,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 9077, 5.0, 20)
 					 .biquad(sampleRate, FilterPassType::HIGHSHELF, 1000, 0.7, 10)
 					 .build())
-			.mul(0.005)
+			.mul(0.01)
 			.AR(5, 500, Pow(5), Pow(-5))
 			.build());
 		add(MIDIFile::DrumSet::GUIRO_LONG,
@@ -649,7 +653,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 9077, 5.0, 20)
 					 .biquad(sampleRate, FilterPassType::HIGHSHELF, 1000, 0.7, 10)
 					 .build())
-			.mul(0.005)
+			.mul(0.01)
 			.AR(5, 1000, Pow(5), Pow(-5))
 			.build());
 		add(MIDIFile::DrumSet::CUICA_HIGH,
@@ -672,7 +676,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 9077, 10, 20)
 					 .biquad(sampleRate, FilterPassType::LOWPASS, 10000, 0.5, 0)
 					 .build())
-			.mul(0.04)
+			.mul(0.06)
 			.AR(1, 1000, Pow(5), Pow(15))
 			.build());
 		add(MIDIFile::DrumSet::WOOD_BLOCK_HIGH,
@@ -691,7 +695,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 4667, 15, 30)
 					 .biquad(sampleRate, FilterPassType::LOWPASS, 10000, 0.5, 0)
 					 .build())
-			.mul(0.018)
+			.mul(0.02)
 			.AR(1, 1000, Pow(5), Pow(20))
 			.build());
 		add(MIDIFile::DrumSet::WOOD_BLOCK_LOW,
@@ -710,7 +714,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 3408, 15, 30)
 					 .biquad(sampleRate, FilterPassType::LOWPASS, 10000, 0.5, 0)
 					 .build())
-			.mul(0.02)
+			.mul(0.025)
 			.AR(1, 1000, Pow(5), Pow(20))
 			.build());
 		add(MIDIFile::DrumSet::TRIANGLE_OPEN,
@@ -721,7 +725,7 @@ namespace yzrilyzr_simplesynth{
 			.addMul(mksp<SineWave>(ConstPhase(3101)), 1.0)
 			.addMul(mksp<SineWave>(ConstPhase(8505)), 0.5)
 			.addMul(mksp<SineWave>(ConstPhase(10972)), 0.7)
-			.mul(0.16)
+			.mul(0.18)
 			.AR(5, 1000, Pow(5), Pow(3))
 			.build());
 		add(MIDIFile::DrumSet::TRIANGLE_MUTE,
@@ -732,7 +736,7 @@ namespace yzrilyzr_simplesynth{
 			.addMul(mksp<SineWave>(ConstPhase(3101)), 1.0)
 			.addMul(mksp<SineWave>(ConstPhase(8505)), 0.5)
 			.addMul(mksp<SineWave>(ConstPhase(10972)), 0.7)
-			.mul(0.16)
+			.mul(0.18)
 			.AR(5, 100, Pow(5), Pow(5))
 			.build());
 		add(MIDIFile::DrumSet::SHAKER,
@@ -761,7 +765,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 16772, 10, 30)
 					 .biquad(sampleRate, FilterPassType::HIGHPASS, 2000, 1, 0)
 					 .build())
-			.mul(0.007)
+			.mul(0.009)
 			.AR(10, 1000, Pow(5), Pow(3))
 			.build());
 
@@ -829,7 +833,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, FilterPassType::BELL, 11287, 15, 30)
 					 .biquad(sampleRate, FilterPassType::HIGHPASS, 1000, 1.0, 0)
 					 .build())
-			.mul(0.08)
+			.mul(0.085)
 			.AR(3, 500, Pow(5), Pow(20))
 			.build());
 		add(MIDIFile::DrumSet::SURDO_MUTE,
@@ -849,7 +853,7 @@ namespace yzrilyzr_simplesynth{
 					 .biquad(sampleRate, BELL, 1000, 10, 5)
 					 .biquad(sampleRate, BANDPASS, 180, 2, 0)
 					 .build())
-			.mul(2)
+			.mul(3)
 			.AR(5, 1000, Pow(5), Pow(20))
 			.build());
 
@@ -878,6 +882,7 @@ namespace yzrilyzr_simplesynth{
 						  .build())
 				 .AR(5, 1000, Pow(5), Pow(20))
 				 .build())
+			.mul(1.5)
 			.AR(5, 1000, Pow(5), Pow(5))
 			.build());
 

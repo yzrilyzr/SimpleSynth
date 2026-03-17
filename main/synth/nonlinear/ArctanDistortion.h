@@ -15,5 +15,6 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
+	U_CLASS_INFO(ArctanDistortion)
 	};
 }

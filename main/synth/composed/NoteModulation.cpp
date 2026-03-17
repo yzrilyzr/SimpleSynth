@@ -1,6 +1,7 @@
 #include "NoteModulation.h"
 #include "events/Note.h"
 
+using namespace yzrilyzr_lang;
 
 namespace yzrilyzr_simplesynth{
 	void NoteModulation::onRegisterParam(){
@@ -17,7 +18,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr NoteModulation::clone(){
 		return mksp<NoteModulation>(a->clone());
 	}
-	yzrilyzr_lang::String NoteModulation::toString() const{
+	String NoteModulation::toString() const{
 		return "NoteModulation";
 	}
 }

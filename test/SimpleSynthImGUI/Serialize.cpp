@@ -32,6 +32,24 @@ void json2obj(json & j, ArrayList<ProjectObject *> & objects){
 			const char * key=param.name.c_str();
 			json & fromJSON=obj->fromJSON;
 			if(!fromJSON.contains(key))continue;
+			if((param.type & 0xff) == ParamType::ObjectArray){
+				//添加对象到类型为数组表
+				ArrayList<u_sp<Object>> & arr=*static_cast<ArrayList<u_sp<Object>> *>(param.value);
+				json jsonArr=fromJSON[key];
+				for(int i=0;i < jsonArr.size();i++){
+					uint64_t id=jsonArr[i];
+					if(id == 0)continue;
+					for(ProjectObject * obj1 : objects){
+						if(obj == obj1)continue;
+						json & j1=obj1->fromJSON;
+						uint64_t obj1id=j1.value("id", static_cast<uint64_t>(0));
+						if(id == obj1id){
+							arr.add(obj1->paramRegPtr);
+						}
+					}
+				}
+				continue;
+			}
 			switch(param.type){
 				case ParamType::Float:
 				case ParamType::Double:

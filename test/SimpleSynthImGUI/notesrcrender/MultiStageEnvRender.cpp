@@ -19,7 +19,7 @@ using namespace yzrilyzr_lang;
 
 void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	bool changed=false;
-	u_sp<MultiStageEnvelope> paramRegPtr=std::dynamic_pointer_cast<MultiStageEnvelope, ClassRegister>(obj.paramRegPtr);
+	u_sp<MultiStageEnvelope> paramRegPtr=spsc<MultiStageEnvelope, ClassRegister>(obj.paramRegPtr);
 	auto & pts=paramRegPtr->points;
 	if(ImPlot::BeginPlot(ctx.LANG.getc("module.multi_stage_envelope.data"), ImVec2(500, 200))){
 		ImPlot::SetupAxis(ImAxis_Y1, "Value", ImPlotAxisFlags_NoLabel);

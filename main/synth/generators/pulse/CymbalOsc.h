@@ -11,6 +11,7 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr mul=nullptr;
 	yzrilyzr_array::IntArray osc;
 	u_normal_01 mix;
+	bool ringMode=false;
 	public:
 	~CymbalOsc()=default;
 	CymbalOsc();
@@ -23,8 +24,8 @@ namespace yzrilyzr_simplesynth{
 	NoteProcPtr clone() override;
 	yzrilyzr_lang::String toString() const override;
 	void onRegisterParam() override;
-	U_GET_CLASS_NAME(CymbalOsc)
+	U_CLASS_INFO(CymbalOsc)
 	private:
-	static u_sample square(u_freq Hz, u_time time);
+	u_sample square(u_freq Hz, u_time time);
 	};
 }

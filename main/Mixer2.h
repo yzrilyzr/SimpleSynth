@@ -31,7 +31,7 @@ namespace yzrilyzr_simplesynth{
 		Note note;
 		yzrilyzr_array::SampleArray output;
 		//yzrilyzr_array::Array<Note> noteSnapshots;
-		ChannelData * data; 
+		ChannelData * data;
 		NoteTask(uint8_t uniqueID);
 	};
 	ECLASS(NoteTaskPool, public yzrilyzr_util::Pool2<NoteTask, CHANNEL_MAX_VOICE>){
@@ -48,10 +48,10 @@ namespace yzrilyzr_simplesynth{
 		yzrilyzr_array::SampleArray output[2];
 		yzrilyzr_array::SampleArray noteOutput;
 		u_sp<yzrilyzr_dsp::DSPChain> dspChain[2]; // DSP处理链
-		u_sp<yzrilyzr_dsp::DSP> choruser[2];     // 合唱效果器
-		u_sp<yzrilyzr_dsp::DSP> phaser[2];     // 合唱效果器
-		u_sp<yzrilyzr_dsp::DSP> reverber[2];      // 混响效果器
-		u_sp<yzrilyzr_dsp::DSP> limiter[2];
+		yzrilyzr_dsp::DSPPtr choruser[2];     // 合唱效果器
+		yzrilyzr_dsp::DSPPtr phaser[2];     // 合唱效果器
+		yzrilyzr_dsp::DSPPtr reverber[2];      // 混响效果器
+		yzrilyzr_dsp::DSPPtr limiter[2];
 		std::set<NoteProcPtr> programCache;
 		NoteTaskPool workingNotesPool;
 		bool lastSnapshotChange=true;
@@ -72,8 +72,8 @@ namespace yzrilyzr_simplesynth{
 		u_index getBufferSize()const override;
 		void setSynthMode(int8_t mode, int32_t cores)override;
 		void mix()override;
-		void sendInstantEvent(ChannelEvent * event)override;
-		void postEvent(ChannelEvent * event, u_time startAt)override;
+		void sendInstantEvent(u_up<ChannelEvent> event)override;
+		void postEvent(u_up<ChannelEvent> event, u_time startAt)override;
 		u_time getCurrentTime()const override;
 		void setSampleRate(u_sample_rate sam)override;
 		void resetLimiter()override;            // 重置限制器状态
@@ -87,12 +87,13 @@ namespace yzrilyzr_simplesynth{
 		u_sp<IChannel> getMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id ch)override;
 		u_sp<yzrilyzr_dsp::DSPChain> * getEQ()override;
 		bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)override;
+		U_CLASS_INFO(Mixer2)
 		private:
 		static constexpr int const FLAG_RESET=0b1;
 		yzrilyzr_array::SampleArray output[2]; // 输出缓冲区指针数组
 		yzrilyzr_array::SampleArray drumOutput[2]; // 输出缓冲区指针数组
-		std::deque<ChannelEvent *> instantEventQueue; // 即时事件队列
-		std::deque<ChannelEvent *> postEventQueue; // 即时事件队列
+		std::deque<u_up<ChannelEvent>> instantEventQueue; // 即时事件队列
+		std::unordered_map<yzrilyzr_lang::String,std::deque<u_up<ChannelEvent>>> postEventQueue; // 排队事件队列
 		yzrilyzr_util::FixedThreadPool * threadPool=nullptr;
 		std::vector<std::future<void>> futures;
 		int32_t synthMode=0;

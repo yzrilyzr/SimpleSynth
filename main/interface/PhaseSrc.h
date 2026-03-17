@@ -7,6 +7,7 @@ namespace yzrilyzr_simplesynth{
 	ECLASS(PhaseSrc, public yzrilyzr_util::ClassRegister){
 		public:
 		virtual ~PhaseSrc()=default;
+		virtual u_freq getFreq(const Note & note)=0;
 		virtual s_phase getPhase(const Note & note)=0;
 		virtual void init(){}
 		void registerParamPhaseSrc(const yzrilyzr_lang::String & name, u_sp<PhaseSrc> *value);

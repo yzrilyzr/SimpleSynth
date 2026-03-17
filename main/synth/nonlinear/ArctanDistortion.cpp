@@ -10,6 +10,7 @@ using namespace yzrilyzr_lang;
 namespace yzrilyzr_simplesynth{
 	void ArctanDistortion::onRegisterParam(){
 		static double alphaMin=0, alphaMax=100;
+		AmpUnaryComposition::onRegisterParam();
 		RegisterUtil::registerParamGain(*this, "InputGain", &inputGain);
 		registerParam("Alpha", ParamType::Double, &alpha, &alphaMin, &alphaMax);
 		RegisterUtil::registerParamGain(*this, "OutputGain", &outputGain);

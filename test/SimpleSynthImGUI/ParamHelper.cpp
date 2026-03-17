@@ -6,10 +6,15 @@
 #include "interpolator/Interpolator.h"
 #include "synth/source/AmplitudeSources.h"
 #include "util/Convert.h"
+#include "collection/ArrayList.hpp"
 
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_array;
+using namespace yzrilyzr_collection;
+using namespace yzrilyzr_interpolator;
+using namespace yzrilyzr_simplesynth;
+using namespace yzrilyzr_dsp;
 
 ImU32 getPinColor(ParamReg & param){
 	int type=param.type;
@@ -38,27 +43,27 @@ ImU32 getPinColor(u_sp<ClassRegister> paramRegPtr){
 	if(paramRegPtr == nullptr) return IM_COL32(255, 0, 0, 255); // 红色表示无效/空指针
 
 	// 振荡器 - 波形生成，常用蓝色系
-	if(spdc<yzrilyzr_simplesynth::Osc>(paramRegPtr))
+	if(spdc<Osc>(paramRegPtr))
 		return IM_COL32(130, 220, 130, 255);// 浅绿色
 
 	// 音符处理器 - MIDI/音符处理，常用绿色系
-	else if(spdc<yzrilyzr_simplesynth::NoteProcessor>(paramRegPtr))
+	else if(spdc<NoteProcessor>(paramRegPtr))
 		return IM_COL32(90, 220, 90, 255); // 鲜绿色
 
 	// 相位源 - 时间/相位控制，常用黄色系
-	else if(spdc<yzrilyzr_simplesynth::PhaseSrc>(paramRegPtr))
+	else if(spdc<PhaseSrc>(paramRegPtr))
 		return IM_COL32(255, 200, 50, 255); // 金黄色
 
 	// 插值器 - 平滑过渡，常用紫色系
-	else if(spdc<yzrilyzr_interpolator::Interpolator>(paramRegPtr))
+	else if(spdc<Interpolator>(paramRegPtr))
 		return IM_COL32(180, 100, 220, 255); // 紫色
 
 	// DSP处理器 - 通用音频处理，常用橙色系
-	else if(spdc<yzrilyzr_dsp::DSP>(paramRegPtr))
+	else if(spdc<DSP>(paramRegPtr))
 		return IM_COL32(255, 140, 60, 255); // 橙色
 
 	// 采样提供器 - 音频采样，常用青色系
-	else if(spdc<yzrilyzr_array::SampleProvider>(paramRegPtr))
+	else if(spdc<SampleProvider>(paramRegPtr))
 		return IM_COL32(80, 200, 220, 255); // 青色
 
 	// 默认颜色 - 未知类型
@@ -82,19 +87,19 @@ void renderObjectParamInput(CurrentProjectContext & ctx, ParamReg & param, const
 bool setParamValue(ParamReg & param, u_sp<ClassRegister> paramRegPtr){
 	int type=param.type;
 	if(type == ParamType::NoteSrc){
-		return setVal<yzrilyzr_simplesynth::NoteProcessor>(param, paramRegPtr);
+		return setVal<NoteProcessor>(param, paramRegPtr);
 	}
 	if(type == ParamType::PhaseSrc){
-		return setVal<yzrilyzr_simplesynth::PhaseSrc>(param, paramRegPtr);
+		return setVal<PhaseSrc>(param, paramRegPtr);
 	}
 	if(type == ParamType::Interpolator){
-		return setVal<yzrilyzr_interpolator::Interpolator>(param, paramRegPtr);
+		return setVal<Interpolator>(param, paramRegPtr);
 	}
 	if(type == ParamType::DSP){
-		return setVal<yzrilyzr_dsp::DSP>(param, paramRegPtr);
+		return setVal<DSP>(param, paramRegPtr);
 	}
 	if(type == ParamType::SampleData){
-		return setVal<yzrilyzr_array::SampleProvider>(param, paramRegPtr);
+		return setVal<SampleProvider>(param, paramRegPtr);
 	}
 	return false;
 }
@@ -106,6 +111,33 @@ bool renderOneParam(CurrentProjectContext & ctx, ParamReg & param){
 	}
 	const char * cstrName=guiName.c_str(UTF8);
 	bool localChange=false;
+
+	if((param.type & 0xff) == ParamType::ObjectArray){
+		ArrayList<u_sp<Object>> & arr=*static_cast<ArrayList<u_sp<Object>> *>(param.value);
+		ImGui::Text(cstrName);
+		u_index whichIsRemoved=-1;
+		for(int i=0;i < arr.size();i++){
+			ImGui::PushID(&arr[i]);
+			ParamReg preg;
+			preg.type=(param.type >> 8) & 0xffffff;
+			preg.value=&arr[i];
+			renderObjectParamInput(ctx, preg, "V");
+			ImGui::SameLine();
+			if(ImGui::Button(ctx.LANG.getc("param.obj_array.remove"))){
+				whichIsRemoved=i;
+			}
+			ImGui::PopID();
+		}
+		if(whichIsRemoved != -1){
+			arr.remove(whichIsRemoved);
+			localChange=true;
+		}
+		if(ImGui::Button(ctx.LANG.getc("param.obj_array.add"))){
+			arr.add(nullptr);
+			localChange=true;
+		}
+		return localChange;
+	}
 	switch(param.type){
 		case ParamType::Bool:
 			localChange=ImGui::Checkbox(cstrName, static_cast<bool *>(param.value));
@@ -172,7 +204,7 @@ bool renderOneParam(CurrentProjectContext & ctx, ParamReg & param){
 			break;
 		case ParamType::Enum:
 			ImGui::PushItemWidth(150.0f);
-			localChange=ImGui::Combo(cstrName, static_cast<int *>(param.value), static_cast<const char **>(param.valueMin), *static_cast<int *>(param.valueMax));
+			localChange=ImGui::Combo(cstrName, static_cast<int *>(param.value), static_cast<const char **>(param.valueMin), static_cast<const char **>(param.valueMax) - static_cast<const char **>(param.valueMin));
 			ImGui::PopItemWidth();
 			break;
 		case ParamType::Sub:
@@ -206,7 +238,7 @@ bool renderOneParam(CurrentProjectContext & ctx, ParamReg & param){
 				for(int i=0;i < arr.length;i++){
 					ImGui::PushItemWidth(500.0f);
 					ImGui::PushID(&arr[i]);
-					ImGui::SliderInt("v", &arr[i], 1, 20000, "%d", ImGuiSliderFlags_Logarithmic);
+					localChange=ImGui::SliderInt("v", &arr[i], 1, 20000, "%d", ImGuiSliderFlags_Logarithmic) || localChange;
 					ImGui::PopID();
 					ImGui::PopItemWidth();
 				}

@@ -7,7 +7,7 @@
 #include "interpolator/Interpolator.h"
 
 namespace yzrilyzr_simplesynth{
-	ECLASS(TimeEnvelop, public NoteProcessor), public Enveloper{
+	ECLASS(TimeEnvelop, public Enveloper){
 	private:
 	u_sp<yzrilyzr_interpolator::Interpolator> curve;
 	u_time duration;
@@ -31,5 +31,6 @@ namespace yzrilyzr_simplesynth{
 		return curve->y(x);
 	}
 	void onRegisterParam() override;
+	U_CLASS_INFO_B(TimeEnvelop, Enveloper);
 	};
 }

@@ -8,7 +8,7 @@ namespace yzrilyzr_simplesynth{
 	NoiseSrc(){}
 	u_sample getAmp(const Note & note) override;
 	yzrilyzr_lang::String toString() const override;
-	U_GET_CLASS_NAME(NoiseSrc)
+	U_CLASS_INFO(NoiseSrc)
 
 	};
 }

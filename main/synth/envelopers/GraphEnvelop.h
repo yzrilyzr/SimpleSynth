@@ -33,7 +33,7 @@ namespace yzrilyzr_simplesynth{
 		bool finished=false;         // 包络是否已结束（仅用于无循环情况）
 		u_time releaseOffset=0;   // 从延音点开始的释放偏移量
 	};
-	ECLASS(GraphEnvelop, public NoteProcessor, public Enveloper, NoteData<GraphEnvelopKeyData>){
+	ECLASS(GraphEnvelop, public Enveloper, NoteData<GraphEnvelopKeyData>){
 		public:
 		std::vector<GraphPoint> points;
 		int32_t sustainPointIndex=-1;
@@ -52,6 +52,7 @@ namespace yzrilyzr_simplesynth{
 			return mksp<GraphEnvelop>(sustainPointIndex, loopStartPointIndex, loopEndPointIndex, points);
 		}
 		yzrilyzr_lang::String toString()const override;
-		U_GET_CLASS_NAME(GraphEnvelop)
+		U_CLASS_INFO_B(GraphEnvelop, Enveloper);
+
 	};
 }

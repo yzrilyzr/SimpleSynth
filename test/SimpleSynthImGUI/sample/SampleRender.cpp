@@ -40,12 +40,12 @@ void gaussianSmooth(SampleArray & data, SampleArray & smoothed, u_sample sigma, 
 }
 void sampleDataRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	// TODO fix
-	u_sp<SampleArrayProvider> paramRegPtr=spdc<SampleArrayProvider, ClassRegister>(obj.paramRegPtr);
+	u_sp<SampleArrayProvider> paramRegPtr=spsc<SampleArrayProvider, ClassRegister>(obj.paramRegPtr);
 	auto & data=obj.storeData;
 	if(data.find("SampleLength") == data.end()){
 		data["SampleLength"]=mksp<Integer>(256);
 	}
-	Integer & SampleLength=*spdc<Integer>(data["SampleLength"]);
+	Integer & SampleLength=*spsc<Integer>(data["SampleLength"]);
 	ImGui::PushItemWidth(200);
 	ImGui::InputInt(ctx.LANG.getc("module.sample.length"), &SampleLength.value);
 	ImGui::PopItemWidth();

@@ -60,11 +60,12 @@ class CurrentProjectContext{
 	void computeSelectedNodes();
 	void ShowContextMenu();
 	void renderCurrentProjectWindow();
+	void buildLink(ProjectObject & obj, yzrilyzr_util::ParamReg & param);
 	void buildLinks(ProjectObject & obj, yzrilyzr_util::ClassRegister & params);
 	ProjectObject * findNode(int nodeId);
-	yzrilyzr_util::ParamReg * findParam(ProjectObject & obj, int attrId);
-	yzrilyzr_util::ParamReg * findParam(yzrilyzr_util::ClassRegister & params, int attrId);
-	yzrilyzr_util::ParamReg * findParam(int nodeId, int attrId);
+	std::optional<yzrilyzr_util::ParamReg> findParam(ProjectObject & obj, int attrId);
+	std::optional<yzrilyzr_util::ParamReg> findParam(yzrilyzr_util::ClassRegister & params, int attrId);
+	std::optional<yzrilyzr_util::ParamReg> findParam(int nodeId, int attrId);
 
 	void lockLayoutSelected(bool lock);
 	void deleteSelectedLinks();

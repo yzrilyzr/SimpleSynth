@@ -194,7 +194,7 @@ int openMIDIDevice(){
 	}
 	return 0;
 }
-u_sp<DSP> AWeightedFilter(u_sample_rate sr){
+DSPPtr AWeightedFilter(u_sample_rate sr){
 	return DSPGroupBuilder()
 		.begin(DSPGroupBuilder::TYPE_CHAIN)
 		.biquad(sr, HIGHPASS, 20.598996, 0.707, 0)
@@ -213,9 +213,9 @@ void calibrate(int channel, int  program){
 	mixer1.getGlobalConfig().set(mixer2->getGlobalConfig());
 	mixer1.setUseLimiter(false);
 	mixer1.setChannelUseDSP(false);
-	mixer1.postEvent(new ProgramChange(channel, program), 0);
-	mixer1.postEvent(new ChannelControl(channel, MIDIFile::CC::VOLUME, 127), 0);
-	mixer1.postEvent(new ChannelControl(channel, MIDIFile::CC::EXPRESSION, 127), 0);
+	mixer1.postEvent(mkup<ProgramChange>(channel, program), 0);
+	mixer1.postEvent(mkup<ChannelControl>(channel, MIDIFile::CC::VOLUME, 127), 0);
+	mixer1.postEvent(mkup<ChannelControl>(channel, MIDIFile::CC::EXPRESSION, 127), 0);
 	int index=-1;
 	EnvelopDetector rmsED(0, 10000, 10000, EnvelopDetector::RMS, 20);
 	EnvelopDetector awRmsED(0, 10000, 10000, EnvelopDetector::RMS, 100);
@@ -225,7 +225,7 @@ void calibrate(int channel, int  program){
 	rmsED.init(sampleRate);
 	peakED.init(sampleRate);
 	awPeakED.init(sampleRate);
-	u_sp<DSP> awFilter=AWeightedFilter(sampleRate);
+	DSPPtr awFilter=AWeightedFilter(sampleRate);
 	awFilter->init(sampleRate);
 	SampleArray rms(128);
 	SampleArray awRms(128);
@@ -249,8 +249,8 @@ void calibrate(int channel, int  program){
 			}
 			index++;
 			u_time time=mixer1.getCurrentTime();
-			mixer1.postEvent(new NoteOn(channel, index, 1), time);
-			mixer1.postEvent(new NoteOff(channel, index, 1), time + 0.5);
+			mixer1.postEvent(mkup<NoteOn>(channel, index, 1), time);
+			mixer1.postEvent(mkup<NoteOff>(channel, index, 1), time + 0.5);
 			rmsED.resetMemory();
 			peakED.resetMemory();
 			awPeakED.resetMemory();
@@ -373,6 +373,7 @@ int main(int argc, char * argv[]){
 	SDL_PauseAudio(0);
 	openMIDIDevice();
 	mixer2->setUseLimiter(true);
+	static int inc=0;
 	while(true){
 		String str=Util::readLine(System::in);
 		try{
@@ -388,12 +389,11 @@ int main(int argc, char * argv[]){
 					exportWAV(fileName, seq);
 				} else{
 					System::out.printf(L"播放: %s\n", fileName);
-					seq->postToMixer(mixer2.get(), 1, "Console_XM");
+					seq->postToMixer(mixer2.get(), 1, String("Console_XM") + std::to_string(inc++));
 				}
 			} else if(str.endsWith(".mid")){
 				u_sp<MixerSequence> seq=SynthUtil::parseMIDI(FileInputStream(str));
 				if(seq == nullptr)throw Exception("File read error");
-				static int inc=0;
 				String fileName=File(str).getName();
 				if(convertMIDIMode){
 					System::out.printf(L"转换: %s\n", fileName);
@@ -403,7 +403,7 @@ int main(int argc, char * argv[]){
 					exportWAV(fileName, seq);
 				} else{
 					System::out.printf(L"播放: %s\n", fileName);
-					seq->postToMixer(mixer2.get(), 1, "Console_MIDI" + std::to_string(inc++));
+					seq->postToMixer(mixer2.get(), 1, String("Console_MIDI") + std::to_string(inc++));
 				}
 			} else if(str.endsWith(".hrir")){
 				mixer2->getGlobalConfig().set3DEffect(HRIR::parseHRIR(FileInputStream(str)));

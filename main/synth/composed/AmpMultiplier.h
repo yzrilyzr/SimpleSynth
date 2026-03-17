@@ -18,6 +18,6 @@ namespace yzrilyzr_simplesynth{
 		return mksp<AmpMultiplier>(a->clone(), b->clone());
 	}
 	yzrilyzr_lang::String toString() const override;
-	U_GET_CLASS_NAME(AmpMultiplier);
+	U_CLASS_INFO(AmpMultiplier);
 	};
 }
