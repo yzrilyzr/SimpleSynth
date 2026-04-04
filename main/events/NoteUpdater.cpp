@@ -21,7 +21,7 @@ namespace yzrilyzr_simplesynth{
 		double modValue=0;
 		if(cfg.Modulation > 0 && note.passedTime > cfg.ModDelay){
 			modValue=(double)cfg.Modulation * (double)cfg.ModDepth
-				* fast_sin((note.passedTime - (double)cfg.ModDelay)*  Math::TAU * (double)cfg.ModRate, cfg.ModRate);
+				* fast_sin((note.passedTime - (double)cfg.ModDelay) * Math::TAU * (double)cfg.ModRate, cfg.ModRate);
 			finalID+=modValue;
 		}
 
@@ -36,15 +36,15 @@ namespace yzrilyzr_simplesynth{
 		// 更新音符状态
 		note.passedTime=cfg.currentTime - note.startAtTime;
 		note.closedPassedTime=cfg.currentTime - note.closedAtTime;
-		note.freqSynth=cfg.tuning->getFrequencyByID(finalID);
 		note.idSynth=finalID;
+		note.freqSynth=cfg.tuning->getFrequencyByID(finalID);
 		note.velocitySynth=cfg.velocityMap->y(note.velocity) * static_cast<s_note_vel>(1 + 0.6 * modValue) * static_cast<s_note_vel>(cfg.Expression);
 	}
-	void NoteUpdater::postUpdateNote(Note & note,  const ChannelConfig & cfg){
+	void NoteUpdater::postUpdateNote(Note & note, const ChannelConfig & cfg){
 		note.phaseSynth+=note.freqSynth * cfg.deltaTime;
 		note.dataInvalidated=false;
 	}
-	void NoteUpdater::noteOn(Note & note,  ChannelConfig & cfg, s_note_id_i id, s_note_vel velocity){
+	void NoteUpdater::noteOn(Note & note, ChannelConfig & cfg, s_note_id_i id, s_note_vel velocity){
 		note.id=note.idSynth=static_cast<s_note_id>(id);
 		note.velocity=velocity;
 		note.velocitySynth=0;
@@ -64,7 +64,7 @@ namespace yzrilyzr_simplesynth{
 		cfg.lastNote=&note;
 		cfg.noteHoldMap[id]=true;
 	}
-	void NoteUpdater::noteOff(Note & note,  const ChannelConfig & cfg, s_note_vel velocity){
+	void NoteUpdater::noteOff(Note & note, const ChannelConfig & cfg, s_note_vel velocity){
 		note.requestClose(cfg);
 	}
 }

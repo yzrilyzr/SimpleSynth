@@ -1,9 +1,7 @@
 ﻿#pragma once
 #include "yzrutil.h"
 #include "../MenuRegister.hpp"
-#include "synth/generators/physic/TwoStringResonator.h"
-
-
+#include "synth/physic/TwoStringResonator.h"
 
 void twostringresonatorRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj);
 void TwoStringResonatorExciterWindow(u_sp<yzrilyzr_simplesynth::TwoStringResonator> & paramRegPtr);

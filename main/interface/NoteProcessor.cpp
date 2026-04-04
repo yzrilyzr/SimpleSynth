@@ -28,16 +28,16 @@ namespace yzrilyzr_util{
 	}
 }
 namespace yzrilyzr_simplesynth{
-	bool NoteProcessor::noMoreData(const Note & note){
+	bool NoteProcessor::noMoreData(const Note & note)const{
 		return note.closed(*note.cfg) || note.fclosed(*note.cfg);
 	}
 
-	/*void NoteProcessor::getAmpBlock(const Note * noteSnapshots, u_sample * output, u_index length){
+	void NoteProcessor::getAmpBlock(const Note * noteSnapshots, u_sample * output, u_index length){
 		for(u_index i=0;i < length;i++){
 			output[i]=getAmp(noteSnapshots[i]);
-			if(noMoreData(const_cast<Note&>(noteSnapshots[i])))break;
+			//if(noMoreData(const_cast<Note&>(noteSnapshots[i])))break;
 		}
-	}*/
+	}
 
 	String NoteProcessor::toString() const{
 		return "NoteProcessor";

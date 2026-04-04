@@ -7,7 +7,7 @@
 #include "imgui.h"
 #include "implot.h"
 #include "interpolator/LineInterpolator.h"
-#include "synth/envelopers/GraphEnvelop.h"
+#include "synth/enveloper/GraphEnvelop.h"
 #include "tuning/EqualTemperament.h"
 #include "util/Lang.h"
 #include "lang/Exception.h"

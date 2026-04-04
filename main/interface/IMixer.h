@@ -48,8 +48,11 @@ namespace yzrilyzr_simplesynth{
 		virtual void asyncMix();
 		virtual void awaitMix();
 
-		virtual u_index getBufferSize()const=0;
-		virtual void setBufferSize(u_index bs)=0;
+		virtual u_index getBufferSize()const=0;//获取已分配工作缓冲区大小
+		virtual void setBufferSize(u_index bs)=0;//设置分配工作缓冲区大小
+
+		virtual u_index getBufferLimit()const=0;//获取实际的工作缓冲区大小
+		virtual void setBufferLimit(u_index bs)=0;//设置实际的工作缓冲区大小
 
 		u_index getOutputChannelCount()const;
 		virtual u_sample * getOutput(uint32_t chIndex)const=0;

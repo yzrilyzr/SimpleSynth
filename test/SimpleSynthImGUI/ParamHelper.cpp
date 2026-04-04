@@ -4,7 +4,7 @@
 #include "array/Array.hpp"
 #include "imnodes.h"
 #include "interpolator/Interpolator.h"
-#include "synth/source/AmplitudeSources.h"
+#include "synth/util/AmplitudeSources.h"
 #include "util/Convert.h"
 #include "collection/ArrayList.hpp"
 
@@ -41,10 +41,6 @@ ImU32 getPinColor(ParamReg & param){
 }
 ImU32 getPinColor(u_sp<ClassRegister> paramRegPtr){
 	if(paramRegPtr == nullptr) return IM_COL32(255, 0, 0, 255); // 红色表示无效/空指针
-
-	// 振荡器 - 波形生成，常用蓝色系
-	if(spdc<Osc>(paramRegPtr))
-		return IM_COL32(130, 220, 130, 255);// 浅绿色
 
 	// 音符处理器 - MIDI/音符处理，常用绿色系
 	else if(spdc<NoteProcessor>(paramRegPtr))

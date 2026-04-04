@@ -8,29 +8,29 @@
 #include "dsp/Chorus.h"
 #include "dsp/DSPGroupBuilder.h"
 #include "dsp/Delayer.h"
-#include "synth/composed/NearestAmpSet.h"
-#include "synth/composed/NoteVolBalance.h"
-#include "synth/composed/Matrix6x6Modulation.h"
-#include "synth/envelopers/EnvUtil.h"
-#include "synth/envelopers/TimeEnvelop.h"
-#include "synth/filters/BiquadEnvFilterGroup.h"
-#include "synth/generators/drum/SimpleDrumAmp.h"
-#include "synth/generators/noise/NoiseSrc.h"
-#include "synth/generators/physic/BowedString.h"
-#include "synth/generators/physic/KarplusStrongSrc.h"
-#include "synth/generators/physic/PianoSrc.h"
-#include "synth/generators/physic/TwoStringResonator.h"
-#include "synth/generators/physic/Sitar.h"
-#include "synth/generators/pulse/CymbalOsc.h"
-#include "synth/generators/pulse/Pulse.h"
-#include "synth/generators/pulse/SawWave.h"
-#include "synth/generators/pulse/SquareWave.h"
-#include "synth/generators/pulse/TriWave.h"
-#include "synth/generators/sine/AHarmonicWave.h"
-#include "synth/generators/sine/SineBasePowHarmonicWave.h"
-#include "synth/generators/sine/SineWave.h"
-#include "synth/source/AmpBuilder.h"
-#include "synth/source/AmplitudeSources.h"
+#include "synth/enveloper/TimeEnvelop.h"
+#include "synth/envfilter/BiquadEnvFilterGroup.h"
+#include "synth/modulation/Matrix6x6Modulation.h"
+#include "synth/modulation/SimpleDrumAmp.h"
+#include "synth/osc/noise/NoiseSrc.h"
+#include "synth/osc/pulse/CymbalOsc.h"
+#include "synth/osc/pulse/Pulse.h"
+#include "synth/osc/pulse/SawWave.h"
+#include "synth/osc/pulse/SquareWave.h"
+#include "synth/osc/pulse/TriWave.h"
+#include "synth/osc/sine/AHarmonicWave.h"
+#include "synth/osc/sine/SineBasePowHarmonicWave.h"
+#include "synth/osc/sine/SineWave.h"
+#include "synth/physic/BowedString.h"
+#include "synth/physic/KarplusStrongSrc.h"
+#include "synth/physic/PianoSrc.h"
+#include "synth/physic/Sitar.h"
+#include "synth/physic/TwoStringResonator.h"
+#include "synth/set/NearestAmpSet.h"
+#include "synth/util/AmpBuilder.h"
+#include "synth/util/AmplitudeSources.h"
+#include "synth/util/EnvUtil.h"
+#include "synth/util/NoteVolBalance.h"
 
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_dsp;
@@ -309,9 +309,9 @@ namespace yzrilyzr_simplesynth{
 					AmpBuilder()
 					.src(AmpBuilder(mksp<SineWave>())
 						 .pm(AmpBuilder(mksp<SineWave>())
-							 .freqSrc(MulPhase(NotePhase, 24))
+							 .freqSrc(NotePhase * 24)
 							 .ADSR(0, 700, 0, false, 1000, Line(), Pow(5), Pow(2))
-							 .build(), 0.15)
+							 .build(), 0.05)
 						 .ADSR(10, 1500, 0.5, false, 1000, Pow(5), Pow(5), Pow(2))
 						 .build())
 					.add(AmpBuilder(mksp<SineWave>())
@@ -328,7 +328,7 @@ namespace yzrilyzr_simplesynth{
 						 .ADSR(0, 1000, 0.25, true, 1000, Line(), Pow(5), Pow(2))
 						 .build())
 					.ADSR(10, 8000, 0.5, false, 500, Pow(5), Pow(5), Pow(2))
-					.noteDSP(mksp<Chorus>(1.0, 2.0, 1.0, 0.0))
+					.noteDSP(mksp<Chorus>(1.0, 2.0, 0.5, 0.0))
 					.noteDSP(mksp<Delayer>(220, -0.8, 0.05))
 					.build();
 			case MIDIFile::Instruments::PIANO_ELECTRIC_PIANO_2:
@@ -339,29 +339,29 @@ namespace yzrilyzr_simplesynth{
 								  .setOp(3, AmpBuilder(SineW()).velMix(0.143).ADSR(1, 5000, 0, false, 100, Pow(-5), Pow(2), Pow(2)).build(), 1.0, 0.0, 0.0, 1.0, 0.0)
 								  .setOp(4, AmpBuilder(SineW()).ADSR(1, 7000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 1.0, -1.0, 0.0, 1.0, 0.99)
 								  .setOp(5, AmpBuilder(SineW()).velMix(0.143).ADSR(1, 3500, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build(), 1.0, 1.0, 0.0, 1.0, 0.0)
-								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 0, 0.58 * 6)
+								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 1, 0, 0.38 * 6)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 3, 2, 0.89 * 6)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 4, 0.79 * 6)
 								  .setMatrix(Matrix6x6ModulationBuilder::TYPE_FM, 5, 5, 0.006)
 								  .build())
 					.mul(0.3)
 					.ADSR(1, 9000, 0, false, 500, Pow(-5), Pow(3), Pow(1))
-					.noteDSP(mksp<Chorus>(1.0, 2.0, 1.0, 0.0))
+					.noteDSP(mksp<Chorus>(1.0, 2.0, 0.5, 0.0))
 					.noteDSP(mksp<Delayer>(220, -0.8, 0.05))
 					.build();
 			case MIDIFile::Instruments::PIANO_HARPSICHORD:
 				return AmpBuilder()
 					.ks(0.85)
-					.biquad(sampleRate, BELL, 200.0, 0.5, 15.0)
-					.biquad(sampleRate, BELL, 1000.0, 0.5, -3.0)
-					.biquad(sampleRate, HIGHSHELF, 2000.0, 1, -3.0)
+					.biquad(RBJParams{FilterPassType::BELL, 200, sampleRate, 0.5, 15.0})
+					.biquad(RBJParams{FilterPassType::BELL, 1000, sampleRate, 0.5, -3.0})
+					.biquad(RBJParams{FilterPassType::HIGHSHELF, 2000, sampleRate, 1, -3.0})
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.ADSR(5, 5000, 0, false, 100, Pow(-5), Pow(8), Pow(15)).build();
 			case MIDIFile::Instruments::PIANO_CLAVICHORD:
 				return AmpBuilder()
 					.ks(0.95)
-					.biquad(sampleRate, BELL, 300.0, 0.5, 15.0)
-					.biquad(sampleRate, BELL, 1000.0, 0.5, -3.0)
+					.biquad(RBJParams{FilterPassType::BELL, 300, sampleRate, 0.5, 15.0})
+					.biquad(RBJParams{FilterPassType::BELL, 1000, sampleRate, 0.5, -3.0})
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.mul(0.5)
 					.ADSR(5, 5000, 0, false, 100, Pow(-5), Pow(8), Pow(15)).build();
@@ -442,7 +442,7 @@ namespace yzrilyzr_simplesynth{
 					0.9, 0.9, 1.0, 0.7, 0.6
 																   })))
 					.detune(2, 0.2)
-					.biquad(sampleRate, HIGHSHELF, 2000.0, 0.5, -12.0)
+					.biquad(RBJParams{FilterPassType::HIGHSHELF, 2000, sampleRate, 0.5, -12.0})
 					.mul(0.4)
 					.ADSR(10, 1, 0.7, true, 200, Pow(-5), Pow(5), Pow(5)).build();
 			case MIDIFile::Instruments::ORGAN_PERCUSSIVE_ORGAN:
@@ -508,7 +508,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::ORGAN_ACCORDIAN:
 				return AmpBuilder().src(mksp<SquareWave>())
 					.pm(mksp<SineWave>(), 0.65, 1)
-					.IIR(sampleRate, 1, 10.1, 9346.7)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 10.1, 9346.7, sampleRate, 1})
 					.mul(0.4)
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.ADSR(37, 2000, 0.71, true, 100, Pow(5), Pow(5), Pow(5))
@@ -533,7 +533,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::ORGAN_TANGO_ACCORDIAN:
 				return AmpBuilder().src(mksp<SquareWave>())
 					.pm(mksp<SineWave>(), 0.65, 1)
-					.IIR(sampleRate, 1, 10.1, 9346.7)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 10.1, 9346.7, sampleRate, 1})
 					.mul(0.4)
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.ADSR(37, 2000, 0.71, true, 100, Pow(5), Pow(5), Pow(5))
@@ -548,7 +548,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(0.5)
 					.ks(0.5)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -560,7 +560,7 @@ namespace yzrilyzr_simplesynth{
 					.build()
 				)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -568,7 +568,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(AmpBuilder().src(mksp<Pulse>(0.1, 0.3, 0.1, 0)).add(mksp<NoiseSrc>()).mul(0.5).build())
 					.ks(0.5)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -576,7 +576,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(AmpBuilder().src(mksp<SquareWave>()).add(mksp<NoiseSrc>()).mul(0.5).build())
 					.ks(0.75)
 					.ADSR(10, 5000, 0.1, false, 100, Pow(5), Pow(5), Pow(5))
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -584,7 +584,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(AmpBuilder().src(mksp<SquareWave>()).add(mksp<NoiseSrc>()).mul(0.5).build())
 					.ks(0.5)
 					.ADSR(10, 400, 0, false, 100, Pow(5), Pow(5), Pow(5))
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.clamp(1.2, 1)
 					.build();
@@ -592,8 +592,8 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder()
 					.ks(0.85)
 					.arctanDistortion(1, 3, 1)
-					.biquad(sampleRate, FilterPassType::BELL, 200, 0.6, 4)
-					.biquad(sampleRate, FilterPassType::LOWPASS, 4000, 1, 1)
+					.biquad(RBJParams{FilterPassType::BELL, 200, sampleRate, 0.6, 4})
+					.biquad(RBJParams{FilterPassType::LOWPASS, 4000, sampleRate, 1, 1})
 					.clampV(0.9, 0.9)
 					.biquadEnvVel(100, 127, 1, LOWPASS)
 					.ADSR(10, 50, 1, true, 100, Pow(5), Pow(5), Pow(5))
@@ -601,14 +601,14 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::GUITAR_DISTORTION_GUITAR:
 				return AmpBuilder()
 					.ks(0.85)
-					.biquad(sampleRate, FilterPassType::BELL, 200, 0.6, 5)
+					.biquad(RBJParams{FilterPassType::BELL, 200, sampleRate, 0.6, 5})
 					.clampV(100, 0.9)
 					.arctanDistortion(1, 25, 1)
 					.clampV(0.8, 0.8)
 					.noteDSP(DSPGroupBuilder().begin(DSPGroupBuilder::TYPE_CHAIN)
-							 .biquad(sampleRate, FilterPassType::BELL, 500, 0.6, 4)
-							 .biquad(sampleRate, FilterPassType::LOWPASS, 3000, 0.5, 0)
-							 .biquad(sampleRate, FilterPassType::HIGHPASS, 10, 1, 0)
+							 .biquad(RBJParams{FilterPassType::BELL, 500, sampleRate, 0.6, 4})
+							 .biquad(RBJParams{FilterPassType::LOWPASS, 3000, sampleRate, 0.5, 0})
+							 .biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 1, 0})
 							 .build())
 					.mul(0.8)
 					.biquadEnvVel(100, 127, 1, LOWPASS)
@@ -679,7 +679,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::BASS_SLAP_BASS_2:
 				return AmpBuilder().src(mksp<Pulse>(0.3, 0.4, 0.3, 0))
 					.ks(0.9)
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.mul(1.2)
 					.ADSR(10, 1000, 0.3, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -687,7 +687,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(mksp<SawWave>()).ks(0.3).mul(1.5).ADSR(5, 1000, 0.3, true, 100, Pow(-5), Pow(5), Pow(5)).build();
 			case MIDIFile::Instruments::BASS_SYNTH_BASS_2:
 				return AmpBuilder().src(mksp<SawWave>())
-					.IIR(sampleRate, 2, 10.1, 1045.8)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 10.1, 1045.8, sampleRate, 2})
 					.mul(1.2)
 					.ADSR(5, 1000, 0.3, true, 100, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -736,7 +736,7 @@ namespace yzrilyzr_simplesynth{
 							.ks(0.3)
 							.ADSR(10, 1, 1, false, 1500, Pow(-5), Pow(5), Pow(10))
 							.build(), 0.7)
-					.biquad(sampleRate, LOWPASS, 2000, 0.5, 0)
+					.biquad(RBJParams{FilterPassType::LOWPASS, 2000, sampleRate, 0.5, 0})
 					.biquadEnvVel(70, 127, 1, LOWPASS)
 					.build();
 			case MIDIFile::Instruments::SOLO_STRING_ORCHESTRAL_HARP:
@@ -746,7 +746,7 @@ namespace yzrilyzr_simplesynth{
 					.mul(0.8)
 					.ADSR(5, 5000, 0, false, 300, Pow(-5), Pow(8), Pow(5))
 					.biquadEnvVel(70, 127, 1, LOWPASS)
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.build();
 			case MIDIFile::Instruments::SOLO_STRING_TIMPANI:
 				return AmpBuilder(Matrix6x6ModulationBuilder()
@@ -841,7 +841,7 @@ namespace yzrilyzr_simplesynth{
 					.autoMod(0.1, 0.3, 5, 0.8)
 					.addMul(
 						AmpBuilder(mksp<NoiseSrc>())
-						.biquad(sampleRate, BANDPASS, 500, 3, 0)
+						.biquad(RBJParams{FilterPassType::BANDPASS, 500, sampleRate, 3, 0})
 						.ADSR(1, 20, 0, false, 20, Line(), Line(), Line())
 						.build(), 0.3)
 					.AHDSR(5, 50, 180, 0.8, true, 630, Pow(-5), Pow(5), Pow(5))
@@ -879,8 +879,8 @@ namespace yzrilyzr_simplesynth{
 									{FilterPassType::LOWPASS, NoteFreqAmp * 40, 0.5, 0}
 									}
 					)
-					.biquad(sampleRate, LOWPASS, 17000, 0.20, 0)
-					.biquad(sampleRate, HIGHPASS, 250, 0.20, 0)
+					.biquad(RBJParams{FilterPassType::LOWPASS, 17000, sampleRate, 0.20, 0})
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 250, sampleRate, 0.20, 0})
 					.autoMod(0.7, 0.3, 5.0, 0.1,
 							 AmpBuilder().src(
 								 mksp<Pulse>(0.2, 0.3, 0.35, 0))
@@ -892,19 +892,19 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(mksp<SawWave>())
 					.pm(mksp<SineWave>(), 0.15, 1)
 					.autoMod(0.2, 0.3, 5.2, 0.75)
-					.IIR(sampleRate, 2, 10.1, 5000)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 10.1, 5000, sampleRate, 2})
 					.ADSR(50, 108, 0.8, true, 100, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::BRASS_TROMBONE:
 				return AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.1, 0.46))
-					.biquad(sampleRate, BANDPASS, 1500, 0.30, 0)
+					.biquad(RBJParams{FilterPassType::BANDPASS, 1500, sampleRate, 0.30, 0})
 					.autoMod(0.1, 0.1, 5.3, 0.5)
 					.mul(3)
 					.ADSR(50, 108, 0.8, true, 100, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::BRASS_TUBA:
 				return AmpBuilder().src(mksp<Pulse>(0.0, 0.04, 0.1, 0.46))
-					.biquad(sampleRate, BANDPASS, 100, 0.30, 0)
+					.biquad(RBJParams{FilterPassType::BANDPASS, 100, sampleRate, 0.30, 0})
 					.autoMod(0.1, 0.1, 5.3, 0.5)
 					.mul(8)
 					.ADSR(50, 762, 0.6, true, 100, Pow(5), Pow(5), Pow(5))
@@ -913,14 +913,14 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(SawW())
 					.autoMod(0.1, 0.1, 5.3, 0.5)
 					.detune(3, 0.05)
-					.biquad(sampleRate, BANDPASS, 500, 0.30, 0)
+					.biquad(RBJParams{FilterPassType::BANDPASS, 500, sampleRate, 0.30, 0})
 					.ADSR(50, 762, 0.6, true, 100, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::BRASS_BRASS_SECTION:
 				return AmpBuilder(mksp<Pulse>(0.0, 0.0, 0.1, 0))
 					.detune(3, 0.05)
-					.biquad(sampleRate, HIGHPASS, 500, 1, 0)
-					.biquad(sampleRate, LOWPASS, 10000, 0.5, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 500, sampleRate, 1, 0})
+					.biquad(RBJParams{FilterPassType::LOWPASS, 10000, sampleRate, 0.5, 0})
 					.ADSR(50, 100, 0.8, true, 1000, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::BRASS_SYNTH_BRASS_1:
@@ -1087,7 +1087,7 @@ namespace yzrilyzr_simplesynth{
 					//.autoMod(0.2, 0.2, 7, 0.75)
 					.detune(3, 0.15)
 					.mul(0.707)
-					.biquad(sampleRate, HIGHPASS, 10, 0.7, 0)
+					.biquad(RBJParams{FilterPassType::HIGHPASS, 10, sampleRate, 0.7, 0})
 					.biquadEnvVel(90, 127, 1, LOWPASS)
 					.AHDSR(5, 30, 300, 0.75, true, 300, Pow(-5), Pow(5), Pow(5))
 					.build();
@@ -1120,7 +1120,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::LEAD_CHARANG:
 				return AmpBuilder().src(mksp<SawWave>())
 					.biquadEnv(NoteIDAmp + ConstAmp(30) + (AmpBuilder(ConstAmp(10)).ADSR(5, 1000, 0, false, 100, Pow(5), Pow(5), Pow(5)).build()), ConstAmp(1), LOWPASS)
-					.biquad(sampleRate, LOWPASS, 6000, 1, 0)
+					.biquad(RBJParams{FilterPassType::LOWPASS, 6000, sampleRate, 1, 0})
 					.ADSR(100, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::LEAD_VOICE:
@@ -1131,7 +1131,7 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::LEAD_FIFTHS:
 				return AmpBuilder().src(mksp<SawWave>())
-					.add(mksp<SawWave>(MulPhase(NotePhase, 3.0 / 2.0)))
+					.add(ConstFreq(mksp<SawWave>(), NotePhase * (3.0 / 2.0)))
 					.autoMod(0.3, 0.3, 5.4, 0.75)
 					.mul(0.5)
 					.detune(3, 0.15)
@@ -1141,7 +1141,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::LEAD_BASS_LEAD:
 				return AmpBuilder().src(mksp<SawWave>())
 					.biquadEnv(NoteIDAmp + ConstAmp(30) + (AmpBuilder(ConstAmp(30)).ADSR(5, 1000, 0, false, 100, Pow(-5), Pow(5), Pow(5)).build()), ConstAmp(1), LOWPASS)
-					.biquad(sampleRate, LOWPASS, 6000, 1, 0)
+					.biquad(RBJParams{FilterPassType::LOWPASS, 6000, sampleRate, 1, 0})
 					.ADSR(50, 200, 0.9, true, 200, Pow(-5), Pow(5), Pow(5))
 					.build();
 
@@ -1286,7 +1286,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(mksp<SineWave>())
 					.pm(mksp<SineWave>(), 0.19, 1)
 					.ADSR(33, 694, 0.68, true, 171, Pow(5), Pow(5), Pow(5))
-					.IIR(sampleRate, 1, 10.1, 552.1)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 10.1, 552.1, sampleRate, 1})
 					.build();
 			case MIDIFile::Instruments::FX_GOBLINS:
 				return AmpBuilder().src(mksp<SineWave>())
@@ -1312,7 +1312,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder().src(mksp<Sitar>()).ADSR(50, 5000, 0, false, 100, Pow(5), Pow(5), Pow(5)).build();
 			case MIDIFile::Instruments::ETHNIC_BANJO:
 				return AmpBuilder().ks(0.22)
-					.IIR(sampleRate, 2, 100, 6000.0)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 100, 6000.0, sampleRate, 2})
 					.ADSR(10, 1500, 0, false, 100, Pow(-20), Pow(8), Pow(5))
 					.build();
 			case MIDIFile::Instruments::ETHNIC_SHAMISEN:
@@ -1332,9 +1332,9 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::ETHNIC_BAGPIPE:
 				return AmpBuilder()
 					.src(mksp<Pulse>(0.136, 0.015, 0.0087, 0))
-					.add(mksp<Pulse>(MulPhase(NotePhase, 1.5), 0.136, 0.015, 0.0087, 0))
-					.add(mksp<Pulse>(MulPhase(NotePhase, 2), 0.136, 0.015, 0.0087, 0))
-					.add(mksp<Pulse>(MulPhase(NotePhase, 4), 0.136, 0.015, 0.0087, 0))
+					.add(ConstFreq(mksp<Pulse>(0.136, 0.015, 0.0087, 0), NotePhase * 1.5))
+					.add(ConstFreq(mksp<Pulse>(0.136, 0.015, 0.0087, 0), NotePhase * 2))
+					.add(ConstFreq(mksp<Pulse>(0.136, 0.015, 0.0087, 0), NotePhase * 4))
 					.biquadEnvGroup(DSPGroupBuilder::TYPE_CHAIN, {
 						{FilterPassType::LOWSHELF, NoteFreqAmp * 4, 1, -15},
 									{FilterPassType::BELL, NoteFreqAmp * 8, 10, 5},
@@ -1367,7 +1367,7 @@ namespace yzrilyzr_simplesynth{
 			case MIDIFile::Instruments::PERCUSSIVE_TINKLE_BELL:
 				return AmpBuilder(mksp<SineWave>())
 					.pm(AmpBuilder(mksp<SineWave>())
-						.freqSrc(MulPhase(NotePhase, 6.5))
+						.freqSrc(NotePhase * 6.5)
 						.ADSR(5, 700, 0, false, 100, Pow(5), Pow(3), Pow(5))
 						.build(), 0.308)
 					.ADSR(5, 1500, 0, false, 100, Pow(5), Pow(5), Pow(5))
@@ -1376,7 +1376,7 @@ namespace yzrilyzr_simplesynth{
 				return AmpBuilder()
 					.src(mksp<NoiseSrc>())
 					.add(mksp<SquareWave>())
-					.add(mksp<SquareWave>(MulPhase(NotePhase, 1243.0 / 529.0)))
+					.add(ConstFreq(mksp<SquareWave>(), NotePhase * (1243.0 / 529.0)))
 					.biquadEnvGroup(DSPGroupBuilder::TYPE_CHAIN, {
 						{FilterPassType::BELL, NoteFreqAmp, 30, 90},
 									{FilterPassType::BELL, NoteFreqAmp * (1243.0 / 529.0), 30, 30},
@@ -1442,7 +1442,7 @@ namespace yzrilyzr_simplesynth{
 					.ADSR(2000, 5, 1, false, 2000, Pow(2), Pow(2), Pow(2)).build();
 			case MIDIFile::Instruments::EFFECTS_SEASHORE:
 				return AmpBuilder().src(mksp<NoiseSrc>())
-					.IIR(sampleRate, 1, 103.3, 4060.0)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 103.3, 4060.0, sampleRate, 1})
 					.biquadEnv(AmpBuilder().src(ConstAmp(50))
 							   .ADSR(500, 0, 1, true, 1500, Pow(5), Pow(5), Pow(3))
 							   .add(ConstAmp(70))
@@ -1451,12 +1451,12 @@ namespace yzrilyzr_simplesynth{
 					.build();
 			case MIDIFile::Instruments::EFFECTS_APPLAUSE:
 				return AmpBuilder().src(mksp<NoiseSrc>())
-					.IIR(sampleRate, 2, 123.2, 2224.6)
+					.iir(ButterworthParams{FilterPassType::BANDPASS, 123.2, 2224.6, sampleRate, 2})
 					.ADSR(219, 0, 1, true, 656, Pow(5), Pow(5), Pow(5))
 					.build();
 			case MIDIFile::Instruments::EFFECTS_GUNSHOT:
 				return AmpBuilder().src(AmpBuilder().src(mksp<NoiseSrc>())
-										.addMul(mksp<SquareWave>(ConstPhase(51)), 0.1)
+										.addMul(ConstFreq(mksp<SquareWave>(), 51), 0.1)
 										.mean(mksp<TimeEnvelop>(2100, Pow(-4)), 130)
 										.build()).ADSR(2, 0, 0, false, 2000, Pow(5), Pow(5), mksp<GraphInterpolator>(std::initializer_list<double>{
 					0, 0,

@@ -6,7 +6,7 @@
 #include "interface/IChannel.h"
 #include "interface/IMixer.h"
 #include "../SimpleSynthProject.h"
-#include "synth/generators/physic/PianoSrc.h"
+#include "synth/physic/PianoSrc.h"
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
 void pianoRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){

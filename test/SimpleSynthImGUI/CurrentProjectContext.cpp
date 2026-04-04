@@ -5,7 +5,7 @@
 #include "util/ClassRegister.h"
 #include "SimpleSynthProject.h"
 #include "SynthUtil.h"
-#include "synth/source/AmplitudeSources.h"
+#include "synth/util/AmplitudeSources.h"
 #include "lang/String.h"
 #include "lang/System.h"
 #include "imnodes.h"
@@ -46,10 +46,11 @@ void CurrentProjectContext::openFile(const std::string & filePath){
 			obj->fromJSON=nullptr;
 		}
 	} catch(const std::exception & e){
+		System::err.println(e.what());
 				// 显示错误消息
 		notificationManager.AddNotification(
 			LANG.getf("notification.open_file.error", file, e.what()),
-			3.0f,
+			10.0f,
 			ImVec4(1.0f, 0.0f, 0.0f, 1.0f)  // 红色
 		);
 	}

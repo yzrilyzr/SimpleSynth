@@ -1,14 +1,14 @@
-#include "util/Lang.h"
+#include "../NodeAutoLayout.h"
 #include "../SimpleSynthProject.h"
 #include "../SimpleSynthWindow.h"
+#include "dsp/DSP.h"
 #include "interface/IChannel.h"
 #include "interface/IMixer.h"
-#include "dsp/DSP.h"
 #include "interface/InstrumentProvider.h"
 #include "interface/NoteProcessor.h"
-#include "synth/composed/NonInterpolateAmpSet.h"
+#include "synth/set/NonInterpolateAmpSet.h"
+#include "util/Lang.h"
 #include "util/MIDIFile.h"
-#include "../NodeAutoLayout.h"
 
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_util;

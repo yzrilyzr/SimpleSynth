@@ -7,8 +7,8 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui.h"
-#include "implot.h"
 #include "imnodes.h"
+#include "implot.h"
 #include "instrument/ReplaceableInstrument.h"
 #include "instrument/SimpleMIDIInstrument.h"
 #include "io/File.h"
@@ -16,7 +16,7 @@
 #include "lang/System.h"
 #include "lang/Thread.h"
 #include "stdio.h"
-#include "synth/generators/physic/TwoStringResonator.h"
+#include "synth/physic/TwoStringResonator.h"
 #include "util/Lang.h"
 #include "util/Locale.h"
 #include "util/Util.h"
@@ -132,17 +132,7 @@ void closeAndExit(){
 }
 
 void fill_audio_pcm(void * userdata, Uint8 * stream, int len){
-	u_time t=(u_time)System::nanoTime();
-	/*try{
-		std::unique_lock<std::shared_mutex> lock(ctx.mixerLock);
-		mixer->commitChannels();
-		mixer->waitForChannels();
-		mixer->mixChannels();
-	} catch(Exception e){
-		std::cout << e.what() << std::endl;
-		closeAndExit();
-	}*/
-	mixer->mix();
+	mixer->awaitMix();
 	for(uint32_t sample=0, j=0, buf=mixer->getBufferSize(), chc=mixer->getOutputChannelCount(); sample < buf; sample++){
 		for(uint32_t ch=0; ch < chc; ch++){
 			double f1=mixer->getOutput(ch)[sample];
@@ -154,8 +144,8 @@ void fill_audio_pcm(void * userdata, Uint8 * stream, int len){
 			stream[j++]=(Uint8)((c1 >> 24) & 0xff);
 		}
 	}
-	ctx.processTime=(u_time_f)((u_time_f)(System::nanoTime() - t) / 1000000000.0);
-	//cout << (float)(mixer->getCurrentSampleIndex()/ mixer->getSampleRate())<< endl;
+	cpuLoadHistory.write(mixer->getProcessTime());
+	mixer->asyncMix();
 }
 void CALLBACK MidiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2){
 	switch(wMsg){
@@ -231,6 +221,7 @@ int main(int argc, char * argv[]){
 		fprintf(stderr, "Could not initialize SDL - %s\n", SDL_GetError());
 		return -1;
 	}
+	cpuLoadHistory.ensureCapacity((u_index)512);
 	mixer=new Mixer2(floatBufferLen);
 	mixer->setSynthMode(Mixer2::MODE_THREAD_POOL, -1);
 	mixer->setSampleRate(ctx.sampleRate);

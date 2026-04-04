@@ -41,12 +41,12 @@ namespace yzrilyzr_simplesynth{
 	public:
 	virtual ~NoteProcessor()=default;
 	virtual void init(ChannelConfig & cfg){}//初始化
-	virtual inline u_sample getAmp(const Note & note)=0;//渲染每个音符（音符生命周期由合成器管理，无需手动初始化，在这里仅填写声音是如何产生的）
-	//virtual void getAmpBlock(const Note* noteSnapshots,u_sample* output,u_index length);
+	virtual __forceinline inline u_sample getAmp(const Note & note)=0;//渲染每个音符（音符生命周期由合成器管理，无需手动初始化，在这里仅填写声音是如何产生的）
+	virtual __forceinline inline void getAmpBlock(const Note * noteSnapshots, u_sample * output, u_index length);
 	//给音符合并后的数据后处理（模拟箱体、混响、等等）
-	virtual inline u_sample postProcess(u_sample input){ return input; }
+	virtual __forceinline inline void postProcess(u_sample * input, u_index length){ }
 	//音符是否还有数据，供合成器管理生命周期
-	virtual bool noMoreData(const Note & note);
+	virtual __forceinline inline bool noMoreData(const Note & note)const;
 	virtual void cc(ChannelConfig & cfg, ChannelControl & cc){}
 	virtual void noteOn(ChannelConfig & cfg, s_note_id_i id, s_note_vel vel){}//接收NoteOn事件
 	virtual void noteOff(ChannelConfig & cfg, s_note_id_i id, s_note_vel vel){}//接收NoteOff事件

@@ -17,6 +17,7 @@
 #include "tuning/Vallotti.h"
 #include "tuning/Werckmeister.h"
 #include "tuning/Young.h"
+#include "Mixer2.h"
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
@@ -26,8 +27,10 @@ void mixerSettingWindow(CurrentProjectContext & ctx){
 	ImGui::Begin(ctx.LANG.getc("window.mixer.title"));
 	IMixer & mixer=*ctx.mixer;
 	ImGui::Text(ctx.LANG.getf("window.mixer.queue_info", mixer.getCurrentProcessingNoteCount(), mixer.getPostedEventCount()).c_str(UTF8));
-	ImGui::ProgressBar(ctx.processTime / mixer.getProcessStandardTime());
+	ImGui::PlotLines(ctx.LANG.getc("window.mixer.process_time"), cpuLoadHistory.getBuffer(),cpuLoadHistory.capacity(), 0, "", 0.0f, mixer.getProcessStandardTime(), ImVec2(cpuLoadHistory.capacity(), 80.0f));
+	ImGui::ProgressBar(mixer.getProcessTime() / mixer.getProcessStandardTime());
 	static bool limiter=true;
+	ImGui::Checkbox(ctx.LANG.getc("window.mixer.proc_block_mode"), &(static_cast<Mixer2&>(mixer)).procBlockMode);
 	ImGui::Checkbox(ctx.LANG.getc("window.mixer.limiter"), &limiter);
 	mixer.setUseLimiter(limiter);
 	if(ImGui::Button(ctx.LANG.getc("window.mixer.reset"))){

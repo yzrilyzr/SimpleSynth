@@ -4,7 +4,7 @@
 #include "SimpleSynthProject.h"
 #include "imnodes.h"
 #include "lang/Boxing.h"
-#include "synth/source/AmplitudeSources.h"
+#include "synth/util/AmplitudeSources.h"
 #include <string>
 using json=nlohmann::json;
 using namespace yzrilyzr_interpolator;
@@ -75,6 +75,16 @@ void ProjectObject::paramToJSON(json & a, const ClassRegister & paramReg){
 				json b=json::object();
 				paramToJSON(b, *static_cast<ClassRegister *>(p.value));
 				a[p.name.c_str()]=b;
+			}
+			break;
+			case ParamType::IntArray:
+			{
+				json jsonArr=json::array();
+				IntArray arr=*static_cast<IntArray *>(p.value);
+				for(int i=0;i < arr.size();i++){
+					jsonArr.push_back(arr[i]);
+				}
+				a[p.name.c_str()]=jsonArr;
 			}
 			break;
 			default:
@@ -182,6 +192,16 @@ void ProjectObject::JSONToParam(const json & j, ClassRegister & paramReg){
 			case ParamType::Sub:
 				JSONToParam(j[key], *static_cast<ClassRegister *>(param.value));
 				break;
+			case ParamType::IntArray:
+			{
+				json jsonArr=j[key];
+				IntArray arr(jsonArr.size());
+				for(int i=0;i < jsonArr.size();i++){
+					arr[i]=jsonArr[i];
+				}
+				*static_cast<IntArray *>(param.value)=arr;
+			}
+			break;
 		}
 	}
 }

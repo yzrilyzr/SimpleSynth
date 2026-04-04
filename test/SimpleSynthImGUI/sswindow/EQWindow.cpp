@@ -52,19 +52,22 @@ double calculateDbPerOctave(double * frequencies, double * magnitudes, int index
 	return (dbPerOctave1 + dbPerOctave2) / 2.0;
 }
 
+struct StructEQ{
+	u_sp<BiquadIIR> iir=nullptr;
+	double q=0;
+	double freq=0;
+	double gain=0;
+	int order=2;
+	FilterPassType type=BANDPASS;
+};
+
 void eqWindow(CurrentProjectContext & ctx){
 	IMixer & mixer=*ctx.mixer;
 	ImGui::Begin(ctx.LANG.getc("window.eq.title"));
-	struct StructEQ{
-		u_sp<IIR> iir=nullptr;
-		double q=0;
-		double freq=0;
-		double gain=0;
-		FilterPassType type=BANDPASS;
-	};
+
 	static ArrayList<StructEQ *> eqs;
 	u_sample_rate sampleRate=mixer.getSampleRate();
-	u_sample_rate test_sampleRate=44100;
+	u_sample_rate test_sampleRate=96000;
 	const u_index siz=1 << 16;
 	const u_index fsiz=siz >> 1;
 	static SampleArray input_data(siz);
@@ -77,16 +80,24 @@ void eqWindow(CurrentProjectContext & ctx){
 	if(changed){
 		changed=false;
 		DSPChain dsp;
-		for(StructEQ * s : eqs){
-			if(s->iir == nullptr){
-				s->iir=mksp<IIR>(2, 3);
+		try{
+			for(StructEQ * s : eqs){
+				s->iir=mksp<BiquadIIR>(s->freq, s->q, s->gain, s->type, s->order);
+				/*if(s->iir == nullptr){
+					s->iir=mksp<BiquadIIR>(2, 3);
+				}*/
+				//s->iir=IIRUtil::newButterworthIIRFilter(test_sampleRate, FilterPassType::LOWPASS, 16, s->freq, 0);
+				//if(s->order == 2)IIRUtil::RBJ_biquad(s->iir->aCoeff, s->iir->bCoeff, s->freq, test_sampleRate, s->q, s->type, s->gain);
+				//else IIRUtil::biquad_butterworth(s->iir->aCoeff, s->iir->bCoeff, s->freq, test_sampleRate, s->q, s->type, s->gain, s->order);
+				//IIRUtil::designThiranFilter(*s->iir->aCoeff, *s->iir->bCoeff, s->freq, 15);
+				dsp.add(s->iir);
 			}
-			//s->iir=IIRUtil::newButterworthIIRFilter(test_sampleRate, FilterPassType::LOWPASS, 16, s->freq, 0);
-			IIRUtil::biquad(s->iir->aCoeff, s->iir->bCoeff, s->freq, test_sampleRate, s->q, s->type, s->gain);
-			//IIRUtil::designThiranFilter(*s->iir->aCoeff, *s->iir->bCoeff, s->freq, 15);
-			dsp.add(s->iir);
+		} catch(std::exception & e){
+			System::err.println(e.what());
 		}
-		Arrays::fill(input_data, 1, siz,static_cast<u_sample>(0));
+		dsp.init(test_sampleRate);
+		dsp.resetMemory();
+		Arrays::fill(input_data, 1, siz, static_cast<u_sample>(0));
 		input_data[0]=fsiz;
 		for(u_index i=0;i < siz;i++){
 			input_data[i]=dsp.procDsp(input_data[i]);
@@ -111,8 +122,10 @@ void eqWindow(CurrentProjectContext & ctx){
 			u_sp<DSPChain> cc=c[ii];
 			cc->clear();
 			for(StructEQ * s : eqs){
-				u_sp<IIR> b=mksp<IIR>();
-				b->cloneParam(s->iir.get());
+				//u_sp<IIR> b=mksp<IIR>();
+				//b->cloneParam(s->iir.get());
+				auto b=mksp<BiquadIIR>(s->freq, s->q, s->gain, s->type, s->order);
+				b->init(mixer.getSampleRate());
 				cc->add(b);
 			}
 		}
@@ -136,7 +149,7 @@ void eqWindow(CurrentProjectContext & ctx){
 	}
 	if(ImPlot::BeginPlot(ctx.LANG.getc("window.eq.freq_response"), ImVec2(1200, 700))){
 		ImPlot::SetupAxis(ImAxis_Y1, ctx.LANG.getc("window.eq.freq_response.magnitude"), ImPlotAxisFlags_Lock | ImPlotAxisFlags_NoLabel);
-		ImPlot::SetupAxisLimits(ImAxis_Y1, -30, 30);
+		ImPlot::SetupAxisLimits(ImAxis_Y1, -90, 35);
 		ImPlot::SetupAxis(ImAxis_Y2, ctx.LANG.getc("window.eq.freq_response.phase"), ImPlotAxisFlags_Lock | ImPlotAxisFlags_NoLabel);
 		ImPlot::SetupAxisLimits(ImAxis_Y2, -180, 180);
 		ImPlot::SetupAxis(ImAxis_X1, ctx.LANG.getc("window.eq.freq_response.freq"), ImPlotAxisFlags_Lock | ImPlotAxisFlags_NoLabel);
@@ -144,7 +157,7 @@ void eqWindow(CurrentProjectContext & ctx){
 		ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Log10);
 		ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
 		auto mag1=Arrays::cast<double>(mag_data);
-		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.magnitude"), x_data, mag1->_array, fsiz);
+		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.magnitude"), x_data, mag1._array, fsiz);
 		ImPlotPoint point=ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);
 		bool is_mouse_in_plot=ImPlot::IsPlotHovered();
 		bool isLeftDown=ImGui::IsMouseDown(ImGuiMouseButton_Left);
@@ -181,6 +194,7 @@ void eqWindow(CurrentProjectContext & ctx){
 			str->freq=1000;
 			str->gain=1;
 			str->q=0.707;
+			str->order=2;
 			eqs.add(str);
 			currentEdit=str;
 		}
@@ -201,14 +215,14 @@ void eqWindow(CurrentProjectContext & ctx){
 		}
 		if(ImPlot::IsPlotHovered()){
 			ImGui::BeginTooltip();
-			double slope=calculateDbPerOctave(x_data, mag1->_array, point.x, siz);
+			double slope=calculateDbPerOctave(x_data, mag1._array, point.x, siz);
 			ImGui::Text(ctx.LANG.getf("window.eq.freq_response.hover", point.x, point.y, slope).c_str(UTF8));
 			ImGui::EndTooltip();
 		}
 
 		ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
 		auto pha1=Arrays::cast<double>(pha_data);
-		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.phase"), x_data, pha1->_array, fsiz);
+		ImPlot::PlotLine(ctx.LANG.getc("window.eq.freq_response.phase"), x_data, pha1._array, fsiz);
 		ImPlot::EndPlot();
 	}
 	static double freq_min=5;
@@ -217,6 +231,8 @@ void eqWindow(CurrentProjectContext & ctx){
 	static double q_max=10;
 	static double gain_min=-50;
 	static double gain_max=50;
+	static int32_t order_min=1;
+	static int32_t order_max=16;
 	if(currentEdit != nullptr){
 		static int type=0;
 		type=currentEdit->type;
@@ -227,6 +243,7 @@ void eqWindow(CurrentProjectContext & ctx){
 		changed=ImGui::SliderScalar(ctx.LANG.getc("window.eq.filter.freq"), ImGuiDataType_Double, &currentEdit->freq, &freq_min, &freq_max, "%.2f", ImGuiSliderFlags_Logarithmic) || changed;
 		changed=ImGui::SliderScalar(ctx.LANG.getc("window.eq.filter.q"), ImGuiDataType_Double, &currentEdit->q, &q_min, &q_max, "%.2f") || changed;
 		changed=ImGui::SliderScalar(ctx.LANG.getc("window.eq.filter.gain"), ImGuiDataType_Double, &currentEdit->gain, &gain_min, &gain_max, "%.2f") || changed;
+		changed=ImGui::SliderScalar(ctx.LANG.getc("window.eq.filter.order"), ImGuiDataType_S32, &currentEdit->order, &order_min, &order_max) || changed;
 		bool removeEq=ImGui::Button(ctx.LANG.getc("window.eq.filter.remove"));
 		changed=changed || removeEq;
 		if(removeEq){

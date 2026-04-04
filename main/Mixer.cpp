@@ -16,7 +16,7 @@
 #include "lang/Runtime.h"
 #include "lang/System.h"
 #include "lang/Thread.h"
-#include "synth/envelopers/EnvelopMultiplier.h"
+#include "synth/enveloper/EnvelopMultiplier.h"
 #include "util/MIDIFile.h"
 #include "util/Random.h"
 #include "util/Util.h"
@@ -396,8 +396,7 @@ namespace yzrilyzr_simplesynth{
 	u_index Channel::getBufferSize()const{
 		return output[0].length;
 	}
-	Channel::~Channel(){
-	}
+	Channel::~Channel(){}
 	Channel::Channel(){
 		channelConfig.channel=this;
 		//
@@ -486,7 +485,7 @@ namespace yzrilyzr_simplesynth{
 					if(note.noMoreData)continue;
 					NoteUpdater::preUpdateNote(note, channelConfig);
 					u_sample noteout=np.getAmp(note);
-					NoteUpdater::postUpdateNote(note,  channelConfig);
+					NoteUpdater::postUpdateNote(note, channelConfig);
 					if(isnan(noteout) || std::abs(noteout) > 50){
 						std::cout << "Note output Exception" << std::endl;
 						np.getAmp(note);
@@ -496,10 +495,10 @@ namespace yzrilyzr_simplesynth{
 						note.noMoreData=true;
 					}
 				}
-				outputf=(u_sample)np.postProcess(outputf);
+				np.postProcess(&outputf, 1);
 				if(isnan(outputf) || std::abs(outputf) > 50){
 					std::cout << "PostProcess output Exception" << std::endl;
-					np.postProcess(outputf);
+					np.postProcess(&outputf, 1);
 				}
 				outputf*=channelConfig.Volume;
 			}
@@ -669,7 +668,7 @@ namespace yzrilyzr_simplesynth{
 			auto & po=workingNotesPool.get(i);
 			Note & n=*po.object;
 			if(n.id == note.id){
-				NoteUpdater::noteOff(n,  channelConfig, note.velocity);
+				NoteUpdater::noteOff(n, channelConfig, note.velocity);
 			}
 		}
 	}
@@ -877,10 +876,11 @@ namespace yzrilyzr_simplesynth{
 	}
 	u_sp<AHDSREnvelop> Channel::getAHDSREnv()const{
 		if(auto a=U_INSTANCE_OF(EnvelopMultiplier, channelConfig.noteProcessor)){
-			if(auto b=U_INSTANCE_OF_PTR(AHDSREnvelop,a->a)){
+			if(auto b=U_INSTANCE_OF_PTR(AHDSREnvelop, a->a)){
 				return b;
 			}
 		}
+		return nullptr;
 	}
 	void Channel::procDataEntry(){
 		PNData & rpn=channelConfig.rpn;
@@ -913,7 +913,7 @@ namespace yzrilyzr_simplesynth{
 			std::cout << "Midi Instrument not set" << std::endl;
 			src=SynthUtil::getDefault();
 		} else if(IMixer::isDrumSetChannel(getConfig(), channelID)){
-			src=instr->getDrumSet(channelConfig.Bank, getSampleRate());			
+			src=instr->getDrumSet(channelConfig.Bank, getSampleRate());
 		} else{
 			src=instr->get(channelConfig.Bank, event.id, getSampleRate());
 			if(src == nullptr){

@@ -49,7 +49,6 @@ namespace yzrilyzr_simplesynth_vst{
 	//------------------------------------------------------------------------
 		protected:
 		u_sp<yzrilyzr_simplesynth::IMixer> mixer;
-		yzrilyzr_util::MemoryFIFOBuffer<u_sample> fifoBuffer[2];
 		s_midichannel_id chID=0;
 		void processParameter(Steinberg::Vst::ProcessData & data);
 		void processEvent(Steinberg::Vst::ProcessData & data);

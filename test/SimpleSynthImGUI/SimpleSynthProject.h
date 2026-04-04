@@ -52,7 +52,6 @@ class CurrentProjectContext{
 	NotificationManager notificationManager;
 	ProjectObject * rightClickedObj=nullptr;
 	yzrilyzr_simplesynth::IMixer * mixer;
-	u_time_f processTime=0;
 	void setMixer(yzrilyzr_simplesynth::IMixer * mixer);
 	void openFile(const std::string & filePath);
 	void newProject();

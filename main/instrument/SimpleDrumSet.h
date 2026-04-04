@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "events/Note.h"
 #include "interface/NoteProcessor.h"
-#include "synth/composed/NonInterpolateAmpSet.h"
-#include "synth/generators/sine/SineWaveTable.h"
+#include "synth/osc/sine/SineWaveTable.h"
+#include "synth/set/NonInterpolateAmpSet.h"
 
 namespace yzrilyzr_simplesynth{
 	ECLASS(SimpleDrumSet, public NonInterpolateAmpSet){

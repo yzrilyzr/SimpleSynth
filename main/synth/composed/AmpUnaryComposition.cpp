@@ -1,4 +1,4 @@
-#include "AmpUnaryComposition.h"
+#include "synth/composed/AmpUnaryComposition.h"
 #include "lang/StringFormat.hpp"
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_util;

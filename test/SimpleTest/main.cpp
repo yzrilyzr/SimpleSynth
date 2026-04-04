@@ -4,11 +4,19 @@
 #include "SynthUtil.h" 
 #include "instrument/SimpleMIDIInstrument.h"
 #include "lang/String.h"
+#include "synth/osc/sine/SineWave.h"
+#include "synth/operator/AmpMultiplier.h"
+#include "dsp/IIR.h"
+#include "dsp/IIRUtil.h"
+#include "util/DT.h"
+#include "array/Array.hpp"
 
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_lang;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_io;
+using namespace yzrilyzr_array;
+using namespace yzrilyzr_dsp;
 
 u_sp<Mixer2> mixer2=nullptr;
 
@@ -106,6 +114,67 @@ void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
 }
 
 int main(int argc, char * argv[]){
+	DT dt;
+	SampleArray output1(256 * 1000);
+	SampleArray output2(256 * 1000);
+	u_sample * outputs1=output1.data();
+	u_sample * outputs2=output2.data();
+	IIR iir;
+	IIRUtil::RBJ_biquad(iir, RBJParams{HIGHPASS, 3000, 44100, 0.7, 0});
+	for(size_t ii=0; ii < 100; ii++){
+		Arrays::fill(output1, (u_sample)0);
+		Arrays::fill(output2, (u_sample)0);
+		System::out.print("Test per sample");
+		dt.getAndSetDeltaTime();
+		for(size_t i=0, j=output1.length; i < j; i++){
+			outputs1[i]=iir.procDsp(outputs1[i]);
+		}
+		System::out.println(dt.getAndSetDeltaTime());
+		System::out.print("Test block: ");
+		dt.getAndSetDeltaTime();
+		for(size_t i=0, j=output1.length; i < j; i+=256){
+			iir.procBlock(outputs1, outputs1, 256);
+		}
+		System::out.println(dt.getAndSetDeltaTime());
+		System::out.println();
+	}
+	//NoteProcPtr sw=mksp<SineWave>();
+	//NoteProcPtr sw2=mksp<SineWave>();
+	//NoteProcPtr mul=mksp<AmpMultiplier>(sw, sw2);
+	//Array<Note> note(256 * 1000);
+	//Note * notes=note.data();
+	//SampleArray output1(note.length);
+	//SampleArray output2(note.length);
+	//u_sample * outputs1=output1.data();
+	//u_sample * outputs2=output2.data();
+	//int ph=0;
+	//for(size_t ii=0; ii < 100; ii++){
+	//	for(size_t i=0, j=note.length; i < j; i++){
+	//		note[i].uniqueID=0;
+	//		note[i].id=40;
+	//		note[i].freqSynth=400;
+	//		note[i].velocitySynth=1;
+	//		note[i].phaseSynth=ph;
+	//		ph++;
+	//	}
+	//	Arrays::fill(output1, (u_sample)0);
+	//	Arrays::fill(output2, (u_sample)0);
+	//	System::out.print("Test per sample");
+	//	dt.getAndSetDeltaTime();
+	//	for(size_t i=0, j=note.length; i < j; i++){
+	//		outputs1[i]=mul->getAmp(notes[i]);
+	//	}
+	//	System::out.println(dt.getAndSetDeltaTime());
+
+	//	System::out.print("Test block: ");
+	//	dt.getAndSetDeltaTime();
+	//	for(size_t i=0, j=note.length; i < j; i+=256){
+	//		mul->getAmpBlock(notes + i, outputs2 + i, 256);
+	//	}
+	//	System::out.println(dt.getAndSetDeltaTime());
+	//	System::out.println();
+	//	//System::out.println(Arrays::equals(output1, output2));
+	//}
 	if(SDL_Init(SDL_INIT_AUDIO) != 0){
 		fprintf(stderr, "Could not initialize SDL - %s\n", SDL_GetError());
 		return -1;

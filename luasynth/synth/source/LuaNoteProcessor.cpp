@@ -197,25 +197,20 @@ namespace yzrilyzr_simplesynth{
 		return result;
 	}
 
-	u_sample LuaNoteProcessor::postProcess(u_sample output){
-		if(!luaInitialized || luaPostProcessRef == LUA_NOREF){
-			return output;
-		}
+	void LuaNoteProcessor::postProcess(u_sample * input, u_index length){
+		if(!luaInitialized || luaPostProcessRef == LUA_NOREF) return;
 
 		lua_rawgeti(L, LUA_REGISTRYINDEX, luaPostProcessRef);
-		lua_pushnumber(L, output);
-
-		if(lua_pcall(L, 1, 1, 0) != LUA_OK){
+		lua_pushlightuserdata(L, input);      // 传递指针
+		lua_pushinteger(L, length);           // 传递长度
+		// 如果需要输出缓冲区，可以再加一个 lightuserdata
+		if(lua_pcall(L, 2, 0, 0) != LUA_OK){  // 2个参数，无返回值
 			lua_pop(L, 1);
-			return output;
+			return;
 		}
-
-		u_sample result=lua_tonumber(L, -1);
-		lua_pop(L, 1);
-		return result;
 	}
 
-	bool LuaNoteProcessor::noMoreData(const Note & note){
+	bool LuaNoteProcessor::noMoreData(const Note & note)const{
 		if(!luaInitialized || luaNoMoreDataRef == LUA_NOREF){
 			return NoteProcessor::noMoreData(note);
 		}
@@ -276,7 +271,7 @@ namespace yzrilyzr_simplesynth{
 	}
 
 	// Lua绑定辅助方法实现
-	void LuaNoteProcessor::pushNoteToLua(const Note & note){
+	void LuaNoteProcessor::pushNoteToLua(const Note & note)const{
 		lua_newtable(L);
 		// 这里添加Note对象的属性到Lua表
 		// 例如：频率、音量、相位等

@@ -26,5 +26,8 @@ namespace yzrilyzr_simplesynth{
 		}
 		return t;
 	}
+	T * getDataConst(const Note & note)const{
+		return data[note.uniqueID];
+	}
 	};
 }

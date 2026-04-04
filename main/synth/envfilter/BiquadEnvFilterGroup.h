@@ -1,0 +1,51 @@
+#pragma once
+#include "SimpleSynth.h"
+#include "SynthUtil.h"
+#include "dsp/DSPGroup.h"
+#include "dsp/FilterPassType.h"
+#include "events/NoteData.hpp"
+#include "synth/composed/AmpUnaryComposition.h"
+#include "synth/util/AmplitudeSources.h"
+#include <vector>
+namespace yzrilyzr_simplesynth{
+	struct BiquadEnvFilterGroupConfig{
+		yzrilyzr_dsp::FilterPassType type;//类型
+		NoteProcPtr freqEnv;//频率包络
+		NoteProcPtr qEnv;//Q包络
+		NoteProcPtr gainEnv;//增益包络
+		BiquadEnvFilterGroupConfig(yzrilyzr_dsp::FilterPassType t, NoteProcPtr freq, NoteProcPtr q, NoteProcPtr gain)
+			: type(t), freqEnv(std::move(freq)), qEnv(std::move(q)), gainEnv(std::move(gain)){}
+
+		BiquadEnvFilterGroupConfig(yzrilyzr_dsp::FilterPassType t, NoteProcPtr freq, double q, double gain)
+			: type(t), freqEnv(std::move(freq)), qEnv(ConstAmp(q)), gainEnv(ConstAmp(gain)){}
+
+		BiquadEnvFilterGroupConfig(yzrilyzr_dsp::FilterPassType t, double freq, double q, double gain)
+			: type(t), freqEnv(ConstAmp(freq)), qEnv(ConstAmp(q)), gainEnv(ConstAmp(gain)){}
+	};
+	struct BiquadEnvFilterChange{
+		double freq=0;
+		double q=0;
+		double gain=0;
+	};
+	EBCLASS(BiquadEnvFilterGroupKeyData){
+		public:
+		u_sp<yzrilyzr_dsp::DSPGroup> filters;
+		std::vector< BiquadEnvFilterChange> changes;
+	};
+	ECLASS(BiquadEnvFilterGroup, public AmpUnaryComposition, NoteData<BiquadEnvFilterGroupKeyData>){
+		private:
+		std::vector<BiquadEnvFilterGroupConfig> filtersCfg;
+		int type;
+		public:
+		BiquadEnvFilterGroup();
+		BiquadEnvFilterGroup(NoteProcPtr src, int type, std::vector<BiquadEnvFilterGroupConfig> filtersCfg);
+		void init(ChannelConfig & cfg)override;
+		u_sample getAmp(const Note & note) override;
+		NoteProcPtr clone() override;
+		BiquadEnvFilterGroupKeyData * init(BiquadEnvFilterGroupKeyData * data, const Note & note) override;
+		yzrilyzr_lang::String toString() const override;
+		void onRegisterParam() override;
+		U_CLASS_INFO(BiquadEnvFilterGroup);
+
+	};
+}

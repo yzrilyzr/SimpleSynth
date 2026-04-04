@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "synth/composed/NonInterpolateAmpSet.h"
+#include "synth/set/NonInterpolateAmpSet.h"
 
 namespace yzrilyzr_simplesynth{
 	ECLASS(TR808DrumSet, public NonInterpolateAmpSet){

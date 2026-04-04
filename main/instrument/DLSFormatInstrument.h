@@ -7,8 +7,8 @@
 #include "soundbank/dls/DLSRegion.h"
 #include "soundbank/dls/DLSSample.h"
 #include "soundbank/dls/DLSSoundbank.h"
-#include "synth/composed/NonInterpolateAmpSet.h"
-#include "synth/source/AmpBuilder.h"
+#include "synth/set/NonInterpolateAmpSet.h"
+#include "synth/util/AmpBuilder.h"
 #include "tuning/EqualTemperament.h"
 #include <map>
 

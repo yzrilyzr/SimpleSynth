@@ -3,9 +3,9 @@
 #include "SynthUtil.h"
 #include "instrument/SimpleWaveTable.h"
 #include "instrument/XMInstrument.h"
-#include "synth/envelopers/EnvUtil.h"
-#include "synth/generators/physic/KarplusStrongSrc.h"
-#include "synth/source/AmpBuilder.h"
+#include "synth/util/EnvUtil.h"
+#include "synth/physic/KarplusStrongSrc.h"
+#include "synth/util/AmpBuilder.h"
 #include "interface/NoteProcessor.h"
 #include "array/Array.hpp"
 #include "dsp/IIR.h"
@@ -372,7 +372,7 @@ namespace yzrilyzr_simplesynth{
 	void SynthUtil::setMIDICallback(MIDICallback c){
 		callback=c;
 	}
-	FixedRandom::FixedRandom(SampleArray * data){
+	FixedRandom::FixedRandom(const SampleArray & data){
 		this->data=data;
 		this->index=0;
 	}
@@ -381,22 +381,23 @@ namespace yzrilyzr_simplesynth{
 		this->index=0;
 	}
 	u_sample FixedRandom::next(){
-		u_sample d=(*data)[index];
-		index=(index + 1) % data->length;
+		u_sample d=data[index];
+		index=(index + 1) % data.length;
 		return d;
 	}
-	SampleArray * SynthUtil::noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2){
-		SampleArray * randomData=new SampleArray(length);
-		u_sp<IIR> iir=IIRUtil::newButterworthIIRFilter(sampleRate, FilterPassType::BANDPASS, 2, f1, f2);
-		iir->init(sampleRate);
+	SampleArray SynthUtil::noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2){
+		SampleArray randomData(length);
+		IIR iir;
+		IIRUtil::design_butterworth(iir.aCoeff, iir.bCoeff, ButterworthParams{FilterPassType::BANDPASS, f1, f2, sampleRate, 2});
+		iir.init(sampleRate);
 		Random random(5319539547595419742L);
 		for(u_index i=0;i < length;i++){
-			(*randomData)[i]=iir->procDsp(random.nextGaussian());
+			randomData[i]=iir.procDsp(random.nextGaussian());
 		}
 		return randomData;
 	}
 	void SynthUtil::deleteStatic(){
-		delete NOISE;
+		NOISE=nullptr;
 	}
 	u_sp<MixerSequence> SynthUtil::parseXM(InputStream & inputStream){
 		u_sp<MixerSequence> mixerSequence=mksp<MixerSequence>();
@@ -511,6 +512,6 @@ namespace yzrilyzr_simplesynth{
 			|| (program >= MIDIFile::Instruments::ETHNIC_BAGPIPE && program <= MIDIFile::Instruments::ETHNIC_FIDDLE)
 			;
 	}
-	SampleArray * SynthUtil::NOISE=SynthUtil::noise(96000, 48000, 20, 20000);
+	SampleArray SynthUtil::NOISE=SynthUtil::noise(96000, 48000, 20, 20000);
 	SynthUtil::MIDICallback SynthUtil::callback=nullptr;
 }

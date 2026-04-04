@@ -1,4 +1,4 @@
-#include "AmpBinaryComposition.h"
+#include "synth/composed/AmpBinaryComposition.h"
 #include "lang/StringFormat.hpp"
 #include "lang/Exception.h"
 using namespace yzrilyzr_util;

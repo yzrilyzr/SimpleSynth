@@ -7,7 +7,7 @@
 #include "imgui.h"
 #include "implot.h"
 #include "interpolator/LineInterpolator.h"
-#include "synth/envelopers/MultiStageEnvelope.h"
+#include "synth/enveloper/MultiStageEnvelope.h"
 #include "tuning/EqualTemperament.h"
 #include "util/Lang.h"
 #include "lang/Exception.h"
@@ -21,27 +21,30 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 	bool changed=false;
 	u_sp<MultiStageEnvelope> paramRegPtr=spsc<MultiStageEnvelope, ClassRegister>(obj.paramRegPtr);
 	auto & pts=paramRegPtr->points;
-	if(ImPlot::BeginPlot(ctx.LANG.getc("module.multi_stage_envelope.data"), ImVec2(500, 200))){
+	if(ImPlot::BeginPlot(ctx.LANG.getc("module.multi_stage_envelope.data"), ImVec2(500, 200), ImPlotFlags_NoLegend)){
 		ImPlot::SetupAxis(ImAxis_Y1, "Value", ImPlotAxisFlags_NoLabel);
 		ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 1.0, ImPlotCond_Always);
 		ImPlot::SetupAxis(ImAxis_X1, "Index", ImPlotAxisFlags_NoLabel);
 		if(pts.size() > 1){
 			auto & last=pts[pts.size() - 1];
-			ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, last.x*1000, ImPlotCond_Always);
+			ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, last.x * 1000, ImPlotCond_Always);
 		}
 		ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
 		static constexpr int dataSize=10000;
 		static float data[dataSize];
 		if(pts.empty()){
 			pts.emplace_back(MSEPoint{0, 0, MSEPointType::DEFAULT, MSEPointMode::HOLD, 0, 0});
-			pts.emplace_back(MSEPoint{0.1, 1, MSEPointType::DECAY, MSEPointMode::SINGLE_CURVE, 1, 0});
-			pts.emplace_back(MSEPoint{0.3, 0, MSEPointType::DEFAULT, MSEPointMode::SINGLE_CURVE, 1, 0});
+			pts.emplace_back(MSEPoint{0.5, 1, MSEPointType::DECAY, MSEPointMode::SINGLE_CURVE, 1, 0});
+			pts.emplace_back(MSEPoint{1, 0.5, MSEPointType::LOOP_START, MSEPointMode::SINGLE_CURVE, 1, 0});
+			pts.emplace_back(MSEPoint{1.5, 0.8, MSEPointType::DEFAULT, MSEPointMode::SINGLE_CURVE, 1, 0});
+			pts.emplace_back(MSEPoint{2, 0.3, MSEPointType::SUSTAIN_OR_LOOP_END, MSEPointMode::PULSE, 0.5, 0});
+			pts.emplace_back(MSEPoint{3, 0, MSEPointType::DEFAULT, MSEPointMode::SINGLE_CURVE, 1, 0});
 			ChannelConfig cfg;
 			paramRegPtr->init(cfg);
 		}
 
 		if(pts.size() > 1){
-			int endX=1000.0*pts[pts.size() - 1].x;
+			int endX=1000.0 * pts[pts.size() - 1].x;
 			endX=Math::max(dataSize - 1, endX);
 			MSEPoint * start=&pts[0];
 			MSEPoint * end=&pts[1];
@@ -55,8 +58,15 @@ void MultiStageEnvRenderFunc(CurrentProjectContext & ctx, ProjectObject & obj){
 						break;
 					}
 				}
-				data[i]=MultiStageEnvelope::calcEnv(*start, *end, t);
+				data[i]=MultiStageEnvelope::calcEnv(start->x, start->y, end->x, end->y, end->mode, end->modeValue, t);
 			}
+			FloatArray xs(pts.size());
+			FloatArray ys(pts.size());
+			for(u_index i=0;i < pts.size();i++){
+				xs[i]=pts[i].x * 1000;
+				ys[i]=pts[i].y;
+			}
+			ImPlot::PlotScatter("Point", xs.data(), ys.data(), xs.length);
 			ImPlot::PlotLine(ctx.LANG.getc("module.multi_stage_envelope.data"), data, endX);
 		}
 		ImPlotPoint mouse_pos=ImPlot::GetPlotMousePos(ImAxis_X1, ImAxis_Y1);

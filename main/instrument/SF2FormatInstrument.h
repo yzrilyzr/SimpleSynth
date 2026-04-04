@@ -9,8 +9,8 @@
 #include "soundbank/sf2/SF2Layer.h"
 #include "soundbank/sf2/SF2LayerRegion.h"
 #include "soundbank/sf2/SF2Soundbank.h"
-#include "synth/composed/NonInterpolateAmpSet.h"
-#include "synth/composed/RegionAmp.h"
+#include "synth/set/NonInterpolateAmpSet.h"
+#include "synth/set/RegionAmp.h"
 #include "tuning/EqualTemperament.h"
 #include <map>
 

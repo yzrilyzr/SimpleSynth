@@ -49,6 +49,8 @@ using namespace yzrilyzr_io;
 using namespace yzrilyzr_collection;
 using namespace yzrilyzr_lang;
 
+yzrilyzr_dsp::RingBuffer<float> cpuLoadHistory;
+
 void fileOpenWindow(CurrentProjectContext & ctx){
 	IMixer & mixer=*ctx.mixer;
 	ImGui::Begin(ctx.LANG.getc("window.play_file.title"));

@@ -202,7 +202,11 @@ namespace yzrilyzr_simplesynth_vst{
 			auto numChannels=bus.numChannels;
 			auto sampleRate=mixer->getSampleRate();
 			if(numChannels > 0 && numChannels <= mixer->getOutputChannelCount()){
-				u_index bufLen=mixer->getBufferSize();
+				if(mixer->getBufferSize() < cbkSamples){
+					mixer->setBufferSize(cbkSamples * 2);
+				}
+				mixer->setBufferLimit(cbkSamples);
+
 				if(!mixer->hasData()){
 					bus.silenceFlags=0b11;
 					if(data.symbolicSampleSize == kSample32){
@@ -217,12 +221,7 @@ namespace yzrilyzr_simplesynth_vst{
 					return kResultOk;
 				}
 				bus.silenceFlags=0;
-				while(fifoBuffer[0].available() < cbkSamples){
-					mixer->mix();
-					for(Steinberg::int32 ch=0;ch < numChannels;ch++){
-						fifoBuffer[ch].write(mixer->getOutput(ch), 0, bufLen);
-					}
-				}
+				mixer->mix();
 				float time=mixer->getProcessTime() / mixer->getProcessStandardTime();
 				if(data.outputParameterChanges){
 					Vst::IParamValueQueue * paramQueue=nullptr;
@@ -239,20 +238,17 @@ namespace yzrilyzr_simplesynth_vst{
 				if(data.symbolicSampleSize == kSample32){
 					for(Steinberg::int32 ch=0;ch < numChannels;ch++){
 						auto out=bus.channelBuffers32[ch];
-						fifoBuffer[ch].read(out, 0, cbkSamples);
-						fifoBuffer[ch].compact();
+						memcpy(out, mixer->getOutput(ch), cbkSamples * size);						
 					}
 				} else if(data.symbolicSampleSize == kSample64){
-					u_sample * tmp=new u_sample[cbkSamples];
 					for(Steinberg::int32 ch=0;ch < numChannels;ch++){
 						auto out=bus.channelBuffers64[ch];
-						fifoBuffer[ch].read(tmp, 0, cbkSamples);
-						fifoBuffer[ch].compact();
+						auto mx=mixer->getOutput(ch);
 						for(Steinberg::int32 i=0;i < cbkSamples;i++){
-							out[i]=(Sample64)tmp[i];
+							out[i]=(Sample64)mx[i];
 						}
 					}
-					delete[] tmp;
+					
 				}
 			#endif
 			#ifdef DSP_DOUBLE_PRECISION

@@ -12,7 +12,7 @@ namespace yzrilyzr_simplesynth{
 		auto it=channelEvents.find(channel);
 		if(it == channelEvents.end()){
 			it=channelEvents.emplace(channel, std::vector<EventWrapper>()).first;
-		}		
+		}
 		it->second.emplace_back(EventWrapper {std::move(n1), static_cast<u_index>(it->second.size())});
 	}
 	bool MixerSequence::compareMixerEvents(const EventWrapper & a, const EventWrapper & b){
@@ -45,7 +45,8 @@ namespace yzrilyzr_simplesynth{
 				auto & events=entry.second;
 				for(auto & eventw : events){
 					u_up<ChannelEvent>  clone=eventw.event->clone();
-					mixer->postEvent(std::move(clone), clone->startAtTime + t1);
+					auto startTime = clone->startAtTime;
+					mixer->postEvent(std::move(clone), startTime + t1);
 				}
 			}
 		} else if(auto m2=U_INSTANCE_OF(Mixer2, mixer)){
@@ -83,7 +84,8 @@ namespace yzrilyzr_simplesynth{
 							continue;
 					}
 				}
-				m2->postEvent(std::move(ev), ev->startAtTime + curTime + postAtTime);
+				auto startTime = ev->startAtTime;
+				m2->postEvent(std::move(ev), startTime + curTime + postAtTime);
 			}
 		}
 	}

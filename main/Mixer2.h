@@ -30,7 +30,7 @@ namespace yzrilyzr_simplesynth{
 		public:
 		Note note;
 		yzrilyzr_array::SampleArray output;
-		//yzrilyzr_array::Array<Note> noteSnapshots;
+		yzrilyzr_array::Array<Note> noteSnapshots;
 		ChannelData * data;
 		NoteTask(uint8_t uniqueID);
 	};
@@ -66,10 +66,13 @@ namespace yzrilyzr_simplesynth{
 	};
 	ECLASS(Mixer2, public IMixer){
 		public:
+		bool procBlockMode=false;
 		Mixer2(u_index bufferSize);
 		~Mixer2();
 		void setBufferSize(u_index bs)override;
 		u_index getBufferSize()const override;
+		u_index getBufferLimit()const override;//获取实际的工作缓冲区大小
+		void setBufferLimit(u_index bs)override;//设置实际的工作缓冲区大小
 		void setSynthMode(int8_t mode, int32_t cores)override;
 		void mix()override;
 		void sendInstantEvent(u_up<ChannelEvent> event)override;
@@ -89,11 +92,12 @@ namespace yzrilyzr_simplesynth{
 		bool hasMIDIChannel(const yzrilyzr_lang::String & group, s_midichannel_id id)override;
 		U_CLASS_INFO(Mixer2)
 		private:
+		u_index bufferLimit=0;
 		static constexpr int const FLAG_RESET=0b1;
 		yzrilyzr_array::SampleArray output[2]; // 输出缓冲区指针数组
 		yzrilyzr_array::SampleArray drumOutput[2]; // 输出缓冲区指针数组
 		std::deque<u_up<ChannelEvent>> instantEventQueue; // 即时事件队列
-		std::unordered_map<yzrilyzr_lang::String,std::deque<u_up<ChannelEvent>>> postEventQueue; // 排队事件队列
+		std::unordered_map<yzrilyzr_lang::String, std::deque<u_up<ChannelEvent>>> postEventQueue; // 排队事件队列
 		yzrilyzr_util::FixedThreadPool * threadPool=nullptr;
 		std::vector<std::future<void>> futures;
 		int32_t synthMode=0;
@@ -128,18 +132,18 @@ namespace yzrilyzr_simplesynth{
 		void closeNotSustainNotes(ChannelData & data, ChannelConfig & cfg);
 		private:
 		void processChannelSnapshots();
-		void processInstantEvents(u_time deltaTime, u_index bufSize);
-		void processScheduledEvents(u_time deltaTime, u_index bufSize);
+		void processInstantEvents(u_time deltaTime, u_index bufLimit);
+		void processScheduledEvents(u_time deltaTime, u_index bufLimit);
 		void synthesizeNotes();
 		void prepareNoteMixTasks(std::unordered_map<ChannelData *, std::vector<NoteTask *>>&noteMixTasks);
 		void submitNoteMixTasks(std::unordered_map<ChannelData *, std::vector<NoteTask *>>&noteMixTasks);
 		void cleanupFinishedNotes();
-		void mixNonDrumChannelsToOutput(u_index chc, u_index bufSize);
-		void processNonDrumLimiters(u_index chc, u_index bufSize);
-		void mixDrumChannelsToOutput(u_index chc, u_index bufSize);
-		void processDrumLimiters(u_index chc, u_index bufSize);
-		void mixDrumToMainOutput(u_index chc, u_index bufSize);
-		void processMasterEffects(u_index chc, u_index bufSize);
-		void finalizeMix(u_index bufSize);
+		void mixNonDrumChannelsToOutput(u_index chc, u_index bufLimit);
+		void processNonDrumLimiters(u_index chc, u_index bufLimit);
+		void mixDrumChannelsToOutput(u_index chc, u_index bufLimit);
+		void processDrumLimiters(u_index chc, u_index bufLimit);
+		void mixDrumToMainOutput(u_index chc, u_index bufLimit);
+		void processMasterEffects(u_index chc, u_index bufLimit);
+		void finalizeMix(u_index bufLimit);
 	};
 }

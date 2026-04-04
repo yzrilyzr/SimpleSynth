@@ -1,27 +1,23 @@
 ﻿#include "RegisterAllModules.h"
+#include "SimpleSynthWindow.h"
 #include "array/SampleProvider.h"
-#include "interpolator/BezierInterpolator.h"
-#include "interpolator/GraphInterpolator.h"
-#include "interpolator/LineInterpolator.h"
-#include "interpolator/PowInterpolator.h"
-#include "util/Lang.h"
-//
 #include "dsp/AllPassFilter.h"
 #include "dsp/BiquadIIR.h"
 #include "dsp/Chorus.h"
 #include "dsp/Compressor.h"
-#include "dsp/Delayer.h"
 #include "dsp/DSPChain.h"
 #include "dsp/DSPParallel.h"
+#include "dsp/Delayer.h"
 #include "dsp/EnvelopDetector.h"
-#include "dsp/FeedbackCombFilter.h"
-#include "dsp/FeedforwardCombFilter.h"
-#include "dsp/FIR.h"
 #include "dsp/FDNReverb.h"
 #include "dsp/FDNReverb2.h"
+#include "dsp/FIR.h"
+#include "dsp/FeedbackCombFilter.h"
+#include "dsp/FeedforwardCombFilter.h"
 #include "dsp/Freeverb.h"
 #include "dsp/HRIR.h"
 #include "dsp/IIR.h"
+#include "dsp/IIRUtil.h"
 #include "dsp/Integrator.h"
 #include "dsp/Limiter.h"
 #include "dsp/LowPassFeedbackCombFilter.h"
@@ -29,76 +25,70 @@
 #include "dsp/Phaser.h"
 #include "dsp/SchroederReverb.h"
 #include "dsp/UnitDelay.h"
-
-//
-#include "synth/composed/AmpAdder.h"
-#include "synth/composed/AutoMod.h"
-#include "synth/composed/Matrix6x6Modulation.h"
-#include "synth/composed/FreqModAmp.h"
-#include "synth/composed/NoteDSP.h"
-#include "synth/composed/PostProcessDSP.h"
-#include "synth/composed/AmpMultiplier.h"
-#include "synth/composed/AmpWithCC.h"
-#include "synth/composed/AmpQuantization.h"
-#include "synth/composed/MultiKeyTrigger.h"
-#include "synth/composed/NoteVelocityMix.h"
-#include "synth/composed/NoteShift.h"
-#include "synth/composed/SimpleDetuner.h"
-#include "synth/composed/SoftSync.h"
-#include "synth/composed/HardSync.h"
-//
-#include "synth/filters/BiquadFilterSrc.h"
-#include "synth/filters/BiquadEnvFilterGroup.h"
-#include "synth/filters/MeanFilterSrc.h"
-//
-#include "synth/generators/drum/SimpleDrumAmp.h"
-//
-#include "synth/generators/noise/NoiseSrc.h"
-#include "synth/generators/noise/LFSRNoise.h"
-//
-#include "synth/generators/sine/SineWave.h"
-//
-#include "synth/generators/pulse/CymbalOsc.h"
-#include "synth/generators/pulse/TriWave.h"
-#include "synth/generators/pulse/SawWave.h"
-#include "synth/generators/pulse/SquareWave.h"
-#include "synth/generators/pulse/Pulse.h"
-#include "synth/generators/pulse/VVVF.h"
-//
-#include "synth/generators/physic/KarplusStrongSrc.h"
-#include "synth/generators/physic/BowedString.h"
-#include "synth/generators/physic/dwg/DWGNoteProcessor.h"
-#include "synth/generators/physic/Sitar.h"
-#include "synth/generators/physic/TwoStringResonatorExciter.h"
-#include "synth/generators/physic/TwoStringResonator.h"
-#include "synth/generators/physic/PianoSrc.h"
-//
-#include "synth/generators/sampler/WaveSampler.h"
-//
-#include "synth/envelopers/AHDSREnvelop.h"
-#include "synth/envelopers/TimeEnvelop.h"
-#include "synth/envelopers/GraphEnvelop.h"
-#include "synth/envelopers/FadeOutEnvelop.h"
-#include "synth/envelopers/EnvelopMultiplier.h"
-#include "synth/envelopers/MultiStageEnvelope.h"
-//
+#include "dsprender/DSPRender.h"
+#include "imgui.h"
+#include "interpolator/BezierInterpolator.h"
+#include "interpolator/GraphInterpolator.h"
+#include "interpolator/LineInterpolator.h"
+#include "interpolator/PowInterpolator.h"
+#include "interpolatorrender/InterpolatorRender.h"
+#include "notesrcrender/NoteSrcRender.h"
+#include "piano/PianoRender.h"
+#include "sample/SampleRender.h"
+#include "synth/dsp/NoteDSP.h"
+#include "synth/dsp/PostProcessDSP.h"
+#include "synth/enveloper/AHDSREnvelop.h"
+#include "synth/enveloper/EnvelopMultiplier.h"
+#include "synth/enveloper/FadeOutEnvelop.h"
+#include "synth/enveloper/GraphEnvelop.h"
+#include "synth/enveloper/MultiStageEnvelope.h"
+#include "synth/enveloper/TimeEnvelop.h"
+#include "synth/envfilter/BiquadEnvFilterGroup.h"
+#include "synth/envfilter/BiquadEnvFilterSrc.h"
+#include "synth/envfilter/MeanFilterSrc.h"
+#include "synth/modulation/ArpeggiatorMod.h"
+#include "synth/modulation/AutoMod.h"
+#include "synth/modulation/FreqModAmp.h"
+#include "synth/modulation/Matrix6x6Modulation.h"
+#include "synth/modulation/NoteVelocityMix.h"
+#include "synth/modulation/PhaseModAmp.h"
+#include "synth/modulation/SimpleDrumAmp.h"
+#include "synth/nonlinear/AmpQuantization.h"
 #include "synth/nonlinear/ArctanDistortion.h"
 #include "synth/nonlinear/ClampAmp.h"
 #include "synth/nonlinear/ClampWithVelocityAmp.h"
+#include "synth/nonlinear/FoldbackDistortion.h"
 #include "synth/nonlinear/SoftClipAmp.h"
 #include "synth/nonlinear/TapeSaturationDistortion.h"
-#include "synth/nonlinear/FoldbackDistortion.h"
-//
-#include "synth/source/AmplitudeSources.h"
-#include "imgui.h"
-#include "dsp/IIRUtil.h"
-#include "SimpleSynthWindow.h"
+#include "synth/operator/AmpAdder.h"
+#include "synth/operator/AmpMultiplier.h"
+#include "synth/osc/noise/LFSRNoise.h"
+#include "synth/osc/noise/NoiseSrc.h"
+#include "synth/osc/pulse/CymbalOsc.h"
+#include "synth/osc/pulse/Pulse.h"
+#include "synth/osc/pulse/SawWave.h"
+#include "synth/osc/pulse/SquareWave.h"
+#include "synth/osc/pulse/TriWave.h"
+#include "synth/osc/pulse/VVVF.h"
+#include "synth/osc/sampler/WaveSampler.h"
+#include "synth/osc/sine/SineWave.h"
+#include "synth/performance/AmpWithCC.h"
+#include "synth/performance/ArpeggiatorTrigger.h"
+#include "synth/performance/MultiKeyTrigger.h"
+#include "synth/performance/NoteShift.h"
+#include "synth/performance/SimpleDetuner.h"
+#include "synth/physic/BowedString.h"
+#include "synth/physic/KarplusStrongSrc.h"
+#include "synth/physic/PianoSrc.h"
+#include "synth/physic/Sitar.h"
+#include "synth/physic/TwoStringResonator.h"
+#include "synth/physic/TwoStringResonatorExciter.h"
+#include "synth/physic/dwg/DWGNoteProcessor.h"
+#include "synth/sync/HardSync.h"
+#include "synth/sync/SoftSync.h"
+#include "synth/util/AmplitudeSources.h"
 #include "twostringresonator/TwoStringResonatorRender.h"
-#include "piano/PianoRender.h"
-#include "sample/SampleRender.h"
-#include "dsprender/DSPRender.h"
-#include "interpolatorrender/InterpolatorRender.h"
-#include "notesrcrender/NoteSrcRender.h"
+#include "util/Lang.h"
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_interpolator;
 using namespace yzrilyzr_dsp;
@@ -111,6 +101,7 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	String composed="Composed";
 	reg.registerModule(lang, composed, composedsn, "AmpAdder", "register_module.notesrc.name.add", [](){return mksp<AmpAdder>();});
 	reg.registerModule(lang, composed, composedsn, "AmpMultiplier", "register_module.notesrc.name.mul", [](){return mksp<AmpMultiplier>();});
+	reg.registerModule(lang, composed, composedsn, "PhaseModAmp", "register_module.notesrc.name.phase_mod", [](){return mksp<PhaseModAmp>();});
 	reg.registerModule(lang, composed, composedsn, "FreqModAmp", "register_module.notesrc.name.freq_mod", [](){return mksp<FreqModAmp>();});
 	reg.registerModule(lang, composed, composedsn, "Matrix6x6Modulation", "register_module.notesrc.name.matrix_6x6_modulation", [](){return mksp<Matrix6x6Modulation>();}, Matrix6x6ModulationRenderFunc, false);
 	reg.registerModule(lang, composed, composedsn, "NoteDSP", "register_module.notesrc.name.note_dsp", [](){return mksp<NoteDSP>();});
@@ -122,13 +113,15 @@ void registerAllNoteProcessor(Lang & lang, MenuRegister & reg){
 	reg.registerModule(lang, composed, composedsn, "AmpQuantization", "register_module.notesrc.name.quantization", [](){return mksp<AmpQuantization>();});
 	reg.registerModule(lang, composed, composedsn, "AutoMod", "register_module.notesrc.name.automod", [](){return mksp<AutoMod>();});
 	reg.registerModule(lang, composed, composedsn, "SimpleDetuner", "register_module.notesrc.name.simpledetuner", [](){return mksp<SimpleDetuner>();});
+	reg.registerModule(lang, composed, composedsn, "ArpeggiatorTrigger", "register_module.notesrc.name.arpeggiator_trigger", [](){return mksp<ArpeggiatorTrigger>();});
+	reg.registerModule(lang, composed, composedsn, "ArpeggiatorMod", "register_module.notesrc.name.arpeggiator_mod", [](){return mksp<ArpeggiatorMod>();});
 	reg.registerModule(lang, composed, composedsn, "SoftSync", "register_module.notesrc.name.softsync", [](){return mksp<SoftSync>();});
 	reg.registerModule(lang, composed, composedsn, "HardSync", "register_module.notesrc.name.hardsync", [](){return mksp<HardSync>();});
 
 	// 滤波器（Filter）分类 - 补充 lang 参数和翻译键
 	String filtersn=lang.get("register_module.category.notesrc.filter");
 	String filter="Filter";
-	reg.registerModule(lang, filter, filtersn, "BiquadFilterSrc", "register_module.notesrc.name.biquad", [](){return mksp<BiquadFilterSrc>();});
+	reg.registerModule(lang, filter, filtersn, "BiquadEnvFilterSrc", "register_module.notesrc.name.biquad", [](){return mksp<BiquadEnvFilterSrc>();});
 	reg.registerModule(lang, filter, filtersn, "BiquadEnvFilterGroup", "register_module.notesrc.name.biquad_env_filter_group", [](){return mksp<BiquadEnvFilterGroup>();});
 	reg.registerModule(lang, filter, filtersn, "MeanFilterSrc", "register_module.notesrc.name.mean", [](){return mksp<MeanFilterSrc>();});
 

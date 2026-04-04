@@ -1,0 +1,34 @@
+﻿#include "PostProcessDSP.h"
+#include "dsp/DSP.h"
+#include "lang/StringFormat.hpp"
+using namespace yzrilyzr_dsp;
+using namespace yzrilyzr_util;
+using namespace yzrilyzr_lang;
+
+namespace yzrilyzr_simplesynth{
+	PostProcessDSP::PostProcessDSP() :AmpUnaryComposition(nullptr){
+		RegisterUtil::registerParamDSP(*this, "DSP", &dsp);
+	}
+	PostProcessDSP::PostProcessDSP(NoteProcPtr a, DSPPtr dsp) : AmpUnaryComposition(a){
+		this->dsp=dsp;
+	}
+	void PostProcessDSP::init(ChannelConfig & cfg){
+		AmpUnaryComposition::init(cfg);
+		if(dsp == nullptr)throw NullPointerException("dsp == null");
+		this->dsp->init(cfg.sampleRate);
+		this->dsp->resetMemory();
+	}
+	u_sample PostProcessDSP::getAmp(const Note & note){
+		return a->getAmp(note);
+	}
+	void PostProcessDSP::postProcess(u_sample * input, u_index length){
+		a->postProcess(input, length);
+		dsp->procBlock(input, length);
+	}
+	NoteProcPtr PostProcessDSP::clone(){
+		return mksp<PostProcessDSP>(a->clone(), dsp->clone());
+	}
+	String PostProcessDSP::toString() const{
+		return StringFormat::object2string("PostProcessDSP", a, dsp);
+	}
+}

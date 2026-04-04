@@ -10,7 +10,7 @@
 #include "interface/IMixer.h"
 #include "interface/InstrumentProvider.h"
 #include "interface/NoteTuning.h"
-#include "synth/envelopers/AHDSREnvelop.h"
+#include "synth/enveloper/AHDSREnvelop.h"
 #include "util/FixedThreadPool.h"
 #include "util/Flag.h"
 #include "util/Pool2.hpp"

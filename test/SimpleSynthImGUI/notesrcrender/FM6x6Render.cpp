@@ -5,7 +5,7 @@
 #include "array/Array.hpp"
 #include "imgui-knobs.h"
 #include "imgui.h"
-#include "synth/composed/Matrix6x6Modulation.h"
+#include "synth/modulation/Matrix6x6Modulation.h"
 using namespace yzrilyzr_simplesynth;
 using namespace yzrilyzr_util;
 using namespace yzrilyzr_array;

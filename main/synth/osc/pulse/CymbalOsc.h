@@ -1,0 +1,28 @@
+﻿#pragma once
+#include "interface/NoteProcessor.h"
+#include "SynthUtil.h"
+
+namespace yzrilyzr_simplesynth{
+	ECLASS(CymbalOsc, public NoteProcessor){
+	private:
+	FixedRandom random;
+	NoteProcPtr mul=nullptr;
+	yzrilyzr_array::IntArray osc;
+	u_normal_01 mix;
+	bool ringMode=false;
+	public:
+	~CymbalOsc()=default;
+	CymbalOsc();
+	CymbalOsc(NoteProcPtr mul, u_normal_01 mix);
+	CymbalOsc(NoteProcPtr mul, u_normal_01 mix, const yzrilyzr_array::IntArray & arr);
+
+	void init(ChannelConfig & cfg) override;
+	u_sample getAmp(const Note & note) override;
+	NoteProcPtr clone() override;
+	yzrilyzr_lang::String toString() const override;
+	void onRegisterParam() override;
+	U_CLASS_INFO(CymbalOsc)
+	private:
+	u_sample square(u_freq Hz, u_time time);
+	};
+}

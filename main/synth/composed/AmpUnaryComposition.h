@@ -10,10 +10,10 @@ namespace yzrilyzr_simplesynth{
 	AmpUnaryComposition(NoteProcPtr a1);
 	yzrilyzr_lang::String toString() const override;
 	void init(ChannelConfig & cfg) override;
-	inline u_sample postProcess(u_sample output) override{
-		return a->postProcess(output);
+	inline void postProcess(u_sample * input, u_index length) override{
+		a->postProcess(input, length);
 	}
-	inline bool noMoreData(const Note & note) override{
+	inline bool noMoreData(const Note & note)const override{
 		return a->noMoreData(note);
 	}
 	void cc(ChannelConfig & cfg, ChannelControl & cc)override;

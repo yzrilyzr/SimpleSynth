@@ -1,13 +1,12 @@
 ﻿#pragma once
-#include "interface/IMixer.h"
-#include "interface/NoteProcessor.h"
 #include "MixerSequence.h"
 #include "SimpleSynth.h"
+#include "array/Array.hpp"
 #include "events/ChannelEvent.h"
+#include "interface/IMixer.h"
+#include "interface/NoteProcessor.h"
 #include "io/InputStream.h"
 #include "util/MIDIFile.h"
-
-#include "array/Array.hpp"
 
 namespace yzrilyzr_simplesynth{
 	class NoteProcessor;
@@ -36,8 +35,8 @@ namespace yzrilyzr_simplesynth{
 		static u_up<ChannelEvent>  MIDIBytes2Event(uint8_t ty, uint8_t data1, uint8_t data2);
 		static uint64_t Event2MIDIBytes(u_up<ChannelEvent>  event);
 		static uint64_t MergeMIDIBytes(uint8_t ty, uint8_t data1, uint8_t data2);
-		static yzrilyzr_array::SampleArray * noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2);
-		static yzrilyzr_array::SampleArray * NOISE;
+		static yzrilyzr_array::SampleArray noise(u_index length, u_sample_rate sampleRate, u_freq f1, u_freq f2);
+		static yzrilyzr_array::SampleArray NOISE;
 		static void deleteStatic();
 		static bool isInstrumentProviderSustainable(s_program_id program);
 		static void setMIDICallback(MIDICallback callback);
@@ -46,10 +45,10 @@ namespace yzrilyzr_simplesynth{
 	};
 	EBCLASS(FixedRandom){
 		private:
-		yzrilyzr_array::SampleArray * data=nullptr;
+		yzrilyzr_array::SampleArray data;
 		u_index index;
 		public:
-		FixedRandom(yzrilyzr_array::SampleArray * data);
+		FixedRandom(const yzrilyzr_array::SampleArray & data);
 		FixedRandom();
 		u_sample next();
 	};

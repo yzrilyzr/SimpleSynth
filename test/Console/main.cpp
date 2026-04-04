@@ -53,7 +53,7 @@ using namespace yzrilyzr_lang;
 using namespace yzrilyzr_dsp;
 using namespace yzrilyzr_array;
 
-int floatBufferLen=256;
+int floatBufferLen=8192;
 u_sample_rate exportSampleRate=48000;
 u_sp<Mixer2> mixer2=nullptr;
 bool convertMIDIMode=false;
@@ -82,8 +82,6 @@ void closeAndExit(){
 
 void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
 	mixer2->awaitMix();
-	u_time t=(u_time)System::nanoTime();
-	//mixer2->mix();
 	for(uint32_t sample=0, j=0, chc=mixer2->getOutputChannelCount(), buf=mixer2->getBufferSize(); sample < buf; sample++){
 		for(u_index ch=0; ch < chc; ch++){
 			double f1=mixer2->getOutput(ch)[sample];
@@ -95,8 +93,7 @@ void fill_audio_pcm2(void * userdata, Uint8 * stream, int len){
 			stream[j++]=(Uint8)((c1 >> 24) & 0xff);
 		}
 	}
-	u_time_f processTime=(u_time_f)((u_time_f)(System::nanoTime() - t) / 1000000000.0);
-	if(processTime > mixer2->getProcessStandardTime()){
+	if(mixer2->getProcessTime() > mixer2->getProcessStandardTime()){
 		std::cout << "Too Heavy" << std::endl;
 	}
 	mixer2->asyncMix();
@@ -197,11 +194,11 @@ int openMIDIDevice(){
 DSPPtr AWeightedFilter(u_sample_rate sr){
 	return DSPGroupBuilder()
 		.begin(DSPGroupBuilder::TYPE_CHAIN)
-		.biquad(sr, HIGHPASS, 20.598996, 0.707, 0)
-		.biquad(sr, HIGHPASS, 107.65265, 0.707, 0)
-		.biquad(sr, HIGHSHELF, 737.86223, 0.5, 5)
-		.biquad(sr, HIGHSHELF, 1000, 0.5, 5)
-		.biquad(sr, HIGHSHELF, 5000.86223, 0.5, 5)
+		.biquad(RBJParams{HIGHPASS, 20.598996, sr, 0.707, 0})
+		.biquad(RBJParams{HIGHPASS, 107.65265, sr, 0.707, 0})
+		.biquad(RBJParams{HIGHSHELF, 737.86223, sr, 0.5, 5})
+		.biquad(RBJParams{HIGHSHELF, 1000, sr, 0.5, 5})
+		.biquad(RBJParams{HIGHSHELF, 5000.86223, sr, 0.5, 5})
 		.build();
 }
 void calibrate(int channel, int  program){
@@ -315,7 +312,7 @@ void exportWAV(const String & fileName, u_sp<MixerSequence> seq){
 		}
 	} else if(exportMode){
 		WAVWriter raf(fileName + ".wav");
-		u_index bufLength=8192;
+		u_index bufLength=65536;
 		Mixer2 mixer1(bufLength);
 		mixer1.setSampleRate(exportSampleRate);
 		raf.prepare(mixer1.getSampleRate(), 64, WAVWriter::FORMAT_FLOAT, 2);
@@ -397,7 +394,7 @@ int main(int argc, char * argv[]){
 				String fileName=File(str).getName();
 				if(convertMIDIMode){
 					System::out.printf(L"转换: %s\n", fileName);
-					SynthUtil::sequenceToMIDI(seq, FileOutputStream(fileName + "_convert.mid"));					
+					SynthUtil::sequenceToMIDI(seq, FileOutputStream(fileName + "_convert.mid"));
 				} else if(exportMode || exportTrackMode){
 					System::out.printf(L"导出: %s\n", fileName);
 					exportWAV(fileName, seq);

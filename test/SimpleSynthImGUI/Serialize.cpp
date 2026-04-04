@@ -66,6 +66,7 @@ void json2obj(json & j, ArrayList<ProjectObject *> & objects){
 				case ParamType::Sample:
 				case ParamType::Gain:
 				case ParamType::Sub:
+				case ParamType::IntArray:
 					break;
 				default:
 					uint64_t id=fromJSON.value(key, static_cast<uint64_t>(0));
